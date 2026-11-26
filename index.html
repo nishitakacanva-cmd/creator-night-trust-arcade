@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="css/editorial-hud.css?v=3.2.0">
+<link rel="stylesheet" href="css/editorial-hud.css?v=3.2.2">
 <title>Trust Arcade · Creator Night</title>
 <link rel="stylesheet" href="css/fonts.css">
 <script type="importmap">
@@ -174,7 +174,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css?v=3.2.0">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.2.2">
 </head>
 <body>
 <div id="stage"></div>
@@ -261,7 +261,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.2.0';
+const VERSION = '3.2.2';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -281,6 +281,7 @@ const STAGE = { x0: -9, x1: 9, z0: -30, z1: -22, h: 1.3, stairs: [[-8.3, -6.7], 
 const LAWN = { x0: -12, x1: 12, z0: -21, z1: -11 };
 const MAZE = { x0: -16, x1: 16, z0: -10, z1: 22, hub: { x0: -6, x1: 6, z0: 0, z1: 12 }, cx: 0, cz: 6 };
 const ENTRY = { z: 31, x0: -12, x1: 12, z0: 23.5, z1: 33 };
+const SAMPLE_LOUNGE = {x:16.6,z:-29.5};
 const START = { x: 0, z: 41.4, yaw: 0, pitch: 0.11 };                           // facing north
 
 /* Six niche pavilions: west row faces east, east row faces west. Centre z matches the maze exits. */
@@ -304,7 +305,7 @@ const CORNERS = {
 
 /* Presence zones for the HUD, logging and dwell (first match wins). [x0, z0, x1, z1] */
 const ZONES = [
-  {id:'freebies', r:[5,26,13,33]}, {id:'wall',r:[-18,24,-12,30]},
+  {id:'freebies',r:[SAMPLE_LOUNGE.x-4.25,SAMPLE_LOUNGE.z-2.5,SAMPLE_LOUNGE.x+4.25,SAMPLE_LOUNGE.z+4.7]}, {id:'wall',r:[-18,24,-12,30]},
   {id:'market',r:[-17.5,-22,-6,-8]}, {id:'market',r:[6,-22,17.5,-8]},
   { id: 'stage', r: [STAGE.x0 - 4, STAGE.z0 - 3, STAGE.x1 + 4, STAGE.z1 + 2.5] },
   { id: 'lawn', r: [LAWN.x0, LAWN.z0, LAWN.x1, LAWN.z1 + 0.6] },
@@ -1237,7 +1238,7 @@ const interactables = [];
 function setInteractable(obj, interaction) {
   const list = []; if (obj.isMesh) list.push(obj); else obj.traverse(o => { if (o.isMesh) list.push(o); });
   const data = Object.assign({ cue: () => T('use'), enabled: () => true, outline: true, reach: REACH }, interaction, { root: obj });
-  for (const m of list) { if (m.userData.noHit) continue; m.userData.interact = data; if (!interactables.includes(m)) interactables.push(m); }
+  for (const m of list) { if (m.userData.noHit) continue; if (Object.hasOwn(m,'raycast')) m.raycast = THREE.Mesh.prototype.raycast; m.userData.interact = data; if (!interactables.includes(m)) interactables.push(m); }
   return obj;
 }
 const occluders = [];
@@ -1676,6 +1677,7 @@ const GRAVEL_PATHS = [
     [-34, -19.5, -22.5, -16.8], [22.5, -19.5, 34, -16.8],             // to arcade + lounge
     [-22.5, -21.5, -12, -11.2], [12, -21.5, 22.5, -11.2],            // stage flanks
     [-21, 23.6, -12, 31.5], [12, 23.6, 21, 31.5],                     // to photobooth + chai
+    [17.6,-26.9,19.2,-21.4],                                     // return path from the market to the exit lounge
     [-3.2, 33, 3.2, 42],                                             // arrival walk
 ];
 /* what the visitor's feet are on, for footstep sounds */
@@ -2474,7 +2476,7 @@ class Person {
     // animation LOD: far creators update at a lower rate
     this.acc += dt; this.frame++;
     const every = d2 < 900 ? 1 : d2 < 2500 ? 2 : 4;
-    if (this.frame % every === 0) { this.mixer.update(this.acc); this.acc = 0; }
+    if (this.frame % every === 0 && (this.model.visible || this.def.self)) { this.mixer.update(this.acc); this.acc = 0; }
     if (this.bubble) this.bubble.update(dt, this);
   }
   say(text, sec = 4.5) { if (!this.ok) return; if (!this.bubble) this.bubble = new Bubble(this); this.bubble.show(text, sec); }
@@ -3293,13 +3295,35 @@ const Booth = {
     row(380, S.lang === 'hi' ? 'पोज़' : 'Pose', this.poses.map(p => L(p[1])), this.pose, i => this.pose = i);
     uiBtn(c, s, 'shoot', 30, h - 120, w - 60, 96, S.lang === 'hi' ? 'फ़ोटो लें' : 'Take photo', { size: 40, onClick: () => this.shoot() });
   },
+  previewPose() {
+    const visitor = Self.p;
+    if (!visitor?.ok || this.busy) return null;
+    const figure = SkeletonUtils.clone(Assets.avatars[visitor.def.model].root);
+    const mixer = new THREE.AnimationMixer(figure);
+    const clip = visitor.clips.get(this.poses[this.pose][0]) || visitor.clips.get('idle');
+    const mark = REFS.marks.photo;
+    const holder = new THREE.Group(); holder.add(figure);
+    holder.position.set(mark.x, groundAt(mark.x,mark.z), mark.z);
+    holder.rotation.y = Math.atan2(REFS.boothCamPos.x-mark.x, REFS.boothCamPos.z-mark.z);
+    scene.add(holder);
+    const visible = visitor.group.visible;
+    try {
+      visitor.group.visible = false;
+      if (clip) { mixer.clipAction(clip).play(); mixer.setTime(Math.min(.8,clip.duration*.42)); }
+      return captureCamera(this.cam, 360);
+    } finally {
+      visitor.group.visible = visible; scene.remove(holder); mixer.uncacheRoot(figure);
+      const skeletons = new Set();figure.traverse(o=>{if(o.isSkinnedMesh)skeletons.add(o.skeleton)});
+      skeletons.forEach(skeleton=>skeleton.dispose());
+    }
+  },
   async shoot() {
     if (this.busy || !Self.p || !Self.p.ok) return; this.busy = true; this.scr.invalidate(); logEvent('photo', { action: 'start', label: PHOTO_LABELS[this.label].id });
     const me = Self.p, mark = REFS.marks.photo; try { me.posing = true; me.teleport(mark.x, mark.z, Math.atan2(REFS.boothCamPos.x - mark.x, REFS.boothCamPos.z - mark.z)); me.play(this.poses[this.pose][0], { fade: 0.2, offset: this.pose === 0 ? 0.6 : 0 });
     camera.layers.enable(LAYER_SELF);
     const friends = Social.groups.find(g => g.id === 'photo'); const fr = friends ? friends.members.filter(p => p.ok && !p.path) : [];
     fr.forEach((p, i) => { p.posing = true; const side = new THREE.Vector3(-Math.cos(REFS.boothRy), 0, Math.sin(REFS.boothRy)).multiplyScalar(i ? -0.75 : 0.75); p.walkTo([{ x: mark.x + side.x, z: mark.z + side.z }], q => { q.faceTo(REFS.boothCamPos.x, REFS.boothCamPos.z); q.play(i ? 'wave' : 'cheer'); }, 1.6); });
-    for (this.count = 3; this.count > 0; this.count--) { this.scr.invalidate(); Sound.play('beep'); await wait(1); }
+    for (this.count = 3; this.count > 0; this.count--) { this.scr.invalidate(); window.TrustSocial?.countdown(this.count); Sound.play('beep'); await wait(1); }
     this.scr.invalidate(); flashScreen(); Sound.play('shutter');
     const shot = captureCamera(this.cam, 1080);
     this.last = composePost(shot); S.photo.taken++; persistSoon(); logEvent('photo', { action: 'taken' });
@@ -3334,11 +3358,18 @@ function flashScreen() { const f = $('fade'); f.style.background = '#fff'; f.sty
 /* render a camera to the main canvas and copy the centre square (correct tone mapping, includes bloom) */
 function captureCamera(cam, size = 1080) {
   const cv = renderer.domElement, out = document.createElement('canvas'); out.width = out.height = size;
-  const xr = renderer.xr.enabled; renderer.xr.enabled = false;
-  cam.aspect = cv.width / cv.height; cam.updateProjectionMatrix();
-  if (Post.composer && !XRS.active) { Post.pass.camera = cam; Post.composer.render(); Post.pass.camera = camera; } else renderer.render(scene, cam);
-  const s = Math.min(cv.width, cv.height); out.getContext('2d').drawImage(cv, (cv.width - s) / 2, (cv.height - s) / 2, s, s, 0, 0, size, size);
-  renderer.xr.enabled = xr; return out;
+  const xr = renderer.xr.enabled, aspect = cam.aspect, previous = Post.pass?.camera;
+  try {
+    renderer.xr.enabled = false;
+    cam.aspect = cv.width / cv.height; cam.updateProjectionMatrix();
+    if (Post.composer && !XRS.active) { Post.pass.camera = cam; Post.composer.render(); } else renderer.render(scene,cam);
+    const edge = Math.min(cv.width,cv.height);
+    out.getContext('2d').drawImage(cv,(cv.width-edge)/2,(cv.height-edge)/2,edge,edge,0,0,size,size);
+    return out;
+  } finally {
+    if (Post.pass) Post.pass.camera = previous;
+    renderer.xr.enabled = xr; cam.aspect = aspect; cam.updateProjectionMatrix();
+  }
 }
 function composePost(img) {
   const W = 1080, H = 1440, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
@@ -3362,7 +3393,7 @@ function setupKiosks() {
     uiBtn(c, s, 'open', 40, h - 110, w - 80, 86, S.lang === 'hi' ? 'पासपोर्ट खोलें' : 'Open passport', { size: 32, onClick: () => { if (XRS.active) toast(T('helpedCount', { n: S.helped.length })); else showPassport(); } });
   } });
   REFS.screens.pass = pass.screen;
-  const fb = kiosk(WORLD, 6.6, 28.6, -0.25, { w: 1.2, h: 0.82, name: 'exit_kiosk', draw: (c, w, h, s) => {
+  const fb = kiosk(WORLD, SAMPLE_LOUNGE.x+2.9, SAMPLE_LOUNGE.z+1.42, -.32, { w: 1.2, h: 0.82, name: 'exit_kiosk', draw: (c, w, h, s) => {
     darkBg(c, w, h, true, 26); txt(c, L(SIGNS.exit), 40, 70, 38, { d: true, w: 800 });
     const sv = S.survey || {};
     if (sv.q1 == null) { fitPara(c, L(EXIT_SURVEY.q1), 40, 90, w - 80, 120, 34, { w: 600 }); EXIT_SURVEY.scale.forEach((o, i) => uiBtn(c, s, 'a' + i, 40 + (i % 2) * ((w - 90) / 2 + 10), 250 + Math.floor(i / 2) * 110, (w - 90) / 2, 94, L(o), { kind: 'ghost', size: 30, onClick: () => { S.survey = { q1: i }; persistSoon(); logEvent('survey', { q1: i }); s.invalidate(); } })); return; }
@@ -3500,7 +3531,7 @@ function mapPins() {
   if (MAP_PIN_CACHE) return MAP_PIN_CACHE;
   MAP_PIN_CACHE = [{ id: 'entry', x: 0, z: 30.6 }, { id: 'maze', x: 0, z: 18.5 }, { id: 'hub', x: 0, z: 6 }, { id: 'lawn', x: 0, z: -15.5 }, { id: 'stage', x: 0, z: -26 },
     ...NICHES.map(id => ({ id, x: PAV[id].cx, z: PAV[id].z })),
-    {id:'wall',x:-15,z:25}, {id:'market',x:-10,z:-15}, {id:'freebies',x:9,z:29},
+    {id:'wall',x:-15,z:25}, {id:'market',x:-10,z:-15}, {id:'freebies',x:SAMPLE_LOUNGE.x,z:SAMPLE_LOUNGE.z},
     ...['photo', 'chai', 'lounge', 'arcade'].map(id => ({ id, x: CORNERS[id].cx, z: CORNERS[id].cz }))];
   return MAP_PIN_CACHE;
 }
@@ -4109,7 +4140,7 @@ async function init() {
   setLoad(0.88);
   buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); VRPanel.init();
   setupInput(); setupXR(); bindUI(); Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
-  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, PEOPLE_BY, Merger, rboxGeo, torusGeo,
+  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, SAMPLE_LOUNGE, addPlatform, PEOPLE_BY, Merger, rboxGeo, torusGeo,
     capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
 
   window.brandArtReady = window.TrustBrandArt.mount({THREE,REFS,WORLD,SCREENS,drawMark,Person});
@@ -4161,10 +4192,10 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
-<script src="js/trust-labs.js?v=3.2.0" defer></script>
-<script src="js/model-slots.js?v=3.2.0" defer></script>
-<script src="js/dj-deck.js?v=3.2.0" defer></script>
-<script src="js/world-visuals.js?v=3.2.0" defer></script>
-<script src="js/social-spaces.js?v=3.2.0" defer></script><script src="js/brand-art.js?v=3.2.0" defer></script>
+<script src="js/trust-labs.js?v=3.2.2" defer></script>
+<script src="js/model-slots.js?v=3.2.2" defer></script>
+<script src="js/dj-deck.js?v=3.2.2" defer></script>
+<script src="js/world-visuals.js?v=3.2.2" defer></script>
+<script src="js/social-spaces.js?v=3.2.2" defer></script><script src="js/brand-art.js?v=3.2.2" defer></script>
 </body>
 </html>

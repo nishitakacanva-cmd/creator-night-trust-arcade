@@ -20,7 +20,9 @@
     let preview=document.getElementById('marketArt');if(!preview){preview=document.createElement('img');preview.id='marketArt';preview.alt='Concept brand stall artwork';preview.style.cssText='width:100%;aspect-ratio:1376/768;object-fit:contain;border-radius:14px;margin:8px 0';document.getElementById('marketItem').before(preview)}
     const title=document.getElementById('marketBrand');new MutationObserver(()=>{const name=title.textContent.split(' · ')[0].toLowerCase();const found=manifest.stalls.find(x=>x.brand.toLowerCase()===name);if(found)preview.src=found.file.replace(/\.jpg$/,'.webp')}).observe(title,{childList:true,subtree:true});
     // A visible DJ at the deck, using an existing animated character asset.
-    const dj=new Person({key:'festival_dj',name:'DJ Nikhil',model:'Male_Adult_09',x:0,z:-27.9,ry:0,base:'dance'});dj.onStage=true;
+    const dj=new Person({key:'festival_dj',name:'DJ Nikhil',model:'Male_Adult_09',x:0,z:-27.9,ry:0,base:'idle'});dj.onStage=true;
+    const moveDJ=()=>dj.setBase(window.TrustDJ?.playing?'dance':'idle');
+    window.addEventListener('festival-music-change',moveDJ);moveDJ();
     return {banners:Object.keys(mappings).length+3,brandStalls:manifest.stalls.length};
   }
   window.TrustBrandArt={mount};

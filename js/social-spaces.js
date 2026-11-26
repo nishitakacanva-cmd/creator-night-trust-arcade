@@ -1,6 +1,6 @@
 /* Physical content moments and a private, browser-local trust wall. No posting API. */
 (() => {
-  let ctx, lastFocus, photoTimer, clawBusy=false, clawX=50, activeBrand;
+  let ctx, lastFocus, clawBusy=false, clawX=50, activeBrand;
   const key='creator-night-trust-wall-v1', sampleKey='creator-night-samples-v1';
   const $=id=>document.getElementById(id);
   let notes=[]; try { notes=JSON.parse(localStorage.getItem(key)||'[]').filter(n=>typeof n==='string').map(n=>n.slice(0,160)).slice(-12); } catch{}
@@ -24,7 +24,12 @@
   function open(id){lastFocus=document.activeElement;ctx.openModal(id);$(id).querySelector('button,textarea')?.focus()}
   function textScreen(name,w,h,draw,parent,x,y,z,ry=0,interactive=false){const s=new ctx.CanvasScreen({name,w,h,ppm:220,interactive,draw});s.mesh.position.set(x,y,z);s.mesh.rotation.y=ry;parent.add(s.mesh);return s;}
   function sign(parent,x,y,z,w,title,sub,color='#d5b7bf',ry=0){return textScreen('social_'+title,w,.72,(c,W,H)=>{c.fillStyle='#241c2b';c.fillRect(0,0,W,H);ctx.drawMark(c,40,H/2,23);ctx.txt(c,title,80,H*.43,H*.26,{w:800,color,maxW:W-92});ctx.txt(c,sub,80,H*.76,H*.13,{color:'#fff0dc',maxW:W-90});},parent,x,y,z,ry);}
-  function openStudio(){open('dlgStudio');$('studioStatus').textContent='Pick a pose, then I’ll count you in. Your avatar moves to the mark automatically.'}
+  function previewPose(){
+    const shot=ctx.Booth.previewPose();
+    if(shot){shot.setAttribute('role','img');shot.setAttribute('aria-label',ctx.L(ctx.Booth.poses[ctx.Booth.pose][1]));$('studioPreview').replaceChildren(shot)}
+  }
+  function countdown(n){if(!$('dlgStudio').classList.contains('hidden'))$('studioStatus').textContent='Hold your pose… '+n}
+  function openStudio(){open('dlgStudio');previewPose();$('studioStatus').textContent='Pick a pose, then I’ll count you in. Your avatar moves to the mark automatically.'}
   function buildPhoto(){
     const {THREE,REFS,Person}=ctx,g=REFS.booth;
     sign(g,0,4.35,1.6,3.6,'Instagram','CREATOR NIGHT · PHOTO STUDIO');
@@ -34,13 +39,60 @@
     const pl=ctx.mesh(ctx.boxGeo(1.05,.8,.55),ctx.MAT.cream,g,2.4,.5,1.85);pl.name='instant_print_station';
     ctx.mesh(ctx.boxGeo(.75,.04,.03),ctx.MAT.black,g,2.4,.83,2.14);
     sign(g,2.4,1.15,2.15,1.1,'PRINT BAR','YOUR MOMENT, ON PAPER');
-    dialog('dlgStudio','Instagram photo studio','Hi, I’m Dev. Ready for your photo?',`<p class="social-copy">No running back to the camera. I’ll put your avatar on the mark and count down from three.</p><div class="btnrow" id="studioPoses"></div><div class="btnrow"><button class="btn pri" id="takeMyPhoto">Take my photo</button></div><p id="studioStatus" class="social-status" role="status"></p><p class="fine">Your photo stays here until you choose to download it.</p>`);
-    ctx.Booth.poses.forEach((p,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=ctx.L(p[1]);b.setAttribute('aria-pressed',String(i===ctx.Booth.pose));b.onclick=()=>{ctx.Booth.pose=i;$('studioPoses').querySelectorAll('button').forEach((x,j)=>x.setAttribute('aria-pressed',String(i===j)))};$('studioPoses').append(b)});
-    $('takeMyPhoto').onclick=async()=>{if(ctx.Booth.busy)return;$('takeMyPhoto').disabled=true;let count=3;$('studioStatus').textContent='On your mark… 3';photoTimer=setInterval(()=>{$('studioStatus').textContent=--count>0?'Hold your pose… '+count:'Printing your photo…'},1000);await ctx.Booth.shoot();photoFinished()};
+    dialog('dlgStudio','Instagram photo studio','Hi, I’m Dev. Ready for your photo?',`<p class="social-copy">No running back to the camera. I’ll put your avatar on the mark and count down from three.</p><div id="studioPreview"></div><div class="btnrow" id="studioPoses"></div><div class="btnrow"><button class="btn pri" id="takeMyPhoto">Take my photo</button></div><p id="studioStatus" class="social-status" role="status"></p><p class="fine">Your photo stays here until you choose to download it.</p>`);
+    ctx.Booth.poses.forEach((p,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=ctx.L(p[1]);b.setAttribute('aria-pressed',String(i===ctx.Booth.pose));b.onclick=()=>{if(ctx.Booth.busy)return;ctx.Booth.pose=i;previewPose();$('studioPoses').querySelectorAll('button').forEach((x,j)=>x.setAttribute('aria-pressed',String(i===j)))};$('studioPoses').append(b)});
+    $('takeMyPhoto').onclick=async()=>{if(ctx.Booth.busy)return;$('takeMyPhoto').disabled=true;await ctx.Booth.shoot();photoFinished()};
   }
   let wallScreen;
-  function drawWall(c,W,H){c.fillStyle='#c8ad91';c.fillRect(0,0,W,H);ctx.txt(c,'What does trust mean to you?',W/2,65,40,{w:800,align:'center',color:'#2b2232'});ctx.txt(c,'TAKE A NOTE. LEAVE YOUR OWN WORDS.',W/2,103,18,{align:'center',color:'#453548'});
-    const all=[...examples.map(t=>({t,example:true})),...notes.map(t=>({t}))].slice(-12);all.forEach((n,i)=>{const x=30+i%4*(W/4),y=145+Math.floor(i/4)*(H-170)/3,nw=W/4-45,nh=(H-195)/3;c.save();c.translate(x+nw/2,y+nh/2);c.rotate((i%3-1)*.04);c.fillStyle=['#ffe4a1','#edbad4','#d2e5c1'][i%3];c.shadowColor='#382a2940';c.shadowBlur=6;c.shadowOffsetY=5;c.fillRect(-nw/2,-nh/2,nw,nh);c.shadowBlur=0;c.shadowOffsetY=0;c.fillStyle='#382b3c';c.font='22px "Segoe Print", cursive';const words=n.t.split(/\s+/);let line='',ly=-nh/2+35;for(const word of words){const next=line+word+' ';if(c.measureText(next).width>nw-24){c.fillText(line,-nw/2+12,ly);ly+=28;line=word+' '}else line=next}c.fillText(line,-nw/2+12,ly);ctx.txt(c,n.example?'EXAMPLE':'YOUR NOTE',-nw/2+12,nh/2-15,12,{color:'#584253'});c.restore()});}
+  function noteLines(c,text,width) {
+    const lines=[];
+    let line='';
+    for(const word of text.trim().split(/\s+/u)){
+      const next=line ? line+' '+word : word;
+      if(c.measureText(next).width<=width){line=next;continue}
+      if(line)lines.push(line);
+      line='';
+      for(const char of Array.from(word)){
+        if(line && c.measureText(line+char).width>width){lines.push(line);line=''}
+        line+=char;
+      }
+    }
+    if(line)lines.push(line);
+    return lines;
+  }
+  function drawWall(c,W,H){
+    const cork=c.createLinearGradient(0,0,W,H);
+    cork.addColorStop(0,'#b5997c');cork.addColorStop(1,'#896f5b');
+    c.fillStyle=cork;c.fillRect(0,0,W,H);
+    ctx.txt(c,'What does trust mean to you?',W/2,62,40,{w:800,align:'center',color:'#30252a'});
+    ctx.txt(c,'TAKE A NOTE. LEAVE YOUR OWN WORDS.',W/2,98,16,{align:'center',color:'#382b31'});
+    const cards=[...examples.map(t=>({t,example:true})),...notes.map(t=>({t}))].slice(-12);
+    const cols=cards.length>9?4:3,rows=Math.ceil(cards.length/cols);
+    const gap=16,margin=34,w=(W-margin*2-gap*(cols-1))/cols;
+    const h=Math.min(w*.83,(H-144-(rows-1)*gap)/rows),top=121+(H-144-rows*h-(rows-1)*gap)*.30;
+    cards.forEach((note,i)=>{
+      c.save();c.translate(margin+(i%cols)*(w+gap)+w/2,top+Math.floor(i/cols)*(h+gap)+h/2);
+      c.rotate([-.025,.014,.028,-.012][i%4]);c.translate(-w/2,-h/2);
+      c.fillStyle=['#ffe5a6','#f0c1cb','#d7e3bd','#cddcef'][i%4];
+      c.shadowColor='#39242455';c.shadowBlur=5;c.shadowOffsetY=5;c.fillRect(0,0,w,h);
+      c.shadowColor='transparent';c.shadowBlur=0;c.shadowOffsetY=0;
+      c.beginPath();c.arc(w/2,10,3.7,0,Math.PI*2);c.fillStyle='#8d6956';c.fill();
+      const pad=13,header=20,footer=20,area=h-header-footer;
+      c.save();c.beginPath();c.rect(pad,header,w-pad*2,area);c.clip();
+      // CanvasScreen drawing helpers set alignment. Each note owns its text origin and margins.
+      c.textAlign='left';c.textBaseline='top';c.fillStyle='#342831';
+      let size=Math.min(28,Math.floor(h*.19)),lines;
+      do {
+        c.font=size+'px "Segoe Print","Mukta",cursive';lines=noteLines(c,note.t,w-pad*2-2);
+        if(lines.length*size*1.22<=area || size<=8)break;
+        size--;
+      }while(true);
+      const y=header+(area-lines.length*size*1.22)*.42;
+      lines.forEach((line,j)=>c.fillText(line,pad+1,y+j*size*1.22));
+      c.restore();
+      ctx.txt(c,note.example?'EXAMPLE':'YOUR NOTE',pad,h-7,10,{w:700,align:'left',color:'#5d4942'});c.restore();
+    });
+  }
   function renderNotes(){const list=$('trustNotes');list.replaceChildren();[...examples.map(t=>({t,example:true})),...notes.map(t=>({t}))].forEach(n=>{const d=document.createElement('div');d.className='social-note';d.textContent=n.t;const small=document.createElement('small');small.textContent=n.example?'Example note':'Your note · this browser';d.append(small);list.append(d)});wallScreen?.invalidate()}
   function buildWall(){
     const {WORLD,MAT,mesh,boxGeo,TRAVEL}=ctx;
@@ -135,22 +187,108 @@
     });
     ctx.TRAVEL.market={x:-8.05,z:-8.70,yaw:.38};
   }
-  function buildExit(){const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,TRAVEL}=ctx,g=new THREE.Group();g.name='exit_sample_lounge';g.position.set(9,0,29);WORLD.add(g);
-    mesh(boxGeo(8,.12,5.6),MAT.deck,g,0,.06,0);sign(g,0,3.25,-1.3,4.7,'One last little joy','EXIT LOUNGE · THE FREEBIE CLUB');
-    const pink=std('#bb668f',{roughness:.45});mesh(boxGeo(1.45,1.2,1.1),pink,g,-1.6,.72,-.5);mesh(boxGeo(1.45,.12,1.1),MAT.cream,g,-1.6,2.65,-.5);
-    for(const x of [-2.3,-.9])mesh(boxGeo(.06,1.3,.06),MAT.alu,g,x,1.95,-.04);mesh(boxGeo(1.4,1.28,.03),MAT.glass,g,-1.6,1.95,.06);
-    const geo=new THREE.SphereGeometry(.13,12,8),colors=['#e9bf71','#e187ac','#a6a0d7'];for(let i=0;i<9;i++)mesh(geo,std(colors[i%3]),g,-2.08+(i%3)*.42,1.37+Math.floor(i/3)*.1,-.7+(i%2)*.33);
-    mesh(boxGeo(.03,.45,.03),MAT.alu,g,-1.6,2.38,-.5);const label=sign(g,-1.6,1,.09,1.3,'THE CLAW','CLICK · PLAY · KEEP THE TRUST');ctx.setInteractable(label.mesh,{cue:()=> 'Play the sample claw',onClick:()=>open('dlgFreebies'),reach:4.5,outline:false});
-    mesh(cylGeo(.5,.5,.65,24),MAT.cream,g,.5,.45,-.5);mesh(new THREE.SphereGeometry(.53,24,16),MAT.glass,g,.5,1.25,-.5);for(let i=0;i<7;i++)mesh(geo,std(colors[i%3]),g,.5+Math.sin(i*2)*.24,1.05+i*.045,-.5+Math.cos(i*2)*.24);
-    const lever=mesh(cylGeo(.09,.09,.12,12),MAT.alu,g,.5,.72,.05);ctx.setInteractable(lever,{cue:()=> 'Pick a freebie capsule',onClick:()=>{open('dlgFreebies');dropClaw()},reach:4.5});
-    for(const x of [2.3,3.3]){const chair=mesh(boxGeo(.85,.15,.8),MAT.cream,g,x,.5,-.3);mesh(boxGeo(.85,.8,.12),pink,g,x,.9,-.65);for(const a of [-.3,.3])mesh(cylGeo(.025,.025,.45,8),MAT.alu,g,x+a,.25,-.3)}
-    ctx.colBox(6.6,27.8,8.2,29.8,'clawMachine');ctx.colCircle(9.5,28.5,.55,'capsules');TRAVEL.freebies={x:9,z:32,yaw:0};
-    dialog('dlgFreebies','Exit lounge · demo samples','A little surprise. No hidden strings.',`<p class="social-copy">Move the claw, then drop it. Or pick a capsule for a surprise. Your demo sample never depends on a positive review.</p><div class="claw-window" aria-hidden="true"><div class="claw-arm" id="clawArm"></div>${Array.from({length:8},(_,i)=>`<i class="capsule" style="left:${6+i*11}%;bottom:${8+i%3*12}px"></i>`).join('')}</div><div class="btnrow"><button class="btn" id="clawLeft" aria-label="Move claw left">← Left</button><button class="btn pri" id="clawDrop">Drop claw</button><button class="btn" id="clawRight" aria-label="Move claw right">Right →</button><button class="btn" id="capsulePick">Pick a capsule</button></div><p id="freebieResult" class="sample-result" role="status">What will you pick up?</p><p class="fine">If you post about a gift, make “Gifted” clear. Receiving it doesn’t prove it works. Virtual samples only; nothing is shipped.</p>`);
+  function buildExit(){
+    const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,TRAVEL,Merger,rboxGeo,torusGeo,Assets,SAMPLE_LOUNGE}=ctx;
+    const g=new THREE.Group(),{x,z}=SAMPLE_LOUNGE;
+    g.name='exit_sample_lounge';g.position.set(x,0,z);WORLD.add(g);
+    const m=new Merger(), ox=-1.18, wine=std('#60233e',{roughness:.36,metalness:.27});
+    const lacquer=std('#e7ac9a',{roughness:.30,metalness:.18}), brass=std('#bd975e',{roughness:.29,metalness:.77});
+    const enamel=std('#f3dec0',{roughness:.39}), ink=std('#211d28',{roughness:.64});
+    const mint=std('#86aba0',{roughness:.41}),gold=std('#eab863',{roughness:.38});
+    const at=(px,py,pz)=>new THREE.Matrix4().makeTranslation(px,py,pz);
+    const round=(mat,w,h,d,px,py,pz,r=.04)=>m.add(rboxGeo(w,h,d,r,2),mat,at(px,py,pz));
+    m.box(MAT.deck,8,.14,5.1,0,.07,0);
+    ctx.addPlatform(x-4,z-2.55,x+4,z+2.55,.14);
+    // A solid timber and oxblood back wall gives the cabinet a clear silhouette.
+    round(wine,7.8,2.86,.20,0,1.56,-2.15,.09);
+    for(let i=0;i<39;i++)m.box(MAT.woodSlat,.055,2.63,.045,-3.76+i*.198,1.55,-2.02);
+    m.box(brass,7.7,.04,.10,0,2.96,-2.02);m.box(MAT.bulb,7.62,.013,.035,0,2.925,-1.96);
+    ctx.colBox(x-3.9,z-2.25,x+3.9,z-2.0,'loungeBack');
+    Assets.prop('GlamVelvetSofa',{x:1.42,y:.14,z:-.94,w:2.15,ry:-.09,parent:g});
+    ctx.colBox(x+.25,z-1.58,x+2.58,z-.37,'sampleSofa');
+    m.cyl(brass,.09,.17,.45,1.4,.38,.25);m.cyl(enamel,.35,.35,.046,1.4,.63,.25,32);
+    Assets.prop('GlassVaseFlowers',{x:1.43,y:.654,z:.25,h:.26,parent:g});
+    ctx.colCircle(x+1.4,z+.25,.36,'sampleTable');
+    // Rounded enamel housing, a recessed delivery opening and a physical control deck.
+    round(ink,1.92,.12,1.29,ox,.20,-.25);round(wine,1.94,.77,1.32,ox,.635,-.25,.09);
+    round(brass,1.52,.43,.055,ox,.64,.426);round(ink,1.41,.34,.048,ox,.64,.46);
+    round(wine,1.37,.11,.06,ox,.735,.491);
+    round(lacquer,2.04,.16,1.52,ox,1.055,-.18,.06);
+    round(brass,1.98,.045,1.42,ox,1.146,-.22);
+    for(const side of [-1,1])for(const depth of [-.86,.38])
+      m.cyl(brass,.033,.033,1.27,ox+side*.91,1.78,depth,12);
+    round(wine,1.92,1.28,.055,ox,1.79,-.874);
+    m.box(MAT.bulb,1.78,.025,.03,ox,2.375,-.81);
+    round(wine,2.06,.36,1.48,ox,2.55,-.24,.085);
+    round(brass,2.02,.035,1.46,ox,2.385,-.24);
+    // Two-tone capsule shells, each seated on the tray or nested on the layer below.
+    const top=new THREE.SphereGeometry(.116,14,8,0,Math.PI*2,0,Math.PI/2);
+    const bottom=new THREE.SphereGeometry(.116,14,8,0,Math.PI*2,Math.PI/2,Math.PI/2);
+    const prizes=[mint,lacquer,gold];
+    for(let row=0;row<3;row++)for(let col=0;col<6;col++){
+      const px=ox-.69+col*.271,py=1.285,pz=-.66+row*.31;
+      m.add(top,prizes[(row+col)%3],at(px,py,pz));m.add(bottom,enamel,at(px,py,pz));
+      m.cyl(brass,.115,.115,.009,px,py,pz,14);
+      if(row===1&&col%2===0){m.add(top,prizes[(col+1)%3],at(px+.13,py+.177,pz));m.add(bottom,enamel,at(px+.13,py+.177,pz))}
+    }
+    const front=mesh(boxGeo(1.79,1.20,.012),new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.085,roughness:.14,metalness:.18,depthWrite:false}),g,ox,1.78,.385);
+    const play=()=>open('dlgFreebies');
+    ctx.setInteractable(front,{cue:()=> 'Play the capsule claw',onClick:play,reach:5,outline:false});
+    m.box(MAT.alu,1.64,.048,.055,ox,2.32,-.20);
+    m.cyl(brass,.018,.018,.23,ox,2.18,-.20,10);
+    m.cyl(MAT.metal,.095,.058,.10,ox,2.03,-.20,20);
+    for(let i=0;i<3;i++){
+      const angle=2*Math.PI*i/3, tip=(r,y)=>new THREE.Vector3(ox+Math.cos(angle)*r,y,-.20+Math.sin(angle)*r);
+      m.between(brass,tip(.054,2.01),tip(.18,1.87),.017,8);
+      m.between(brass,tip(.18,1.87),tip(.104,1.75),.014,8);
+    }
+    m.cyl(ink,.065,.08,.045,ox-.52,1.157,.47);m.cyl(MAT.alu,.017,.019,.13,ox-.52,1.23,.47);
+    m.add(new THREE.SphereGeometry(.058,14,10),lacquer,at(ox-.52,1.31,.47));
+    m.cyl(brass,.085,.09,.025,ox+.46,1.15,.47);m.cyl(MAT.bulb,.065,.068,.018,ox+.46,1.174,.47);
+    const marquee=textScreen('capsule_marquee',1.73,.26,(c,w,h)=>{
+      c.fillStyle='#f5dfbf';c.fillRect(0,0,w,h);ctx.txt(c,'CAPSULE CLUB',w/2,h*.51,h*.68,{d:true,w:800,color:'#502137',align:'center',base:'middle'});
+    },g,ox,2.55,.508);
+    marquee.mesh.raycast=THREE.Mesh.prototype.raycast;ctx.setInteractable(marquee.mesh,{cue:()=> 'Play the capsule claw',onClick:play,reach:5,outline:false});
+    // A free-standing gumball dispenser next to the prize window.
+    m.cyl(wine,.28,.32,.7,-3.0,.49,-.38,24);m.cyl(brass,.28,.29,.055,-3.0,.86,-.38,24);
+    mesh(new THREE.SphereGeometry(.32,24,14),MAT.glass,g,-3.0,1.14,-.38);
+    for(let i=0;i<6;i++)m.add(new THREE.SphereGeometry(.077,12,8),prizes[i%3],at(-3+Math.sin(i*2.4)*.17,1.0+i*.025,-.38+Math.cos(i*2.4)*.13));
+    m.cyl(brass,.095,.16,.045,-3,1.45,-.38,20);
+    const knob=mesh(cylGeo(.068,.068,.12,12),brass,g,-3,.67,-.075);knob.rotation.x=Math.PI/2;
+    ctx.setInteractable(knob,{cue:()=> 'Pick a freebie capsule',onClick:()=>{play();dropClaw()},reach:4.5});
+    m.build(g,{name:'capsule_club_fixtures'});
+    ctx.colBox(x+ox-1,z-1.01,x+ox+1,z+.59,'clawMachine');ctx.colCircle(x-3,z-.38,.34,'capsules');
+    TRAVEL.freebies={x:x-.18,z:z+4.20,yaw:.16};
+    dialog('dlgFreebies','Exit lounge · virtual samples','Capsule Club',`<p class="social-copy">Move the claw, then drop it. Or pick a capsule for a surprise. Your demo sample never depends on a positive review.</p><div class="claw-window" aria-hidden="true"><div class="claw-arm" id="clawArm"></div>${Array.from({length:8},(_,i)=>`<i class="capsule" style="left:${6+i*11}%;bottom:${8+i%3*12}px"></i>`).join('')}</div><div class="btnrow"><button class="btn" id="clawLeft" aria-label="Move claw left">← Left</button><button class="btn pri" id="clawDrop">Drop claw</button><button class="btn" id="clawRight" aria-label="Move claw right">Right →</button><button class="btn" id="capsulePick">Pick a capsule</button></div><p id="freebieResult" class="sample-result" role="status">What will you pick up?</p><p class="fine">If you post about a gift, make “Gifted” clear. Receiving it doesn’t prove it works. Virtual samples only; nothing is shipped.</p>`);
     $('clawLeft').onclick=()=>moveClaw(-18);$('clawRight').onclick=()=>moveClaw(18);$('clawDrop').onclick=dropClaw;$('capsulePick').onclick=dropClaw;
   }
   function moveClaw(n){if(clawBusy)return;clawX=Math.max(10,Math.min(90,clawX+n));$('clawArm').style.left=clawX+'%'}
-  async function dropClaw(){if(clawBusy)return;clawBusy=true;document.querySelectorAll('#dlgFreebies .btn').forEach(b=>b.disabled=true);$('clawArm').style.height='180px';$('freebieResult').textContent='Picking your capsule…';ctx.Sound.play('select');await new Promise(r=>setTimeout(r,750));$('clawArm').style.height='60px';await new Promise(r=>setTimeout(r,650));const items=['a mini skincare sample','a luggage tag','a fabric swatch set','a matcha token'];$('freebieResult').textContent='You picked '+items[Math.floor(clawX/25)%items.length]+'. A gift, not an obligation. Yours in the demo sample bag!';ctx.Sound.play('stamp');clawBusy=false;document.querySelectorAll('#dlgFreebies .btn').forEach(b=>b.disabled=false)}
-  function photoFinished(){clearInterval(photoTimer);if($('takeMyPhoto'))$('takeMyPhoto').disabled=false}
+  async function dropClaw(){
+    if(clawBusy)return;
+    clawBusy=true;
+    const arm=$('clawArm'), bay=arm.parentElement, controls=$('dlgFreebies').querySelectorAll('.btn');
+    const capsules=Array.from(bay.querySelectorAll('.capsule'));
+    const center=el=>el.offsetLeft+el.offsetWidth/2;
+    const picked=capsules.reduce((near,cap)=>Math.abs(center(cap)-bay.clientWidth*clawX/100)<Math.abs(center(near)-bay.clientWidth*clawX/100)?cap:near);
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pause=ms=>new Promise(resolve=>setTimeout(resolve,reduced?20:ms));
+    controls.forEach(button=>button.disabled=true);
+    try{
+      const x=center(picked),reach=picked.offsetTop+8;
+      arm.style.left=x+'px';arm.style.height=reach+'px';
+      $('freebieResult').textContent='Picking your capsule…';ctx.Sound.play('select');await pause(720);
+      picked.style.transform='translateY('+ (60-reach)+'px)';arm.style.height='60px';await pause(680);
+      const gifts=['a mini skincare sample','a luggage tag','a fabric swatch set','a matcha token'];
+      const item=gifts[capsules.indexOf(picked)%gifts.length];
+      $('freebieResult').textContent='You picked '+item+'. A gift never requires praise.';
+      try{const bag=JSON.parse(sessionStorage.getItem('creator-night-claw-bag')||'[]');bag.push(item);sessionStorage.setItem('creator-night-claw-bag',JSON.stringify(bag.slice(-40)))}catch{}
+      ctx.Sound.play('stamp');
+    }finally{
+      picked.style.transform='';arm.style.left=clawX+'%';arm.style.height='60px';clawBusy=false;
+      controls.forEach(button=>button.disabled=false);
+    }
+  }
+  function photoFinished(){if($('takeMyPhoto'))$('takeMyPhoto').disabled=false}
   function animatePrint(){const img=$('photoOut');img.classList.remove('printing');void img.offsetWidth;img.classList.add('printing')}
   function handProp(p,kind){
     if(!p?.model)return;const {THREE,MAT}=ctx;let hand;p.model.traverse(o=>{if(o.isBone&&/hand/i.test(o.name)&&/(right|[ _]r[ _]|r_hand|hand_r)/i.test(o.name))hand=o});
@@ -170,13 +308,13 @@
   }
   function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();
     const action=document.createElement('button');action.id='socialAction';action.className='btn pri hidden';document.body.append(action);action.onclick=()=>{const id=action.dataset.action;if(id==='photo')openStudio();else if(id==='wall'){renderNotes();open('dlgTrustWall')}else if(id==='chai')open('dlgCaffeine');else if(id==='freebies')open('dlgFreebies');else openMarket(nearestBrand(ctx.player.x,ctx.player.z))};
-    let prev='';setInterval(()=>{if(!ctx.S.started)return;const x=ctx.player.x,z=ctx.player.z;const a=x<-20&&z>21?'photo':x>20&&z>21?'chai':Math.hypot(x+15,z-27)<5?'wall':Math.hypot(x-9,z-30)<5?'freebies':z<-8&&z>-23&&Math.abs(x)>=6&&Math.abs(x)<18?'market':'';
+    let prev='';setInterval(()=>{if(!ctx.S.started)return;const x=ctx.player.x,z=ctx.player.z;const a=x<-20&&z>21?'photo':x>20&&z>21?'chai':Math.hypot(x+15,z-27)<5?'wall':Math.abs(x-ctx.SAMPLE_LOUNGE.x)<4.25&&Math.abs(z-ctx.SAMPLE_LOUNGE.z-1)<3.7?'freebies':z<-8&&z>-23&&Math.abs(x)>=6&&Math.abs(x)<18?'market':'';
       const destination=a==='market'?nearestBrand(x,z).name:a; if(destination!==prev){prev=destination;action.dataset.action=a;action.textContent={photo:'Ask Dev: take my photo',wall:'Leave a trust note',chai:'Pick your caffeine',freebies:'Play for a demo freebie',market:'Visit '+destination}[a]||''}action.classList.toggle('hidden',!a||!!ctx.S.ui.modal)},250);
     // One focus trap serves both existing and new dialogs, including the Visual Labs.
     let visible=null;const observer=new MutationObserver(()=>{const next=document.querySelector('.modal:not(.hidden)');if(next===visible)return;visible=next;if(next){lastFocus=document.activeElement;next.setAttribute('role','dialog');next.setAttribute('aria-modal','true');if(!next.getAttribute('aria-labelledby')){const h=next.querySelector('h2');if(h){h.id||=next.id+'Title';next.setAttribute('aria-labelledby',h.id)}}next.querySelectorAll('button.x').forEach(b=>b.setAttribute('aria-label','Close'));next.querySelector('button,textarea,input')?.focus()}else lastFocus?.focus?.()});observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
     document.addEventListener('keydown',e=>{const modal=document.querySelector('.modal:not(.hidden)');if(!modal)return;if(e.key==='Tab'){const items=[...modal.querySelectorAll('button:not(:disabled),input,textarea,select,[tabindex="0"]')].filter(x=>x.offsetParent!==null);if(!items.length)return;const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}});
   }
-  window.TrustSocial={install,photoFinished,animatePrint,brands};
+  window.TrustSocial={install,countdown,photoFinished,animatePrint,brands};
 })();
 
 

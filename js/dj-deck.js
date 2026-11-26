@@ -9,7 +9,7 @@
 
   let audio = null;
   let playing = false;
-  let manualOverride = false;
+  let playbackRequest = 0;
   let targetVol = 0.62;
   let fadeTimer = null;
 
@@ -52,18 +52,22 @@
   }
 
   function setPlaying(on, isManual = true) {
-    if (isManual) manualOverride = on;
+    const request = ++playbackRequest;
     const a = ensureAudio();
     if (on) {
       playing = true;
       updateUI();
-      a.play().then(() => fadeTo(targetVol)).catch(() => {
+      a.play().then(() => {
+        if (request === playbackRequest) { fadeTo(targetVol);window.dispatchEvent(new Event('festival-music-change')); }
+      }).catch(() => {
+        if (request !== playbackRequest) return;
         playing = false;
         updateUI();
       });
     } else {
       playing = false;
       updateUI();
+      window.dispatchEvent(new Event('festival-music-change'));
       fadeTo(0, () => { try { a.pause(); } catch (_) {} });
     }
   }
@@ -82,11 +86,6 @@
     const isParty = segId === 'dj';
     if (isParty) {
       if (!playing) {
-        // Pick a lively cue point when the DJ party starts
-        const a = ensureAudio();
-        if (a.currentTime < 1 && segId === 'finale') {
-          try { a.currentTime = CUES[2].time; } catch (_) {}
-        }
         setPlaying(true, false);
       }
     } else if (playing) {
@@ -154,6 +153,6 @@
     });
   }
 
-  window.TrustDJ = { setPlaying, setVolume, onShowSegment, jumpToCue, mountUI };
+  window.TrustDJ = { get playing(){return playing && !!audio && !audio.paused}, setPlaying, setVolume, onShowSegment, jumpToCue, mountUI };
   document.addEventListener('DOMContentLoaded', mountUI);
 })();
