@@ -1,0 +1,173 @@
+{
+  "instructions": "Codex: Drop compressed CC0 .glb models into assets/curated/, set enabled: true for each installed slot, and visually verify scale & sightlines in Playwright.",
+  "slots": [
+    {
+      "id": "fashion_garment_rack",
+      "zone": "fashion",
+      "enabled": true,
+      "file": "assets/curated/fashion_garment_rack.glb",
+      "targetHeightMeters": 1.65,
+      "localPos": [
+        -2.7,
+        0.12,
+        -2.2
+      ],
+      "rotY": 1.57,
+      "castShadow": true
+    },
+    {
+      "id": "beauty_vanity_table",
+      "zone": "beauty",
+      "enabled": true,
+      "file": "assets/curated/beauty_vanity_table.glb",
+      "targetHeightMeters": 1.45,
+      "localPos": [
+        -2.3,
+        0.12,
+        -2.6
+      ],
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "food_tasting_counter",
+      "zone": "food",
+      "enabled": true,
+      "file": "assets/curated/food_tasting_counter.glb",
+      "targetHeightMeters": 0.95,
+      "localPos": [
+        0,
+        0.12,
+        -1.5
+      ],
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "fitness_squat_rack",
+      "zone": "fitness",
+      "enabled": true,
+      "file": "assets/curated/fitness_squat_rack.glb",
+      "targetHeightMeters": 2.1,
+      "localPos": [
+        0,
+        0.12,
+        -3.1
+      ],
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "travel_luggage_set",
+      "zone": "travel",
+      "enabled": true,
+      "file": "assets/curated/travel_luggage_set.glb",
+      "targetHeightMeters": 0.72,
+      "localPos": [
+        -2.9,
+        0.12,
+        -1.6
+      ],
+      "rotY": 0.55,
+      "castShadow": true
+    },
+    {
+      "id": "education_study_desk",
+      "zone": "education",
+      "enabled": true,
+      "file": "assets/curated/education_study_desk.glb",
+      "targetHeightMeters": 0.78,
+      "localPos": [
+        -1.3,
+        0.12,
+        -1.6
+      ],
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "fashion_jacket",
+      "zone": "fashion",
+      "enabled": true,
+      "file": "assets/curated/fashion_jacket.glb",
+      "localPos": [
+        -2.7,
+        0.85,
+        -2.2
+      ],
+      "targetHeightMeters": 0.72,
+      "rotY": 1.57,
+      "castShadow": true
+    },
+    {
+      "id": "education_books",
+      "zone": "education",
+      "enabled": true,
+      "file": "assets/curated/education_books.glb",
+      "localPos": [
+        -1.1,
+        0.9,
+        -1.6
+      ],
+      "targetHeightMeters": 0.25,
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "photo_tripod",
+      "zone": "photo",
+      "enabled": true,
+      "file": "assets/curated/photo_tripod.glb",
+      "localPos": [
+        0,
+        0.1,
+        2.4
+      ],
+      "targetHeightMeters": 1.42,
+      "rotY": 0,
+      "castShadow": true
+    },
+    {
+      "id": "photo_camera",
+      "zone": "photo",
+      "enabled": true,
+      "file": "assets/curated/photo_camera.glb",
+      "localPos": [
+        0,
+        1.52,
+        2.4
+      ],
+      "targetHeightMeters": 0.14,
+      "rotY": 3.14,
+      "castShadow": true
+    },
+    {
+      "id": "photo_softbox",
+      "zone": "photo",
+      "enabled": true,
+      "file": "assets/curated/photo_softbox.glb",
+      "localPos": [
+        1.75,
+        0.1,
+        1.5
+      ],
+      "targetHeightMeters": 1.7,
+      "rotY": 3.14,
+      "castShadow": true
+    },
+    {
+      "id": "chai_kettle",
+      "zone": "chai",
+      "enabled": true,
+      "file": "assets/curated/chai_kettle.glb",
+      "localPos": [
+        1.6,
+        1.18,
+        -2.7
+      ],
+      "targetHeightMeters": 0.28,
+      "rotY": 0,
+      "castShadow": true
+    }
+  ]
+}

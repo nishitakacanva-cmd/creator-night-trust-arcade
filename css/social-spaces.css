@@ -1,0 +1,29 @@
+/* Compact additions keep the existing Visual Labs intact. */
+.modal{overflow:auto}.modal .card{max-height:calc(100dvh - 32px);overflow:auto;background:#18121f}
+.modal button:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid #ffce74;outline-offset:3px}
+.modal .x{min-width:44px;min-height:44px}
+#photoOut{border-radius:0;max-height:64dvh;width:auto;max-width:100%;margin:auto;box-shadow:0 14px 30px #0008;transform:rotate(-2deg)}
+.print-slot{background:#0b090f;padding:14px 14px 24px;border-top:8px solid #08060b;overflow:hidden;border-radius:9px}
+.printing{animation:print-photo 1.8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes print-photo{from{transform:translateY(-90%) rotate(0deg);filter:brightness(2)}to{transform:translateY(0) rotate(-2deg);filter:brightness(1)}}
+.social-kicker{color:#ffcc80;font:700 12px Poppins,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.social-copy{color:#ded7e7;line-height:1.6}.social-status{min-height:26px;color:#ffe0a4;margin-top:14px}
+.social-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}
+.social-note{background:#ffe4a1;color:#33253a;padding:18px 15px;box-shadow:3px 7px 0 #0002;transform:rotate(-2deg);font:22px/1.3 'Segoe Print','Comic Sans MS',cursive;overflow-wrap:anywhere;min-height:110px}
+.social-note:nth-child(3n+2){background:#edbad4;transform:rotate(2deg)}.social-note:nth-child(3n){background:#d2e5c1;transform:rotate(-1deg)}
+.social-note small{display:block;font:11px Poppins,sans-serif;margin-top:12px}
+.social-form textarea{width:100%;min-height:100px;resize:vertical;background:#fff4ce;color:#302337;font:20px/1.5 'Segoe Print',cursive;padding:16px;border-radius:4px;border:0}
+.social-form label{display:block;margin:12px 0 8px}.social-form .check{display:flex;gap:12px;align-items:flex-start;font:14px/1.6 Poppins,sans-serif}.social-form input{min-width:22px;min-height:22px;accent-color:#b43b83}
+.story-preview{background:linear-gradient(155deg,#542154,#271d42);border:1px solid #ffffff30;border-radius:22px;min-height:240px;padding:24px;position:relative;margin:16px 0}
+.story-preview .disclosure{display:inline-block;background:#fff;color:#251931;padding:7px 12px;border-radius:7px;font-weight:700;margin-bottom:30px}
+.story-preview p{font:22px/1.5 Poppins,sans-serif;overflow-wrap:anywhere}.story-preview small{color:#f5d9ee}
+.claw-window{height:230px;position:relative;border:8px solid #d592b3;border-radius:50px 50px 12px 12px;background:linear-gradient(#332842,#1a1226);overflow:hidden;margin:18px 0;box-shadow:inset 0 0 50px #ef9fe32a}
+.claw-arm{position:absolute;top:0;left:50%;height:60px;border-left:4px solid #ddd;transition:left .3s, height .7s;width:20px;z-index:2}
+.claw-arm::after{content:'⋃';font:50px Georgia;position:absolute;bottom:-20px;left:-20px;color:#eee;transform:rotate(180deg)}
+.capsule{position:absolute;bottom:12px;width:42px;height:42px;border-radius:50%;background:linear-gradient(#ffdc84 50%,#e36fb1 50%);border:2px solid #ffffff70;box-shadow:2px 4px 12px #0005}
+.sample-result{background:#fff0c9;color:#35243b;border-radius:14px;padding:18px;font:600 17px/1.5 Poppins,sans-serif}
+#socialAction{position:fixed;right:18px;bottom:100px;z-index:39;max-width:210px;box-shadow:0 5px 18px #0006}
+#quickZoneNav button{min-height:44px!important;flex-shrink:0}#quickZoneNav{bottom:12px!important;max-width:64vw!important}
+#labLaunchBar{bottom:82px!important}#hint{bottom:68px}#cue{bottom:116px}
+@media(max-width:600px){.social-notes{grid-template-columns:1fr 1fr}.social-note{font-size:18px;padding:12px}#quickZoneNav{max-width:96vw!important;bottom:8px!important;left:2vw!important;transform:none!important;right:2vw}#socialAction{right:10px;bottom:78px;font-size:12px;max-width:165px;padding:10px}#labLaunchBar{bottom:138px!important;max-width:94vw}#hint{display:none}#cue{bottom:130px;font-size:12px;max-width:90vw;white-space:normal}.modal{padding:8px}.modal .card{max-height:calc(100dvh - 16px);padding:20px}.story-preview p{font-size:18px}#photoOut{max-height:56dvh}}
+@media(prefers-reduced-motion:reduce){.printing{animation:none}.claw-arm{transition:none}}

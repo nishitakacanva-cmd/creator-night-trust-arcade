@@ -1,0 +1,166 @@
+[
+  {
+    "id": "fashion_garment_rack",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/coat-rack-on-wheels-with-hangers-chrome-2a68784d",
+    "download": "https://www.innerscene.com/api/library/coat-rack-on-wheels-with-hangers-chrome-2a68784d/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 295744,
+    "triangles": 9494,
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "file": "assets/curated/fashion_garment_rack.glb"
+  },
+  {
+    "id": "beauty_vanity_table",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/compact-vanity-80-cm-with-led-ring-mirror-141c439c",
+    "download": "https://www.innerscene.com/api/library/compact-vanity-80-cm-with-led-ring-mirror-141c439c/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 77024,
+    "triangles": 3262,
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "file": "assets/curated/beauty_vanity_table.glb"
+  },
+  {
+    "id": "fitness_squat_rack",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/power-rack-with-olympic-barbell-and-bumper-plates-972a154f",
+    "download": "https://www.innerscene.com/api/library/power-rack-with-olympic-barbell-and-bumper-plates-972a154f/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 258656,
+    "triangles": 44972,
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "file": "assets/curated/fitness_squat_rack.glb"
+  },
+  {
+    "id": "travel_luggage_set",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/rolling-suitcase-ee9d7578",
+    "download": "https://www.innerscene.com/api/library/rolling-suitcase-ee9d7578/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 703580,
+    "triangles": 6468,
+    "validation": {
+      "errors": 0,
+      "warnings": 5
+    },
+    "file": "assets/curated/travel_luggage_set.glb"
+  },
+  {
+    "id": "photo_camera",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/frame-compact-mirrorless-camera-0c4526a2",
+    "download": "https://www.innerscene.com/api/library/frame-compact-mirrorless-camera-0c4526a2/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 79148,
+    "triangles": 8168,
+    "validation": {
+      "errors": 0,
+      "warnings": 5
+    },
+    "file": "assets/curated/photo_camera.glb"
+  },
+  {
+    "id": "photo_tripod",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/tripod-2978f73b",
+    "download": "https://www.innerscene.com/api/library/tripod-2978f73b/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 1474748,
+    "triangles": 8218,
+    "validation": {
+      "errors": 0,
+      "warnings": 8
+    },
+    "file": "assets/curated/photo_tripod.glb"
+  },
+  {
+    "id": "photo_softbox",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/studio-softbox-6e3c1491",
+    "download": "https://www.innerscene.com/api/library/studio-softbox-6e3c1491/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 1543752,
+    "triangles": 3706,
+    "validation": {
+      "errors": 0,
+      "warnings": 9
+    },
+    "file": "assets/curated/photo_softbox.glb"
+  },
+  {
+    "id": "chai_kettle",
+    "source": "https://www.innerscene.com/tools/library/3d-parts/whistle-kettle-kettle-e060f922",
+    "download": "https://www.innerscene.com/api/library/whistle-kettle-kettle-e060f922/download",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "bytes": 53980,
+    "triangles": 2832,
+    "validation": {
+      "errors": 0,
+      "warnings": 4
+    },
+    "file": "assets/curated/chai_kettle.glb"
+  },
+  {
+    "id": "food_tasting_counter",
+    "source": "https://polyhaven.com/a/dining_table",
+    "license": "CC0-1.0",
+    "author": "Poly Haven contributors (see source)",
+    "bytes": 369308,
+    "triangles": 902,
+    "validation": {
+      "errors": 0,
+      "warnings": 1
+    },
+    "file": "assets/curated/food_tasting_counter.glb"
+  },
+  {
+    "id": "education_study_desk",
+    "source": "https://polyhaven.com/a/dining_table",
+    "license": "CC0-1.0",
+    "author": "Poly Haven contributors (see source)",
+    "bytes": 369308,
+    "triangles": 902,
+    "validation": {
+      "errors": 0,
+      "warnings": 1
+    },
+    "file": "assets/curated/education_study_desk.glb"
+  },
+  {
+    "id": "education_books",
+    "source": "https://polyhaven.com/a/book_encyclopedia_set_01",
+    "license": "CC0-1.0",
+    "author": "Poly Haven contributors (see source)",
+    "bytes": 584756,
+    "triangles": 39826,
+    "validation": {
+      "errors": 0,
+      "warnings": 2
+    },
+    "file": "assets/curated/education_books.glb"
+  },
+  {
+    "id": "fashion_jacket",
+    "source": "https://poly.pizza/m/eeKk3ObCbf",
+    "author": "Polygonal Mind",
+    "license": "CC0-1.0",
+    "bytes": 72892,
+    "triangles": 588,
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "file": "assets/curated/fashion_jacket.glb"
+  }
+]

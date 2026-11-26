@@ -1,0 +1,343 @@
+/* Editorial HUD Polish & Tactile Visual Lab Drawer — Trust Arcade v3 */
+
+/* 1. Calm 3-Element Editorial HUD Refinement */
+#btnResearch { display: none !important; } /* Keep debug overlay accessible via L key or Help dialog */
+#hudTL.chip {
+  background: rgba(18, 15, 26, 0.84);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+#hudTR .ib {
+  background: rgba(18, 15, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+#hudTR .ib:hover, #hudTR .ib:focus-visible {
+  border-color: #E1306C;
+  transform: translateY(-1px);
+  outline: 2px solid #FCAF45;
+  outline-offset: 2px;
+}
+
+/* Contextual Visual Lab Trigger Pill (appears calmly in the 7 learning zones) */
+#labLaunchBar {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+#labLaunchBar.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(10px);
+}
+.lab-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, rgba(20, 16, 30, 0.94), rgba(38, 22, 48, 0.94));
+  color: #FAF7F4;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(225, 48, 108, 0.35);
+  backdrop-filter: blur(16px);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.lab-launch-btn:hover, .lab-launch-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(225, 48, 108, 0.32), 0 0 0 2px #FCAF45;
+  outline: none;
+}
+.lab-launch-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #FCAF45, #E1306C, #833AB4);
+  box-shadow: 0 0 10px #E1306C;
+}
+
+/* 2. Editorial Visual Lab Modal (#dlgLab) */
+#dlgLab.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: rgba(10, 8, 16, 0.72);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#dlgLab.hidden { display: none !important; }
+
+.lab-shell {
+  width: min(980px, 96vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #FAF7F4;
+  color: #161320;
+  border-radius: 22px;
+  border: 1px solid rgba(22, 19, 32, 0.12);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.lab-topbar {
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, #833AB4, #C13584, #E1306C, #F77737, #FCAF45);
+  flex-shrink: 0;
+}
+.lab-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 26px 14px;
+  border-bottom: 1px solid rgba(22, 19, 32, 0.09);
+}
+.lab-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #C13584;
+  margin-bottom: 4px;
+}
+.lab-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #121018;
+  line-height: 1.2;
+}
+.lab-subtitle {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: #544E63;
+}
+.lab-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(22, 19, 32, 0.15);
+  background: #fff;
+  color: #121018;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lab-close:hover, .lab-close:focus-visible {
+  background: #121018;
+  color: #fff;
+  outline: 2px solid #E1306C;
+  outline-offset: 2px;
+}
+
+.lab-body {
+  padding: 22px 26px 26px;
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 780px) {
+  .lab-body { grid-template-columns: 1fr; }
+}
+
+.lab-stage-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(22, 19, 32, 0.09);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 6px 20px rgba(22, 19, 32, 0.05);
+}
+.lab-img-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #F7F4F9 0%, #ECE7F1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 270px;
+}
+.lab-img-frame.dark {
+  background: radial-gradient(circle at 50% 35%, #241D33 0%, #120F1B 100%);
+}
+.lab-img-frame img {
+  max-width: 100%;
+  max-height: 330px;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.25s ease, transform 0.25s ease;
+}
+.lab-img-frame.fullbleed img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 340px;
+}
+
+/* Interactive controls & pills */
+.lab-section-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6B637A;
+  margin: 0 0 8px;
+}
+.lab-toggle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.lab-pill {
+  padding: 8px 13px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(22, 19, 32, 0.14);
+  background: #fff;
+  color: #1D1A26;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.lab-pill:hover { border-color: #C13584; }
+.lab-pill.active {
+  background: linear-gradient(135deg, #833AB4, #E1306C);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.28);
+}
+.lab-pill:focus-visible { outline: 2px solid #F77737; outline-offset: 2px; }
+
+.lab-preview-box {
+  background: #FFFFFF;
+  border: 1px solid rgba(22, 19, 32, 0.1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #241F30;
+  margin-bottom: 14px;
+}
+.lab-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.lab-tag {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #F1EBF6;
+  color: #6E2B99;
+}
+.lab-tag.sponsor { background: #FFF0E5; color: #C24B12; }
+.lab-tag.evidence { background: #E7F7EE; color: #166B42; }
+.lab-tag.limit { background: #FCEBF1; color: #B81D56; }
+
+.lab-psych-note {
+  background: #14111E;
+  color: #FAF7F4;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 3px solid #E1306C;
+}
+.lab-psych-note b { color: #FCAF45; }
+
+/* Food 3-plate grid */
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.food-card {
+  background: #fff;
+  border: 1.5px solid rgba(22, 19, 32, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.food-card.selected {
+  border-color: #E1306C;
+  box-shadow: 0 6px 18px rgba(225, 48, 108, 0.18);
+}
+.food-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+/* Travel crop viewport */
+.travel-crop-wrap {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+  position: relative;
+  background: #121018;
+}
+.travel-crop-wrap img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: cover;
+  transition: width 0.2s ease, transform 0.2s ease;
+}
+.travel-slider {
+  width: 100%;
+  accent-color: #E1306C;
+  margin: 10px 0 4px;
+}
+
+/* Field notes summary inside Exit/Passport */
+.field-notes-box {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: left;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.field-notes-box h4 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #FCAF45;
+}
+.field-notes-box ul { margin: 0; padding-left: 16px; }
+.field-notes-box li { margin-bottom: 4px; color: rgba(250, 247, 244, 0.9); }

@@ -1,0 +1,95 @@
+{
+  "pack": "Creator Night Partner Stalls (16:9)",
+  "stalls": [
+    {
+      "brand": "Kay Beauty",
+      "category": "beauty",
+      "file": "assets/brands/kay_beauty_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Plum",
+      "category": "beauty",
+      "file": "assets/brands/plum_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Swiss Beauty",
+      "category": "beauty",
+      "file": "assets/brands/swiss_beauty_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "SNITCH",
+      "category": "fashion",
+      "file": "assets/brands/snitch_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Mokobara",
+      "category": "travel",
+      "file": "assets/brands/mokobara_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Paper Boat",
+      "category": "food",
+      "file": "assets/brands/paper_boat_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Blue Tokai",
+      "category": "caffeine",
+      "file": "assets/brands/blue_tokai_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Boldfit",
+      "category": "fitness",
+      "file": "assets/brands/boldfit_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "upGrad",
+      "category": "education",
+      "file": "assets/brands/upgrad_stall.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    },
+    {
+      "brand": "Caffeine Corner (Matcha \u00b7 Coffee \u00b7 Chai)",
+      "category": "caffeine",
+      "file": "assets/brands/caffeine_corner_menu.jpg",
+      "aspect_ratio": "16:9",
+      "width_px": 1376,
+      "height_px": 768,
+      "usage": "Partner stall back wall lightbox & Story preview header card"
+    }
+  ]
+}

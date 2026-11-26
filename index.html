@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="css/editorial-hud.css">
 <title>Trust Arcade · Creator Night</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,6 +176,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
+<link rel="stylesheet" href="css/social-spaces.css">
 </head>
 <body>
 <div id="stage"></div>
@@ -215,6 +217,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
     <button class="ib" id="btnPass" title="Passport (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/></svg></button>
     <button class="ib" id="btnTour" title="Guided tour (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c4-1 3-7 7-7s3 6 7 5"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="17" r="1.6"/><path d="M12 4v5"/></svg></button>
     <button class="ib" id="btnSound" title="Sound (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg></button>
+    <button class="ib" id="btnQual" title="Graphics quality (cycle High / Med / Perf)" style="width:auto;padding:0 10px;font-size:11px;font-weight:700;letter-spacing:.04em">MED</button>
     <button class="ib" id="btnHelp" title="Help (H)">?</button>
     <button class="ib" id="btnResearch" title="Researcher overlay (L)">L</button>
   </div>
@@ -235,7 +238,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
 
 <div id="dlgPass" class="modal hidden"><div class="card"><button class="x" data-close>✕</button><h2 data-t="passportTitle">Creator passport</h2><p class="sub" id="passSub"></p><div class="stamps" id="passStamps"></div><p class="fine" id="passAward"></p><div class="btnrow"><button class="btn pri" id="passSave" data-t="savePass">Save pass image</button><button class="btn" data-close data-t="close">Close</button></div></div></div>
 <div id="dlgMap" class="modal hidden"><div class="card"><button class="x" data-close>✕</button><h2 data-t="mapTitle">Festival map</h2><p class="sub" data-t="mapSub">Tap a place to go there.</p><div class="mapwrap"><canvas id="mapCanvas" width="1100" height="1018"></canvas><div class="side"><div class="mapbar"><span id="mapSel"></span><button class="btn pri" id="mapGo" disabled data-t="mapGo">Go here ▶</button></div><div class="maplist" id="mapList"></div></div></div></div></div>
-<div id="dlgPhoto" class="modal hidden"><div class="card"><button class="x" data-close>✕</button><h2 data-t="photoTitle">Your Creator Night post</h2><img id="photoOut" alt=""><p class="fine" data-t="photoNote">Saved only if you choose to download it. Nothing is uploaded.</p><div class="btnrow"><button class="btn pri" id="photoSave" data-t="download">Download</button><button class="btn" id="loopSave" data-t="saveLoop">Save 3-second loop</button><button class="btn" data-close data-t="close">Close</button></div></div></div>
+<div id="dlgPhoto" class="modal hidden"><div class="card"><button class="x" data-close>✕</button><h2 data-t="photoTitle">Your Creator Night post</h2><div class="print-slot"><img id="photoOut" alt="Your Creator Night photo print"></div><p class="fine" data-t="photoNote">Saved only if you choose to download it. Nothing is uploaded.</p><div class="btnrow"><button class="btn pri" id="photoSave" data-t="download">Download</button><button class="btn" id="loopSave" data-t="saveLoop">Save 3-second loop</button><button class="btn" data-close data-t="close">Close</button></div></div></div>
 <div id="dlgHelp" class="modal hidden"><div class="card"><button class="x" data-close>✕</button><h2 data-t="helpTitle">How to explore</h2><div id="helpBody" class="sub" style="line-height:1.55"></div><div class="btnrow"><button class="btn" id="hpResearch">Researcher overlay</button><button class="btn" id="hpCredits" data-t="credits">Credits</button><button class="btn pri" data-close data-t="close">Close</button></div><div id="creditsBox" class="fine hidden" style="white-space:pre-wrap"></div></div></div>
 <div id="dlgEnd" class="modal hidden"><div class="card"><h2 data-t="endTitle">Thanks for coming to Creator Night</h2><p class="sub" id="endBody"></p><div class="btnrow"><button class="btn" id="endBack" data-t="stepBack">Step back inside</button><button class="btn pri" id="endRestart" data-t="restart">Start again</button></div></div></div>
 <aside id="research" class="research chip hidden"><h4>Researcher overlay <small style="color:var(--muted)">(L)</small></h4><pre id="rsStats"></pre><div class="btnrow" style="margin-top:6px"><button class="btn" id="rsJSON">Export JSON</button><button class="btn" id="rsCSV">Export CSV</button><button class="btn" id="rsCopy">Copy JSON</button></div><div class="btnrow"><button class="btn" id="rsShow">Skip show ahead</button><button class="btn" id="rsQual">Quality</button></div><textarea class="copybox hidden" id="rsBox"></textarea></aside>
@@ -259,10 +262,10 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '2.0.0';
+const VERSION = '3.1.0';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
-const NO_LOCK = URLP.has('nolock') || TEST_MODE;
+const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
 const IS_TOUCH_DEVICE = matchMedia('(pointer: coarse)').matches;
 const QUALITY_PARAM = (URLP.get('q') || '').toLowerCase();       // high | medium | low
 
@@ -306,7 +309,7 @@ const ZONES = [
   { id: 'lawn', r: [LAWN.x0, LAWN.z0, LAWN.x1, LAWN.z1 + 0.6] },
   { id: 'hub', r: [MAZE.hub.x0, MAZE.hub.z0, MAZE.hub.x1, MAZE.hub.z1] },
   { id: 'maze', r: [MAZE.x0, MAZE.z0, MAZE.x1, MAZE.z1] },
-  ...NICHES.map(id => { const p = PAV[id]; return { id, r: [Math.min(p.front, p.back), p.z - 4, Math.max(p.front, p.back), p.z + 4] }; }),
+  ...NICHES.map(id => { const p = PAV[id]; const xMin = Math.min(p.front, p.back) - (p.side > 0 ? 2.4 : 0); const xMax = Math.max(p.front, p.back) + (p.side < 0 ? 2.4 : 0); return { id, r: [xMin, p.z - 4.4, xMax, p.z + 4.4] }; }),
   ...Object.entries(CORNERS).map(([id, c]) => ({ id, r: [c.x0, c.z0, c.x1, c.z1] })),
   { id: 'entry', r: [ENTRY.x0, ENTRY.z0, ENTRY.x1, ENTRY.z1 + 1] },
   { id: 'entry', r: [-7.5, ENTRY.z1, 7.5, 46] },                   // arrival forecourt outside the arch
@@ -376,7 +379,7 @@ const TXT = {
   logOpt: { en: 'Share anonymous research logs (optional). No names, no photos; nothing leaves this device unless you export it.', hi: 'गुमनाम रिसर्च लॉग साझा करें (वैकल्पिक)। कोई नाम या फ़ोटो नहीं; जब तक आप एक्सपोर्ट न करें, कुछ भी इस डिवाइस से बाहर नहीं जाता।' },
   enter: { en: 'Enter Creator Night', hi: 'क्रिएटर नाइट में प्रवेश करें' },
   unofficial: { en: 'Unofficial student exhibit. Not affiliated with, endorsed by or connected to Instagram or Meta. All creators, brands and posts here are fictional.', hi: 'अनौपचारिक स्टूडेंट प्रदर्शनी। Instagram या Meta से संबद्ध, समर्थित या जुड़ी नहीं। यहाँ के सभी क्रिएटर, ब्रांड और पोस्ट काल्पनिक हैं।' },
-  keysDesk: { en: 'WASD or arrows walk · Shift run · mouse looks · scroll glides forward · click uses · M or the top-left map to jump anywhere · P passport · T guided tour · H help', hi: 'WASD या ऐरो से चलें · Shift से दौड़ें · माउस से देखें · स्क्रॉल से आगे बढ़ें · क्लिक से इस्तेमाल करें · M या ऊपर बाईं ओर का मैप — कहीं भी पहुँचें · P पासपोर्ट · T गाइडेड टूर · H मदद' },
+  keysDesk: { en: 'WASD or arrows walk · Shift run · drag to look · release and click to interact · M or the top-left map to jump anywhere · P passport · T guided tour · H help', hi: 'WASD या ऐरो से चलें · Shift से दौड़ें · माउस से देखें · स्क्रॉल से आगे बढ़ें · क्लिक से इस्तेमाल करें · M या ऊपर बाईं ओर का मैप — कहीं भी पहुँचें · P पासपोर्ट · T गाइडेड टूर · H मदद' },
   keysTouch: { en: 'Left pad walks · drag to look · tap to use · tap the map (top left) to jump anywhere', hi: 'बायाँ पैड चलाता है · देखने के लिए खींचें · इस्तेमाल के लिए टैप करें · कहीं भी पहुँचने के लिए ऊपर बाईं ओर का मैप टैप करें' },
   loading: { en: 'Setting up the festival ground…', hi: 'फ़ेस्टिवल ग्राउंड तैयार हो रहा है…' },
   loadingPeople: { en: 'Creators are arriving…', hi: 'क्रिएटर्स आ रहे हैं…' },
@@ -392,7 +395,7 @@ const TXT = {
   mapSpot: { en: 'This spot', hi: 'यह जगह' },
   mapNear: { en: 'near {x}', hi: '{x} के पास' },
   mapYou: { en: 'You are here', hi: 'आप यहाँ हैं' },
-  photoTitle: { en: 'Your Creator Night post', hi: 'आपकी क्रिएटर नाइट पोस्ट' },
+  photoTitle: { en: 'Your Polaroid print', hi: 'आपकी क्रिएटर नाइट पोस्ट' },
   photoNote: { en: 'Saved only if you choose to download it. Nothing is uploaded.', hi: 'सिर्फ़ तभी सेव होगी जब आप डाउनलोड करें। कुछ भी अपलोड नहीं होता।' },
   download: { en: 'Download', hi: 'डाउनलोड' },
   saveLoop: { en: 'Save 3-second loop', hi: '3 सेकंड का लूप सेव करें' },
@@ -452,7 +455,7 @@ const PLACES = {
   maze: { en: 'Trust maze', hi: 'भरोसे की भूलभुलैया' }, hub: { en: 'Trust plaza', hi: 'ट्रस्ट प्लाज़ा' },
   fashion: { en: 'Fashion', hi: 'फ़ैशन' }, beauty: { en: 'Beauty', hi: 'ब्यूटी' }, fitness: { en: 'Fitness', hi: 'फ़िटनेस' },
   food: { en: 'Food', hi: 'फ़ूड' }, travel: { en: 'Travel', hi: 'ट्रैवल' }, education: { en: 'Education', hi: 'एजुकेशन' },
-  photo: { en: 'Photobooth', hi: 'फ़ोटोबूथ' }, chai: { en: 'Chai corner', hi: 'चाय कॉर्नर' }, lounge: { en: 'Creator lounge', hi: 'क्रिएटर लाउंज' },
+  photo: { en: 'Photobooth', hi: 'फ़ोटोबूथ' }, chai: { en: 'Caffeine Corner', hi: 'कैफ़ीन कॉर्नर' }, lounge: { en: 'Creator lounge', hi: 'क्रिएटर लाउंज' },
   arcade: { en: 'Arcade tent', hi: 'आर्केड टेंट' }, entry: { en: 'Entry and exit', hi: 'एंट्री और एग्ज़िट' }, ground: { en: 'Festival ground', hi: 'फ़ेस्टिवल ग्राउंड' },
 };
 const STAMPS = ['maze', 'fashion', 'beauty', 'fitness', 'food', 'travel', 'education'];
@@ -747,7 +750,7 @@ const SIGNS = {
   arcadeTent: { en: 'TRUST ARCADE · the original', hi: 'ट्रस्ट आर्केड · ओरिजिनल' },
   arcadeSub: { en: 'Step through to play the first version of the exhibit', hi: 'प्रदर्शनी का पहला वर्ज़न खेलने के लिए अंदर जाइए' },
   photo: { en: 'PHOTOBOOTH', hi: 'फ़ोटोबूथ' },
-  chai: { en: 'CHAI CORNER', hi: 'चाय कॉर्नर' },
+  chai: { en: 'CAFFEINE CORNER', hi: 'कैफ़ीन कॉर्नर' },
   lounge: { en: 'CREATOR LOUNGE', hi: 'क्रिएटर लाउंज' },
   ask: { en: 'Ask the panel', hi: 'पैनल से पूछें' },
   exit: { en: 'EXIT & FEEDBACK', hi: 'एग्ज़िट और फ़ीडबैक' },
@@ -1153,10 +1156,11 @@ function heartPath(c, cx, cy, s) {
   c.bezierCurveTo(cx - s * 0.9, cy - s * 0.25, cx - s * 0.45, cy - s * 0.95, cx, cy - s * 0.45);
   c.bezierCurveTo(cx + s * 0.45, cy - s * 0.95, cx + s * 0.9, cy - s * 0.25, cx, cy + s * 0.35); c.closePath();
 }
-function drawMark(c, cx, cy, r) {           // the exhibit's own mark: a gradient heart with a tick
-  c.save(); c.fillStyle = gradFill(c, cx - r, cy + r, cx + r, cy - r); heartPath(c, cx, cy + r * 0.1, r * 1.25); c.fill();
-  c.strokeStyle = '#fff'; c.lineWidth = r * 0.16; c.lineCap = 'round'; c.lineJoin = 'round';
-  c.beginPath(); c.moveTo(cx - r * 0.33, cy - r * 0.02); c.lineTo(cx - r * 0.08, cy + r * 0.22); c.lineTo(cx + r * 0.36, cy - r * 0.26); c.stroke(); c.restore();
+function drawMark(c, cx, cy, r) {
+  c.save(); c.translate(cx,cy); c.strokeStyle='#fff'; c.lineWidth=r*.16;
+  c.fillStyle=gradFill(c,-r,r,r,-r); rrect(c,-r,-r,r*2,r*2,r*.48); c.fill();
+  rrect(c,-r*.7,-r*.7,r*1.4,r*1.4,r*.4); c.stroke(); c.beginPath(); c.arc(0,0,r*.34,0,Math.PI*2);c.stroke();
+  c.beginPath();c.arc(r*.43,-r*.43,r*.09,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.restore();
 }
 function drawIcon(c, name, cx, cy, s, color) {
   c.save(); c.translate(cx, cy); c.strokeStyle = color; c.fillStyle = color; c.lineWidth = Math.max(2, s * 0.1); c.lineCap = 'round'; c.lineJoin = 'round';
@@ -1315,16 +1319,22 @@ async function loadHDR(path) {
 }
 const texLoader = new THREE.TextureLoader();
 const AVATAR_MODELS = ['Business_Female_01', 'Business_Male_05', 'Chef_Female_01', 'Female_Adult_03', 'Female_Adult_05', 'Female_Adult_08', 'Female_Adult_11', 'Female_Adult_12', 'Female_Adult_15', 'Female_Party_02', 'Male_Adult_04', 'Male_Adult_06', 'Male_Adult_08', 'Male_Adult_09', 'Male_Adult_10', 'Male_Adult_12', 'Male_Adult_17', 'Sports_Female_02', 'Sports_Male_04'];
-const PROP_FILES = ['Lantern', 'GlamVelvetSofa', 'SheenChair', 'SpecularSilkPouf', 'IridescentDishWithOlives', 'WaterBottle', 'Corset', 'MaterialsVariantsShoe', 'GlassVaseFlowers', 'DiffuseTransmissionPlant', 'TrafficCone', 'BoomBox', 'PotOfCoals', 'AnisotropyBarnLamp', 'AntiqueCamera', 'Avocado', 'Bench'];
+const PROP_FILES = ['Lantern', 'GlamVelvetSofa', 'SheenChair', 'SpecularSilkPouf', 'IridescentDishWithOlives', 'WaterBottle', 'MaterialsVariantsShoe', 'GlassVaseFlowers', 'DiffuseTransmissionPlant', 'TrafficCone', 'BoomBox', 'PotOfCoals', 'AnisotropyBarnLamp', 'Avocado', 'Bench'];
 const TEX_FILES = {
   grass: ['env/grass_col.jpg', true], grassN: ['env/grass_nrm.jpg', false],
   gravel: ['tex/gravel_col.jpg', true], gravelN: ['tex/gravel_nrm.jpg', false],
   wood: ['tex/wood_col.jpg', true], woodN: ['tex/wood_nrm.jpg', false],
-  concrete: ['tex/concrete_col.jpg', true], concreteR: ['tex/concrete_rgh.jpg', false],
+  concrete: ['tex/terrazzo_col.webp', true], concreteR: ['tex/terrazzo_rgh.webp', false], concreteN: ['tex/terrazzo_nrm.webp', false],
   hedge: ['tex/hedge_col.jpg', true], hedgeN: ['tex/hedge_nrm.jpg', false],
   leaves: ['tex/leaves_card.webp', true], carpet: ['tex/carpet_col.jpg', true],
   canvas: ['tex/canvas_col.jpg', true], canvasN: ['tex/canvas_nrm.jpg', false], rubber: ['tex/rubber_col.jpg', true],
 };
+const materialCache = new WeakMap();
+function realtimeMaterial(m) {
+ if (!m?.isMeshPhysicalMaterial) return m;
+ if (!materialCache.has(m)) { const simple=new THREE.MeshStandardMaterial(); simple.copy(m); materialCache.set(m,simple); }
+ return materialCache.get(m);
+}
 const Assets = {
   tex: {}, props: {}, avatars: {}, clips: { f: [], m: [] }, avatarClips: {}, env: null, failed: [],
   async loadAll(onProgress) {
@@ -1344,7 +1354,7 @@ const Assets = {
     lights.forEach(l => l.parent && l.parent.remove(l));             // props must not bring their own lights
     if (name === 'DiffuseTransmissionPlant') { const drop = []; root.traverse(o => { if (/^(pot|firefly)/i.test(o.name)) drop.push(o); }); drop.forEach(o => o.parent && o.parent.remove(o)); }
     root.traverse(o => {
-      if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = true;
+      if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(realtimeMaterial) : realtimeMaterial(o.material);
       for (const m of (Array.isArray(o.material) ? o.material : [o.material])) {
         if (!m) continue; m.envMapIntensity = 0.7;
         if (m.transmission > 0) { m.transmission = 0; m.transparent = true; m.opacity = Math.min(m.opacity, 0.35); m.depthWrite = false; m.roughness = Math.min(m.roughness, 0.1); }
@@ -1421,7 +1431,7 @@ function buildMaterials() {
     grass: antiTile(std('#8fae74', { map: X.grass, normalMap: X.grassN, normalScale: new THREE.Vector2(0.8, 0.8), roughness: 0.96 })),
     gravel: antiTile(std('#b9b1a4', { map: X.gravel, normalMap: X.gravelN, normalScale: new THREE.Vector2(0.7, 0.7), roughness: 0.9 }), 0.11),
     deck: std('#ffffff', { map: X.wood, normalMap: X.woodN, normalScale: new THREE.Vector2(0.6, 0.6), roughness: 0.62 }),
-    concrete: std('#d9d4d2', { map: X.concrete, roughnessMap: X.concreteR, roughness: 1.0, metalness: 0.0 }),
+    concrete: std('#d9d4d2', { map: X.concrete, normalMap: X.concreteN, normalScale: new THREE.Vector2(.18,.18), roughnessMap: X.concreteR, roughness: 0.85, metalness: 0.0 }),
     concreteDark: std('#5b5562', { map: X.concrete, roughnessMap: X.concreteR, roughness: 0.9 }),
     hedge: std('#a9c98f', { map: X.hedge, normalMap: X.hedgeN, normalScale: new THREE.Vector2(1.2, 1.2), roughness: 0.88 }),
     leaves: std('#86a56c', { map: X.leaves, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.8 }),
@@ -1434,7 +1444,7 @@ function buildMaterials() {
     blackGloss: std('#09080c', { roughness: 0.12, metalness: 0.3 }),
     whiteGloss: std('#f4eff3', { roughness: 0.22 }),
     white: std('#ece7ea', { roughness: 0.55 }),
-    plum: std('#2a1838', { roughness: 0.3, metalness: 0.15 }),
+    plum: std('#382839', { normalMap: X.canvasN, normalScale: new THREE.Vector2(.12,.12), roughness: 0.72, metalness: 0.04 }),
     plumMatte: std('#24152f', { roughness: 0.75 }),
     cream: std('#efe6dc', { roughness: 0.6 }),
     woodSlat: std('#b9875a', { map: X.wood, roughness: 0.55 }),
@@ -2076,19 +2086,12 @@ function buildPavDecor(id, g, p) {
   if (id === 'fashion') {
     M.box(MAT.blackGloss, 1.9, 0.18, 8.2, 0, 0.21, -1.2); M.box(MAT.grad, 1.92, 0.025, 0.025, 0, 0.3, 2.9); for (const s of [-1, 1]) M.box(neon('#ffffff', 1.6), 0.02, 0.02, 8.2, s * 0.96, 0.31, -1.2);
     addPlatform(...pr(p, -0.95, -5.3, 0.95, 2.9), 0.3);
-    for (const s of [-1, 1]) { M.box(MAT.alu, 0.03, 0.03, 3.2, s * 3.5, 1.7, -2.2); for (const z of [-3.8, -0.6]) M.cyl(MAT.alu, 0.02, 0.02, 1.7, s * 3.5, 0.85, z); pavColBox(p, s * 3.2, -3.9, s * 3.8, -0.5, 'rack');
-      const cols = ['#C13584', '#F77737', '#1d1d24', '#efe6dc', '#833AB4', '#FCAF45', '#5851DB', '#E1306C'];
-      for (let i = 0; i < 8; i++) M.add(boxGeo(0.05, 0.9, 0.42), colorMat(cols[i % cols.length], 0.85), new THREE.Matrix4().makeTranslation(s * 3.5, 1.15, -3.6 + i * 0.4)); }
     for (const [x, z] of [[-2.4, -4.6], [2.4, -4.6]]) { M.cyl(MAT.whiteGloss, 0.28, 0.32, 0.9, x, 0.57, z); pavColBox(p, x - 0.35, z - 0.35, x + 0.35, z + 0.35, 'plinth'); }
-    Assets.prop('Corset', { x: -2.4, y: 1.02, z: -4.6, h: 0.55, parent: g }); Assets.prop('MaterialsVariantsShoe', { x: 2.4, y: 1.02, z: -4.6, w: 0.3, parent: g, ry: 0.6 });
+    Assets.prop('MaterialsVariantsShoe', { x: 2.4, y: 1.02, z: -4.6, w: 0.3, parent: g, ry: 0.6 });
     for (const [x, z] of [[-2.6, 1.6], [2.6, 1.6]]) { M.box(MAT.white, 0.5, 0.45, 2.4, x, 0.345, z); pavColBox(p, x - 0.3, z - 1.25, x + 0.3, z + 1.25, 'bench'); }
   } else if (id === 'beauty') {
-    M.box(MAT.whiteGloss, 3.2, 0.78, 0.6, -0.6, 0.51, -4.9); pavColBox(p, -2.3, -5.3, 1.1, -4.5, 'vanity');
-    for (let i = 0; i < 4; i++) for (let k = 0; k < 4; k++) M.add(cylGeo(0.05, 0.05, 0.14 + (k % 2) * 0.05, 10), colorMat(['#f3b6c8', '#d9a8ff', '#ffffff', '#FCAF45'][(i + k) % 4], 0.25), new THREE.Matrix4().makeTranslation(2.2 + k * 0.3, 0.9 + i * 0.45 + 0.07, -5.6));
-    for (let i = 0; i < 4; i++) { M.box(MAT.glass, 1.4, 0.03, 0.35, 2.65, 0.82 + i * 0.45, -5.6); } pavColBox(p, 1.9, -5.9, 3.4, -5.3, 'shelf');
-    Assets.prop('GlassVaseFlowers', { x: -1.8, y: 0.9, z: -4.95, h: 0.45, parent: g });
+    pavColBox(p, -3.0, -3.2, -1.4, -2.0, 'vanity');
   } else if (id === 'fitness') {
-    for (const s of [-1, 1]) { M.box(MAT.metal, 0.08, 2.4, 0.08, s * 1.2, 1.32, -3.6); M.box(MAT.metal, 0.08, 2.4, 0.08, s * 1.2, 1.32, -2.6); M.box(MAT.metal, 0.08, 0.08, 1.0, s * 1.2, 2.5, -3.1); }
     pavColBox(p, -1.35, -3.75, 1.35, -2.45, 'rack');
     M.box(MAT.metal, 2.4, 0.06, 0.6, 3.0, 0.5, -5.2); for (let i = 0; i < 6; i++) M.add(cylGeo(0.07, 0.07, 0.32, 12), MAT.black, new THREE.Matrix4().compose(new THREE.Vector3(2.0 + i * 0.4, 0.6, -5.2), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, Math.PI / 2)), new THREE.Vector3(1, 1, 1)));
     pavColBox(p, 1.7, -5.55, 4.0, -4.85, 'dbRack');
@@ -2096,7 +2099,7 @@ function buildPavDecor(id, g, p) {
     M.box(MAT.glass, 0.04, 2.6, 5, -3.85, 1.6, -3.0);
   } else if (id === 'food') {
     M.box(MAT.deck, 6.2, 0.95, 0.75, 0, 0.6, -5.2); M.box(MAT.alu, 6.2, 0.04, 0.8, 0, 1.1, -5.2); pavColBox(p, -3.2, -5.65, 3.2, -4.8, 'counter');
-    M.box(MAT.whiteGloss, 3.0, 0.92, 0.9, 0, 0.58, -1.5); M.box(MAT.deck, 3.1, 0.05, 1.0, 0, 1.06, -1.5); pavColBox(p, -1.6, -2.0, 1.6, -1.0, 'island');
+    pavColBox(p, -1.6, -2.0, 1.6, -1.0, 'island');
     Assets.prop('PotOfCoals', { x: 1.9, y: 1.12, z: -5.2, h: 0.32, parent: g }); Assets.prop('PotOfCoals', { x: -1.9, y: 1.12, z: -5.2, h: 0.32, parent: g });
     for (const x of [-2, 0, 2]) { Assets.prop('AnisotropyBarnLamp', { x, y: 2.7, z: -5.0, h: 0.42, parent: g, shadow: false }); M.cyl(MAT.black, 0.006, 0.006, 1.6, x, 3.55, -5.0); }
     for (const x of [-1.1, 0, 1.1]) { M.cyl(MAT.alu, 0.03, 0.03, 0.72, x, 0.48, -0.55); M.cyl(MAT.black, 0.2, 0.2, 0.06, x, 0.86, -0.55); }
@@ -2111,7 +2114,7 @@ function buildPavDecor(id, g, p) {
   } else if (id === 'education') {
     for (const s of [-1, 1]) { M.box(MAT.woodSlat, 0.45, 2.8, 4.4, s * 3.6, 1.52, -3.2); pavColBox(p, s * 3.3, -5.4, s * 3.9, -1.0, 'shelf');
       for (let sh = 0; sh < 5; sh++) for (let b = 0; b < 16; b++) { const hh = 0.32 + ((b * 7 + sh * 3) % 5) * 0.03; M.add(boxGeo(0.28, hh, 0.07 + (b % 3) * 0.02), colorMat(['#833AB4', '#C13584', '#F77737', '#2d2a36', '#efe6dc', '#5851DB', '#FCAF45'][(b + sh) % 7], 0.8), new THREE.Matrix4().makeTranslation(s * 3.45, 0.32 + sh * 0.55 + hh / 2, -5.15 + b * 0.27)); } }
-    M.box(MAT.deck, 2.2, 0.75, 1.0, -1.3, 0.5, -1.6); pavColBox(p, -2.45, -2.15, -0.15, -1.05, 'desk');
+    pavColBox(p, -2.45, -2.15, -0.15, -1.05, 'desk');
     Assets.prop('AnisotropyBarnLamp', { x: -1.9, y: 0.87, z: -1.7, h: 0.4, parent: g });
   }
   const out = M.build(g, { name: 'decor_' + id });
@@ -2137,7 +2140,7 @@ function buildPhotobooth() {
   const mark = glowDecal(PALETTE.amber, 1.0, 1.0, 0.85); mark.position.set(0, 0.11, -1.0); g.add(mark); REFS.marks.photo = toW(0, -1.0);
   const rl = new THREE.Group(); rl.position.set(0.95, 0.1, 1.5); g.add(rl);
   mesh(cylGeo(0.015, 0.015, 1.5, 6), MAT.metal, rl, 0, 0.75, 0); const rlr = mesh(torusGeo(0.3, 0.035, 8, 40), MAT.bulbCool, rl, 0, 1.6, 0); rlr.rotation.y = 0.2;
-  Assets.prop('AntiqueCamera', { x: 0, y: 0.1, z: 2.4, h: 1.65, ry: Math.PI, parent: g });
+  // Contemporary camera, tripod and softbox are installed by the curated loader.
   const cw = toW(0, 2.4); colCircle(cw.x, cw.z, 0.5, 'camera'); const rw = toW(0.95, 1.5); colCircle(rw.x, rw.z, 0.25, 'ringLight');
   // giant post frame cut-out (generic icons only)
   const frame = new CanvasScreen({ name: 'post_frame', w: 1.6, h: 2.1, ppm: 300, interactive: false, transparent: true, lit: true, draw: (cc, w, h) => {
@@ -2169,7 +2172,7 @@ function buildChai() {
   for (let i = 0; i < 6; i++) mesh(cylGeo(0.035, 0.03, 0.08, 10), std('#fff6ea', { roughness: 0.3, transparent: true, opacity: 0.85 }), WORLD, sx + 0.2 + i * 0.12, 1.21, sz + 0.15);
   const menu = new CanvasScreen({ name: 'chai_menu', w: 2.6, h: 1.4, ppm: 300, interactive: false, draw: (cc, w, h) => {
     cc.fillStyle = '#1b1410'; rrect(cc, 0, 0, w, h, 24); cc.fill(); txt(cc, L(SIGNS.chai), w / 2, 80, 60, { d: true, w: 800, align: 'center', color: '#FCAF45' });
-    const items = S.lang === 'hi' ? [['कटिंग चाय', '₹20'], ['अदरक चाय', '₹30'], ['बन मस्का', '₹40'], ['सबके लिए पानी', 'मुफ़्त']] : [['Cutting chai', '₹20'], ['Adrak chai', '₹30'], ['Bun maska', '₹40'], ['Water for all', 'free']];
+    const items = S.lang === 'hi' ? [['आइस्ड माचा', '₹160'], ['कोल्ड ब्रू', '₹120'], ['अदरक चाय', '₹30'], ['सबके लिए पानी', 'मुफ़्त']] : [['Iced matcha', '₹160'], ['Cold brew', '₹120'], ['Adrak chai', '₹30'], ['Water for all', 'free']];
     items.forEach(([a, b], i) => { txt(cc, a, 60, 170 + i * 58, 40, { w: 600 }); txt(cc, b, w - 60, 170 + i * 58, 40, { w: 700, align: 'right', color: '#FCAF45' }); });
   } });
   menu.mesh.position.set(sx, 2.55, sz - 1.31); WORLD.add(menu.mesh); LANG_HOOKS.push(() => menu.invalidate());
@@ -2283,7 +2286,7 @@ function buildWorld() {
    pavilion and corner lights, quality levels
    ============================================================================ */
 const LIGHTS = { all: [], tiers: { high: [], medium: [], low: [] }, movers: [], keys: [] };
-let QUALITY = QUALITY_PARAM || (IS_TOUCH_DEVICE ? 'medium' : 'high');
+let QUALITY = QUALITY_PARAM || 'medium';
 function reg(light, tier = 'low') { LIGHTS.all.push(light); light.userData.tier = tier; return light; }
 
 const beamMat = (color) => new THREE.ShaderMaterial({
@@ -2315,8 +2318,8 @@ function makeMover(parent, pos, color, { spot = false, len = 17, radius = 2.2 } 
   LIGHTS.movers.push(m); return m;
 }
 function setupLights() {
-  scene.environment = Assets.env || null; scene.environmentIntensity = 0.42;
-  const hemi = reg(new THREE.HemisphereLight('#3a4a86', '#140c10', 0.7)); scene.add(hemi); LIGHTS.hemi = hemi;
+  scene.environment = Assets.env || null; scene.environmentIntensity = 0.62;
+  const hemi = reg(new THREE.HemisphereLight('#929bb6', '#463026', 0.95)); scene.add(hemi); LIGHTS.hemi = hemi;
   const moon = reg(new THREE.DirectionalLight('#9fb4ff', 0.55)); moon.position.copy(MOON_DIR).multiplyScalar(60); moon.target.position.set(0, 0, 0);
   moon.castShadow = true; moon.shadow.mapSize.set(QUALITY === 'high' ? 4096 : 2048, QUALITY === 'high' ? 4096 : 2048);
   Object.assign(moon.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 5, far: 140 }); moon.shadow.bias = -0.0004; moon.shadow.normalBias = 0.03;
@@ -2353,12 +2356,21 @@ function applyQuality(q, xr) {
   QUALITY = q;
   const allow = xr ? ['low'] : q === 'high' ? ['low', 'medium', 'high'] : q === 'medium' ? ['low', 'medium'] : ['low'];
   for (const l of LIGHTS.all) l.visible = allow.includes(l.userData.tier);
+  updateLightBudget();
   if (LIGHTS.moon) LIGHTS.moon.castShadow = q !== 'low' || xr;
-  renderer.setPixelRatio(xr ? 1 : Math.min(window.devicePixelRatio || 1, TEST_MODE ? 1 : q === 'high' ? 1.5 : q === 'medium' ? 1.2 : 1));
+  renderer.setPixelRatio(xr ? 1 : Math.min(window.devicePixelRatio || 1, TEST_MODE ? 1 : q === 'high' ? 1.25 : q === 'medium' ? 1.0 : 0.85));
   renderer.shadowMap.needsUpdate = true;
+  const qb = document.getElementById('btnQual'); if (qb) qb.textContent = q === 'high' ? 'HIGH' : q === 'medium' ? 'MED' : 'PERF';
   if (typeof Post !== 'undefined') Post.resize();
 }
 
+// Bound actual PBR lights; decorative fixtures retain their emissive glow.
+function updateLightBudget() {
+  const points=LIGHTS.all.filter(l=>l.isPointLight).sort((a,b)=>((a.position.x-player.x)**2+(a.position.z-player.z)**2)-((b.position.x-player.x)**2+(b.position.z-player.z)**2));
+  const n=QUALITY==='high'?8:QUALITY==='medium'?6:4;
+  points.forEach((l,i)=>l.visible=i<n);
+  LIGHTS.all.filter(l=>l.isSpotLight).forEach((l,i)=>{l.visible=i<(QUALITY==='low'?1:2);l.castShadow=false});
+}
 /* moving-head choreography + beam colours by show segment */
 const LightShow = {
   t: 0, flash: 0,
@@ -2627,9 +2639,17 @@ function spawnPeople() {
   Social.wanderers.push({ p: W2, route: [{ x: 21.5, z: -17.2 }, { x: 7.6, z: -15.5 }, { x: 18.6, z: 12 }, { x: 1.5, z: 27.2 }], i: 0, t: 6 });
   Self.init();
 }
+let _pplTick = 0;
 function updatePeople(dt) {
+  _pplTick++;
   const pp = playerPos();
-  for (const p of PEOPLE) if (p !== Self.p) p.update(dt, pp);
+  for (let i = 0; i < PEOPLE.length; i++) {
+    const p = PEOPLE[i]; if (p === Self.p) continue;
+    const d2 = (pp.x - p.pos.x) ** 2 + (pp.z - p.pos.z) ** 2;
+    if (d2 < 484) { p.update(dt, pp); }
+    else if (d2 < 1764) { if ((_pplTick + i) % 3 === 0) p.update(dt * 3, pp); }
+    else { if ((_pplTick + i) % 6 === 0) p.update(dt * 6, pp); }
+  }
   // mentors greet the visitor when they come close
   for (const id of NICHES) { const m = PEOPLE_BY['mentor_' + id]; if (!m || !m.ok) continue; const d = Math.hypot(pp.x - m.pos.x, pp.z - m.pos.z);
     if (d < 4.2) { m.faceTo(pp.x, pp.z); if (!m.greeted) { m.greeted = true; m.once('wave'); m.say(L(MENTORS[id].hello), 5); } } else if (d > 9) m.greeted = false; }
@@ -2658,6 +2678,7 @@ const Show = {
     const tok = ++this.token; this.spotOn = false; this.imagOn = false; this.calling = false; setLedFeed(false);
     logEvent('show_segment', { segment: seg.id });
     Sound.setSegment(seg.id);
+    if (window.TrustDJ && window.TrustDJ.onShowSegment) window.TrustDJ.onShowSegment(seg.id, Sound.on);
     if (seg.id === 'panel') this.runPanel(tok);
     else if (seg.id === 'awards') this.runAwards(tok);
     else if (seg.id === 'finale') this.runFinale(tok);
@@ -2828,8 +2849,8 @@ function initIMAG() {
 function setLedFeed(on) { if (!REFS.led) return; Show.ledFeed = on; REFS.led.mesh.material = on ? REFS.ledFeedMat : REFS.ledMat; }
 const _look = new THREE.Vector3();
 function updateIMAG() {
-  if (!imagRT || !FRAME_DRAW) return; const pp = playerPos(); if (!Show.ledFeed && (!Show.imagOn || Math.hypot(pp.x, pp.z + 22) > 42)) return;
-  if (++imagFrame % (QUALITY === 'high' ? 2 : 4) !== 0) return;
+  if (!imagRT || !FRAME_DRAW || S.ui.modal) return; const pp = playerPos(); if (!Show.ledFeed && (!Show.imagOn || Math.hypot(pp.x, pp.z + 22) > 38)) return;
+  if (++imagFrame % (QUALITY === 'high' ? 6 : 12) !== 0) return;
   _look.lerp(Show.imagOn ? Show.imagTarget : new THREE.Vector3(0, 6, -29), 0.15); imagCam.lookAt(_look);
   const xr = renderer.xr.enabled; renderer.xr.enabled = false; const prev = renderer.getRenderTarget();
   renderer.setRenderTarget(imagRT); renderer.render(scene, imagCam); renderer.setRenderTarget(prev); renderer.xr.enabled = xr;
@@ -3030,8 +3051,8 @@ function setupFood() {
   const id = 'food', P = REFS.pav[id], G = GAME.food; const cl = [];
   const plateMat = std('#f4f1ec', { roughness: 0.3 }), domeMat = std('#d9dde3', { roughness: 0.15, metalness: 1 });
   const foods = [
-    g => { const d = mesh(new THREE.ConeGeometry(0.06, 0.34, 16, 1, true), std('#d8a046', { roughness: 0.6, side: THREE.DoubleSide }), g, 0, 0.05, 0); d.rotation.z = Math.PI / 2; mesh(cylGeo(0.03, 0.03, 0.02, 12), std('#e9e2c9'), g, 0.1, 0.02, 0.08); },
-    g => { for (let k = 0; k < 5; k++) mesh(boxGeo(0.045, 0.04, 0.045), std(k % 2 ? '#d4683a' : '#e8a95a', { roughness: 0.7 }), g, -0.1 + k * 0.05, 0.03, 0); mesh(cylGeo(0.004, 0.004, 0.3, 4), MAT.alu, g, 0, 0.03, 0).rotation.z = Math.PI / 2; },
+    g => { const d = mesh(new THREE.CapsuleGeometry(0.045, 0.22, 4, 12), std('#d8a046', { roughness: 0.6, side: THREE.DoubleSide }), g, 0, 0.05, 0); d.rotation.z = Math.PI / 2; mesh(cylGeo(0.03, 0.03, 0.02, 12), std('#e9e2c9'), g, 0.1, 0.02, 0.08); },
+    g => { for (let k = 0; k < 5; k++) mesh(rboxGeo(0.045, 0.04, 0.045, 0.008), std(k % 2 ? '#d4683a' : '#e8a95a', { roughness: 0.7 }), g, -0.1 + k * 0.05, 0.03, 0); mesh(cylGeo(0.004, 0.004, 0.3, 4), MAT.alu, g, 0, 0.03, 0).rotation.z = Math.PI / 2; },
     g => { const m = mesh(sphGeo(0.11, 16, 10), std('#d9a441', { roughness: 0.9 }), g, 0, 0.0, 0); m.scale.set(1, 0.45, 1); },
   ];
   [-0.95, 0, 0.95].forEach((x, i) => {
@@ -3128,15 +3149,19 @@ function setupFitness() {
     setInteractable(disc, { cue: () => (loaded.includes(i) ? (S.lang === 'hi' ? 'उतारें' : 'Unload') : (S.lang === 'hi' ? 'बार पर लोड करें' : 'Load onto bar')), onClick: () => togglePlate(i), enabled: () => GS(id).step === 'load' });
     plateMeshes.push({ g, disc });
   });
-  const barPlates = [];
-  const rebuildBar = () => { barPlates.forEach(m => bar.remove(m)); barPlates.length = 0; loaded.forEach((i, k) => { for (const s of [-1, 1]) { const m = mesh(cylGeo(0.2, 0.2, 0.05, 28), std(plateCols[i], { roughness: 0.6 }), bar, s * (0.78 + k * 0.07), 0, 0); m.rotation.z = Math.PI / 2; barPlates.push(m); } }); plateMeshes.forEach((pm, i) => { pm.disc.visible = !loaded.includes(i); }); };
-  const togglePlate = (i) => { const k = loaded.indexOf(i); if (k >= 0) loaded.splice(k, 1); else loaded.push(i); Sound.play('clank'); rebuildBar(); scr.invalidate(); };
+  const barPlates = []; let lifting = false;
+  const rebuildBar = () => { barPlates.forEach(m => { bar.remove(m); const ii = interactables.indexOf(m); if (ii >= 0) interactables.splice(ii, 1); }); barPlates.length = 0; loaded.forEach((i, k) => { for (const s of [-1, 1]) { const m = mesh(cylGeo(0.2, 0.2, 0.05, 28), std(plateCols[i], { roughness: 0.6 }), bar, s * (0.78 + k * 0.07), 0, 0); m.rotation.z = Math.PI / 2; setInteractable(m, { cue: () => (S.lang === 'hi' ? 'प्लेट उतारें' : 'Unload plate'), onClick: () => togglePlate(i), enabled: () => GS(id).step === 'load' && !lifting }); barPlates.push(m); } }); plateMeshes.forEach((pm, i) => { pm.disc.visible = !loaded.includes(i); }); };
+  const togglePlate = (i) => { if (lifting) return; const k = loaded.indexOf(i); if (k >= 0) loaded.splice(k, 1); else loaded.push(i); Sound.play('clank'); rebuildBar(); scr.invalidate(); };
+  const resetBar = () => { if (lifting) return; loaded.length = 0; Sound.play('clank'); rebuildBar(); scr.invalidate(); };
   const lift = async () => {
-    const g = GS(id), bad = loaded.some(i => !G.plates[i].ok), good = G.plates.filter(pl => pl.ok).length, ok = !bad && loaded.length === good;
-    const m = PEOPLE_BY.mentor_fitness;
-    if (ok) { if (m) m.once('cheer'); await tween(0.8, k => { bar.position.y = 1.42 + Math.sin(k * Math.PI) * 0.55; }); Sound.applause(3, 0.4); }
-    else { await tween(0.25, k => { bar.position.y = 1.42 + k * 0.2; }); await tween(0.35, k => { bar.position.y = 1.62 - k * 1.42; bar.rotation.z = k * 0.15; }, { ease: EASE.in }); Sound.play('clank'); if (m) m.once('shrug'); await wait(1.2); bar.position.y = 1.42; bar.rotation.z = 0; }
-    Games.answer(id, ok, L(ok ? G.win : G.fail), { loaded: loaded.length, bad });
+    if (lifting) return; lifting = true;
+    try {
+      const g = GS(id), bad = loaded.some(i => !G.plates[i].ok), good = G.plates.filter(pl => pl.ok).length, ok = !bad && loaded.length === good;
+      const m = PEOPLE_BY.mentor_fitness;
+      if (ok) { if (m) m.once('cheer'); await tween(0.8, k => { bar.position.y = 1.42 + Math.sin(k * Math.PI) * 0.55; }); Sound.applause(3, 0.4); }
+      else { await tween(0.25, k => { bar.position.y = 1.42 + k * 0.2; }); await tween(0.35, k => { bar.position.y = 1.62 - k * 1.42; bar.rotation.z = k * 0.15; }, { ease: EASE.in }); Sound.play('clank'); if (m) m.once('shrug'); await wait(1.2); bar.position.y = 1.42; bar.rotation.z = 0; }
+      Games.answer(id, ok, L(ok ? G.win : G.fail), { loaded: loaded.length, bad });
+    } finally { lifting = false; scr.invalidate(); }
   };
   const scr = standScreen(id, 'fitness_board', 1.9, -0.4, 2.2, 1.35, (c, w, h, s) => {
     const g = GS(id);
@@ -3144,7 +3169,8 @@ function setupFitness() {
     if (g.step === 'load') { gameHeader(c, w, h, id, L(G.intro));
       if (!feedbackBox(c, s, w, h, id, 200, ok => { if (ok) Games.go(id, 'cred'); }))
       { txt(c, (S.lang === 'hi' ? 'बार पर: ' : 'On the bar: ') + (loaded.length ? loaded.map(i => '“' + L(G.plates[i].t) + '”').join(', ') : '—'), 36, 230, 28, { w: 600, maxW: w - 72 });
-        uiBtn(c, s, 'lift', 36, h - 140, w - 72, 100, S.lang === 'hi' ? 'उठाइए!' : 'Lift!', { disabled: !loaded.length, onClick: lift }); }
+        uiBtn(c, s, 'lift', 36, h - 140, Math.round((w - 88) * 0.68), 100, S.lang === 'hi' ? 'उठाइए!' : 'Lift!', { disabled: !loaded.length || lifting, onClick: lift });
+        uiBtn(c, s, 'reset', 52 + Math.round((w - 88) * 0.68), h - 140, Math.round((w - 88) * 0.32), 100, S.lang === 'hi' ? 'रीसेट' : 'Reset', { disabled: !loaded.length || lifting, onClick: resetBar }); }
       return; }
     if (g.step === 'cred') { gameHeader(c, w, h, id, L(G.credQ)); if (!feedbackBox(c, s, w, h, id, 200, ok => { if (ok) Games.finish(id); })) optionButtons(c, s, w, 210, G.credA, i => Games.answer(id, i === G.credGood, L(G.credWhy), { cred: i }), 30); return; }
     gameHeader(c, w, h, id); txt(c, '✓ ' + T('done'), 36, 170, 64, { d: true, w: 800, color: '#59E3A0' }); fitPara(c, L(G.win), 36, 200, w - 72, h - 240, 38, { w: 500 });
@@ -3245,7 +3271,7 @@ const Booth = {
   },
   async shoot() {
     if (this.busy || !Self.p || !Self.p.ok) return; this.busy = true; this.scr.invalidate(); logEvent('photo', { action: 'start', label: PHOTO_LABELS[this.label].id });
-    const me = Self.p, mark = REFS.marks.photo; me.posing = true; me.teleport(mark.x, mark.z, Math.atan2(REFS.boothCamPos.x - mark.x, REFS.boothCamPos.z - mark.z)); me.play(this.poses[this.pose][0], { fade: 0.2, offset: this.pose === 0 ? 0.6 : 0 });
+    const me = Self.p, mark = REFS.marks.photo; try { me.posing = true; me.teleport(mark.x, mark.z, Math.atan2(REFS.boothCamPos.x - mark.x, REFS.boothCamPos.z - mark.z)); me.play(this.poses[this.pose][0], { fade: 0.2, offset: this.pose === 0 ? 0.6 : 0 });
     camera.layers.enable(LAYER_SELF);
     const friends = Social.groups.find(g => g.id === 'photo'); const fr = friends ? friends.members.filter(p => p.ok && !p.path) : [];
     fr.forEach((p, i) => { p.posing = true; const side = new THREE.Vector3(-Math.cos(REFS.boothRy), 0, Math.sin(REFS.boothRy)).multiplyScalar(i ? -0.75 : 0.75); p.walkTo([{ x: mark.x + side.x, z: mark.z + side.z }], q => { q.faceTo(REFS.boothCamPos.x, REFS.boothCamPos.z); q.play(i ? 'wave' : 'cheer'); }, 1.6); });
@@ -3257,17 +3283,27 @@ const Booth = {
     fr.forEach(p => { p.posing = false; p.walkTo([p.home], q => { q.faceTo(friends.cx, friends.cz); }, 1.3); });
     setTimeout(() => { if (!this.recording) { me.posing = false; camera.layers.disable(LAYER_SELF); } }, 1500);
     showPhoto(this.last);
+    } catch(e) { console.error('Photo capture failed',e); toast('Photo could not be captured. Please try again.', 'bad'); } finally { this.busy=false; me.posing=false; camera.layers.disable(LAYER_SELF); this.scr.invalidate(); window.TrustSocial?.photoFinished(); }
   },
   async recordLoop() {
     if (this.recording || typeof MediaRecorder === 'undefined') { toast(S.lang === 'hi' ? 'इस ब्राउज़र में लूप रिकॉर्डिंग उपलब्ध नहीं।' : 'Loop recording isn’t available in this browser.', 'bad'); return; }
-    const me = Self.p, mark = REFS.marks.photo; me.posing = true; me.teleport(mark.x, mark.z, Math.atan2(REFS.boothCamPos.x - mark.x, REFS.boothCamPos.z - mark.z)); me.play('dance');
-    const rc = document.createElement('canvas'); rc.width = rc.height = 720; const stream = rc.captureStream(30), chunks = [];
-    let rec; try { rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' }); } catch (e) { toast('Recording failed', 'bad'); return; }
-    rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-    const done = new Promise(r => { rec.onstop = r; });
-    this.recording = { canvas: rc, ctx: rc.getContext('2d') }; rec.start(); closeModal('dlgPhoto', true);
-    await wait(3.2); rec.stop(); await done; this.recording = false; me.posing = false;
-    saveFile('creator-night-loop.webm', new Blob(chunks, { type: 'video/webm' }), 'video/webm'); logEvent('photo', { action: 'loop_saved' });
+    const me = Self.p, mark = REFS.marks.photo;
+    let stream = null;
+    try {
+      me.posing = true; me.teleport(mark.x, mark.z, Math.atan2(REFS.boothCamPos.x - mark.x, REFS.boothCamPos.z - mark.z)); me.play('dance');
+      const rc = document.createElement('canvas'); rc.width = rc.height = 720; stream = rc.captureStream(30); const chunks = [];
+      const rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' });
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      const done = new Promise(r => { rec.onstop = r; });
+      this.recording = { canvas: rc, ctx: rc.getContext('2d') }; rec.start(); closeModal('dlgPhoto', true);
+      await wait(3.2); if (rec.state !== 'inactive') rec.stop(); await done;
+      saveFile('creator-night-loop.webm', new Blob(chunks, { type: 'video/webm' }), 'video/webm'); logEvent('photo', { action: 'loop_saved' });
+    } catch (e) {
+      toast('Recording failed', 'bad');
+    } finally {
+      this.recording = false; me.posing = false; camera.layers.disable(LAYER_SELF);
+      if (stream) stream.getTracks().forEach(t => { try { t.stop(); } catch (_) {} });
+    }
   },
 };
 function flashScreen() { const f = $('fade'); f.style.background = '#fff'; f.style.transition = 'none'; f.style.opacity = '0.85'; requestAnimationFrame(() => { f.style.transition = 'opacity .5s'; f.style.opacity = '0'; setTimeout(() => { f.style.background = '#000'; }, 520); }); }
@@ -3285,8 +3321,8 @@ function composePost(img) {
   x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
   x.fillStyle = gradFill(x, 20, 120, 120, 20); x.beginPath(); x.arc(70, 70, 46, 0, 7); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.arc(70, 70, 40, 0, 7); x.fill(); drawMark(x, 70, 72, 30);
   txt(x, handleOf(S.alias), 135, 64, 34, { w: 700, color: '#121018' }); txt(x, S.lang === 'hi' ? 'क्रिएटर नाइट · ट्रस्ट आर्केड' : 'Creator Night · Trust Arcade', 135, 104, 26, { w: 500, color: '#666' });
-  x.drawImage(img, 0, 140, W, W);
-  const yI = 140 + W + 58; drawIcon(x, 'heartF', 60, yI, 58, '#E1306C'); drawIcon(x, 'chat', 148, yI, 52, '#121018'); drawIcon(x, 'send', 232, yI, 50, '#121018'); drawIcon(x, 'save', W - 60, yI, 50, '#121018');
+  x.drawImage(img, 58, 140, W-116, W-116);
+  const yI = 140 + W - 52; drawIcon(x, 'heartF', 60, yI, 58, '#E1306C'); drawIcon(x, 'chat', 148, yI, 52, '#121018'); drawIcon(x, 'send', 232, yI, 50, '#121018'); drawIcon(x, 'save', W - 60, yI, 50, '#121018');
   const lab = PHOTO_LABELS[Booth.label]; let cap = L(PHOTO_CAPTIONS[Booth.cap]); if (lab.id !== 'none') cap = (lab.id === 'ad' ? '#ad ' : '#gifted ') + cap;
   const hd = handleOf(S.alias); txt(x, hd, 40, yI + 74, 32, { w: 800, color: '#121018' }); x.font = F(32, 800); const hw = x.measureText(hd).width;
   txt(x, cap, 40 + hw + 14, yI + 74, 32, { w: 500, color: '#121018', maxW: W - 100 - hw });
@@ -3340,11 +3376,11 @@ function updateGames(dt) {
 /* ============================================================================
    DOM UI: start panel, HUD, passport, map, photo, help, researcher overlay
    ============================================================================ */
-const MODALS = ['dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd'];
+const MODALS = ['dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd', 'dlgStudio', 'dlgTrustWall', 'dlgMarket', 'dlgFreebies', 'dlgCaffeine'];
 function openModal(id) {
   if (XRS.active) return;
-  MODALS.forEach(m => { if (m !== id) $(m).classList.add('hidden'); });
-  $(id).classList.remove('hidden'); S.ui.modal = id; releasePointer(); applyHover(null);
+  MODALS.forEach(m => { if (m !== id) $(m)?.classList.add('hidden'); });
+  $(id).classList.remove('hidden'); S.ui.modal = id; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; keys.clear(); releasePointer(); applyHover(null); if (window.TrustLabs) window.TrustLabs.renderFieldNotesHook();
   if (id === 'dlgMap') { MapUI.sel = null; drawMapDialog(); } if (id === 'dlgPass') fillPassport(); if (id === 'dlgHelp') fillHelp();
   Sound.play('open');
   logEvent('ui_open', { dialog: id });
@@ -3354,7 +3390,7 @@ function releasePointer() { if (document.pointerLockElement) document.exitPointe
 
 function buildStartPanel() {
   const grid = $('avatarGrid'); grid.innerHTML = '';
-  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; b.onclick = () => { S.avatar = a; refreshStart(); Sound.play && Sound.play('click'); }; grid.appendChild(b); });
+  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; b.setAttribute('aria-label', 'Choose avatar ' + a.replaceAll('_', ' ')); b.onclick = () => { S.avatar = a; refreshStart(); Sound.play && Sound.play('click'); }; grid.appendChild(b); });
   document.querySelectorAll('#langSeg button').forEach(b => b.onclick = () => { setLang(b.dataset.lang); refreshStart(); });
   $('optLog').checked = S.consent;
   $('btnStart').onclick = () => startExperience({ sound: $('optSound').checked, consent: $('optLog').checked });
@@ -3403,11 +3439,11 @@ function updateShowChip() {
 }
 function setHint(t) { const h = $('hint'); if (t === undefined) t = zoneHint(); if (!t || XRS.active) { h.classList.add('hidden'); return; } h.textContent = t; h.classList.remove('hidden'); clearTimeout(setHint.tm); setHint.tm = setTimeout(() => h.classList.add('hidden'), 9000); }
 function setCue(t) { const c = $('cue'); if (!t || XRS.active) { c.classList.add('hidden'); $('reticle').classList.remove('hot'); return; } c.textContent = t; c.classList.remove('hidden'); $('reticle').classList.add('hot'); }
-function updateReticle() { $('reticle').classList.toggle('hidden', !S.started || XRS.active || !(ptr.locked || IS_TOUCH_DEVICE || NO_LOCK)); }
+function updateReticle() { $('reticle').classList.toggle('hidden', !S.started || XRS.active || !(ptr.locked || IS_TOUCH_DEVICE)); }
 const ICON_SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 const ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg>';
 function updateSoundBtn() { const b = $('btnSound'); if (b) { b.classList.toggle('on', Sound.on); b.innerHTML = Sound.on ? ICON_SOUND_ON : ICON_SOUND_OFF; b.title = (Sound.on ? (S.lang === 'hi' ? 'आवाज़ बंद करें' : 'Mute') : (S.lang === 'hi' ? 'आवाज़ चालू करें' : 'Sound on')) + ' (N)'; } }
-function toggleSound() { Sound.set(!Sound.on); toast(Sound.on ? T('soundOn') : T('soundOff')); logEvent('sound', { on: Sound.on }); }
+function toggleSound() { Sound.set(!Sound.on); if (window.TrustDJ && window.TrustDJ.onShowSegment) window.TrustDJ.onShowSegment(Show && Show.seg ? Show.seg.id : 'interval', Sound.on); toast(Sound.on ? T('soundOn') : T('soundOff')); logEvent('sound', { on: Sound.on }); }
 
 /* ---------- passport ---------- */
 function fillPassport() {
@@ -3427,10 +3463,10 @@ function passImage() {
 }
 /* ---------- map ---------- */
 const TRAVEL = {
-  entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: -7.5, z: -18.6, yaw: 0 },
-  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 19.8, z: 26.5, yaw: -Math.PI / 2 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.5, z: -25.5, yaw: Math.PI / 2 },
+  entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: 0, z: -17.8, yaw: 0 },
+  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 23.0, z: 26.5, yaw: -Math.PI / 2 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.5, z: -25.5, yaw: Math.PI / 2 },
 };
-for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 19.2, z: p.z, yaw: p.side < 0 ? Math.PI / 2 : -Math.PI / 2 }; }
+for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 23.0, z: p.z + 1.5, yaw: p.side < 0 ? Math.PI / 2 : -Math.PI / 2 }; }
 /* ---------- map: live minimap in the HUD, full map with tap-to-jump ---------- */
 const MAP_W = 80, MAP_H = 74;
 const mapToPx = (x, z, w, h) => [(x + 40) * w / MAP_W, (z + 37) * h / MAP_H];
@@ -3575,22 +3611,26 @@ function drawMapDialog() {
   };
   $('mapGo').onclick = goMapSel;
 }
+let _isTraveling = false;
 async function fastTravel(t) {
-  const f = $('fade'); f.style.opacity = '1'; Sound.play('whoosh'); await wait(0.3);
-  if (XRS.active) { renderer.xr.getCamera().getWorldPosition(_hp); rig.position.x += t.x - _hp.x; rig.position.z += t.z - _hp.z; }
-  else { player.x = t.x; player.z = t.z; player.yaw = t.yaw; player.pitch = -0.04; player.vx = player.vz = 0; }
-  Tour.stop(true); await wait(0.1); f.style.opacity = '0'; Sound.play('teleport');
+  if (_isTraveling) return; _isTraveling = true;
+  try {
+    const f = $('fade'); f.style.opacity = '1'; Sound.play('whoosh'); await wait(0.3);
+    if (XRS.active) { renderer.xr.getCamera().getWorldPosition(_hp); rig.position.x += t.x - _hp.x; rig.position.z += t.z - _hp.z; }
+    else { player.x = t.x; player.z = t.z; player.yaw = t.yaw; player.pitch = -0.04; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; }
+    Tour.stop(true); await wait(0.1); f.style.opacity = '0'; Sound.play('teleport');
+  } finally { _isTraveling = false; }
 }
 /* ---------- photo dialog ---------- */
 function showPhoto(canvas) {
   if (XRS.active) { VRPanel.photo(canvas); return; }
-  $('photoOut').src = canvas.toDataURL('image/jpeg', 0.92); openModal('dlgPhoto');
+  $('photoOut').src = canvas.toDataURL('image/jpeg', 0.92); $('photoOut').alt='Your Creator Night photo print'; openModal('dlgPhoto'); window.TrustSocial?.animatePrint();
 }
 /* ---------- help + credits ---------- */
 function fillHelp() {
   const desk = S.lang === 'hi'
     ? ['<b>चलना:</b> WASD या ऐरो की, Shift से दौड़ें। माउस से देखें, स्क्रॉल से आगे-पीछे बढ़ें।', '<b>इस्तेमाल:</b> स्क्रीन, क्रिएटर या चीज़ पर क्लिक करें। E/Enter भी काम करता है।', '<b>टूर:</b> T दबाएँ और स्क्रॉल करके पूरे ग्राउंड का गाइडेड टूर लें।', '<b>नक्शा:</b> ऊपर बाईं ओर के मैप पर टैप करें (या M दबाएँ), कोई जगह चुनें और "यहाँ चलें" दबाकर सीधे वहाँ पहुँचें।', '<b>शॉर्टकट:</b> M नक्शा, P पासपोर्ट, H मदद, L रिसर्च ओवरले, Esc पॉइंटर छोड़ें।', '<b>VR:</b> बायाँ स्टिक चलना, दायाँ स्टिक मुड़ना, दायाँ ग्रिप टेलीपोर्ट, ट्रिगर इस्तेमाल, B/Y पैनल।']
-    : ['<b>Walk:</b> WASD or arrow keys, Shift to run. Mouse looks around, scroll glides forward or back.', '<b>Use:</b> click a screen, creator or object. E or Enter works too.', '<b>Tour:</b> press T, then scroll to glide through the whole ground.', '<b>Map:</b> tap the map in the top-left corner (or press M), pick any spot and press Go to jump straight there.', '<b>Shortcuts:</b> M map, P passport, H help, L researcher overlay, Esc releases the pointer.', '<b>VR:</b> left stick walks, right stick turns, right grip teleports, trigger uses, B/Y opens the panel.'];
+    : ['<b>Walk:</b> WASD or arrow keys, Shift to run. Drag to look around. Release and click a person or object; no Esc needed.', '<b>Use:</b> click a screen, creator or object. E or Enter works too.', '<b>Tour:</b> press T, then scroll to glide through the whole ground.', '<b>Map:</b> tap the map in the top-left corner (or press M), pick any spot and press Go to jump straight there.', '<b>Shortcuts:</b> M map, P passport, H help, L researcher overlay, Esc closes a panel.', '<b>VR:</b> left stick walks, right stick turns, right grip teleports, trigger uses, B/Y opens the panel.'];
   $('helpBody').innerHTML = desk.map(l => `<p style="margin:6px 0">${l}</p>`).join('') + `<p class="fine">${esc(T('unofficial'))}</p>`;
   $('creditsBox').textContent = CREDITS;
 }
@@ -3617,7 +3657,8 @@ const Research = {
 function bindUI() {
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { const m = b.closest('.modal'); if (m) closeModal(m.id); });
   $('btnLang').onclick = () => setLang(S.lang === 'hi' ? 'en' : 'hi');
-  $('btnMap').onclick = () => openModal('dlgMap'); $('btnPass').onclick = () => openModal('dlgPass'); $('btnHelp').onclick = () => openModal('dlgHelp');
+  $('btnMap').onclick = () => openModal('dlgMap'); $('btnPass').onclick = () => openModal('dlgPass');   $('btnHelp').onclick = () => openModal('dlgHelp');
+  if ($('btnQual')) $('btnQual').onclick = () => { AutoQ.on = false; const next = QUALITY === 'high' ? 'medium' : QUALITY === 'medium' ? 'low' : 'high'; applyQuality(next, false); toast(next === 'low' ? 'Performance mode (Max FPS)' : next === 'medium' ? 'Balanced graphics' : 'High graphics'); };
   $('btnTour').onclick = () => Tour.toggle(); $('btnSound').onclick = () => toggleSound(); $('btnResearch').onclick = () => Research.toggle();
   $('hpResearch').onclick = () => { closeModal('dlgHelp', true); Research.toggle(true); }; $('hpCredits').onclick = () => $('creditsBox').classList.toggle('hidden');
   $('passSave').onclick = () => passImage().toBlob(b => saveFile('creator-night-pass.png', b, 'image/png'), 'image/png');
@@ -3702,7 +3743,7 @@ function setupInput() {
       case 'KeyL': Research.toggle(); break; case 'KeyT': Tour.toggle(); break; case 'KeyN': toggleSound(); break;
       case 'KeyG': setLang(S.lang === 'hi' ? 'en' : 'hi'); break;
       case 'Space': if (Tour.on) Tour.paused = !Tour.paused; break;
-      case 'KeyE': case 'Enter': activate(ptr.locked || isTouch() || NO_LOCK ? pickCenter() : (ptr.mx >= 0 ? pickScreen(ptr.mx, ptr.my) : pickCenter()), 'keyboard'); break;
+      case 'KeyE': case 'Enter': activate(ptr.locked || isTouch() ? pickCenter() : (ptr.mx >= 0 ? pickScreen(ptr.mx, ptr.my) : pickCenter()), 'keyboard'); break;
       default: break;
     }
   });
@@ -3717,7 +3758,7 @@ function setupInput() {
   window.addEventListener('resize', onResize);
 }
 function updateMovement(dt) {
-  if (XRS.active || Shot.active) return;
+  if (XRS.active || Shot.active || S.ui.modal) return;
   updateLookSmooth(dt);
   if (Tour.on) { Tour.update(dt); player.moving = true; return; }
   const free = S.started && !S.ui.modal, k = c => keys.has(c);
@@ -3827,6 +3868,7 @@ function updateHover() {
 let pathTimer = 0;
 function zoneAt(x, z) { for (const zn of ZONES) { const [x0, z0, x1, z1] = zn.r; if (x >= x0 && x <= x1 && z >= z0 && z <= z1) return zn.id; } return 'ground'; }
 function updateZones(dt) {
+  if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone);
   if (!S.started) return; const pp = playerPos(), z = zoneAt(pp.x, pp.z);
   if (z !== S.zone) {
     if (S.zone) { const dw = (performance.now() - S.zoneSince) / 1000; S.dwell[S.zone] = (S.dwell[S.zone] || 0) + dw; logEvent('zone_exit', { zone: S.zone, dwell_s: Math.round(dw * 10) / 10 }); }
@@ -3840,7 +3882,7 @@ function closeZoneDwell() { if (!S.zone) return; const dw = (performance.now() -
 const XRS = { active: false, ctrls: [], tele: { on: false, valid: false, p: new THREE.Vector3(), marker: null, c: null }, prev: new Map(), snapArmed: true, headYaw: 0 };
 const XRIO = { pulse(intensity, ms) { if (!XRS.active) return; const s = renderer.xr.getSession(); if (!s) return; for (const src of s.inputSources) { const h = src.gamepad && src.gamepad.hapticActuators && src.gamepad.hapticActuators[0]; if (h && h.pulse) { try { h.pulse(intensity, ms); } catch (e) { /* ignore */ } } } } };
 function setupXR() {
-  const btn = VRButton.createButton(renderer); btn.id = 'VRButton'; document.body.appendChild(btn);
+  const btn = VRButton.createButton(renderer); btn.id = 'VRButton'; document.body.appendChild(btn); navigator.xr?.isSessionSupported('immersive-vr').then(ok=>{ if(!ok) btn.style.setProperty('display','none','important'); }); if(!navigator.xr) btn.style.setProperty('display','none','important');
   renderer.xr.addEventListener('sessionstart', onXRStart); renderer.xr.addEventListener('sessionend', onXREnd);
   const rayGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)]);
   for (let i = 0; i < 2; i++) {
@@ -3964,10 +4006,10 @@ const Shot = {
 const Post = {
   composer: null, pass: null, bloom: null,
   init() {
-    const rt = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, samples: 4 });
+    const rt = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, samples: 2 });
     this.composer = new EffectComposer(renderer, rt);
     this.pass = new RenderPass(scene, camera); this.composer.addPass(this.pass);
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2), 0.42, 0.5, 0.9); this.composer.addPass(this.bloom);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(Math.max(1, window.innerWidth / 3), Math.max(1, window.innerHeight / 3)), 0.34, 0.45, 0.92); this.composer.addPass(this.bloom);
     this.grade = new ShaderPass({
       uniforms: { tDiffuse: { value: null }, uTime: { value: 0 } },
       vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
@@ -3980,7 +4022,7 @@ const Post = {
     this.composer.addPass(new OutputPass());
     this.resize();
   },
-  resize() { if (!this.composer) return; const pr = renderer.getPixelRatio(); this.composer.setPixelRatio(pr); this.composer.setSize(window.innerWidth, window.innerHeight); this.bloom.resolution.set(window.innerWidth / 2, window.innerHeight / 2); },
+  resize() { if (!this.composer) return; const pr = renderer.getPixelRatio(); this.composer.setPixelRatio(pr); this.composer.setSize(window.innerWidth, window.innerHeight); this.bloom.resolution.set(Math.max(1, window.innerWidth / 3), Math.max(1, window.innerHeight / 3)); },
   render(dt) {
     if (XRS.active || QUALITY === 'low' || !this.composer) { renderer.render(scene, activeCamera); return; }
     this.pass.camera = activeCamera; this.grade.uniforms.uTime.value = (this.grade.uniforms.uTime.value + dt) % 100; this.composer.render(dt);
@@ -3990,16 +4032,17 @@ const Perf = { fps: 60, acc: 0, n: 0, update(dt) { this.acc += dt; this.n++; if 
 /* automatic quality: if frames run slow for a few seconds, render fewer pixels, then drop lighting tiers; climb back when there is headroom */
 const AutoQ = {
   on: !QUALITY_PARAM && !TEST_MODE, lvl: 0, acc: 0, n: 0, slow: 0, fast: 0, cool: 4, lastDown: -1e9, clock: 0,
-  LADDER: [['high', 1.5], ['high', 1.2], ['medium', 1.0], ['medium', 0.85], ['low', 0.75], ['low', 0.62]],
-  init() { const start = QUALITY === 'high' ? 0 : QUALITY === 'medium' ? 2 : 4; this.lvl = start; this.minLvl = start; },
-  apply() { const [q, pr] = this.LADDER[this.lvl]; applyQuality(q, false); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pr)); Post.resize(); this.cool = 3; this.acc = this.n = 0; },
+  LADDER: [['high', 1.25], ['medium', 1.05], ['medium', 0.9], ['low', 0.85], ['low', 0.7]],
+  init() { const start = QUALITY === 'high' ? 0 : QUALITY === 'medium' ? 1 : 3; this.lvl = start; this.minLvl = start; },
+  apply() { const [q, pr] = this.LADDER[this.lvl]; applyQuality(q, false); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pr)); Post.resize(); this.cool = 2; this.acc = this.n = 0; },
   update(dt) {
-    if (!this.on || XRS.active || document.hidden || !S.started) return;
+    if (!this.on || XRS.active || document.hidden || !S.started || S.ui.modal) return;
     this.clock += dt; if (this.cool > 0) { this.cool -= dt; return; }
-    this.acc += dt; this.n++; if (this.acc < 1.5) return;
+    this.acc += dt; this.n++; if (this.acc < 1.0) return;
     const fps = this.n / this.acc; this.acc = this.n = 0;
-    if (fps < 43) { this.slow++; this.fast = 0; } else if (fps > 57) { this.fast++; this.slow = 0; } else { this.slow = 0; this.fast = 0; }
-    if (this.slow >= 2 && this.lvl < this.LADDER.length - 1) { this.lvl++; this.slow = 0; this.lastDown = this.clock; this.apply(); }
+    const qb = document.getElementById('btnQual'); if (qb) qb.title = `Graphics: ${QUALITY.toUpperCase()} · ${Math.round(fps)} FPS (click to switch)`;
+    if (fps < 48) { this.slow++; this.fast = 0; } else if (fps > 57) { this.fast++; this.slow = 0; } else { this.slow = 0; this.fast = 0; }
+    if (this.slow >= 1 && this.lvl < this.LADDER.length - 1) { this.lvl++; this.slow = 0; this.lastDown = this.clock; this.apply(); }
     else if (this.fast >= 7 && this.lvl > this.minLvl && this.clock - this.lastDown > 25) { this.lvl--; this.fast = 0; this.apply(); }
   },
 };
@@ -4008,20 +4051,20 @@ let lastT = 0, frameN = 0, hudT = 0, screenT = 0;
 function loop(t) { const dt = Math.min(0.05, Math.max(0.0001, (t - (lastT || t)) / 1000)); lastT = t; frame(dt, true); }
 let FRAME_DRAW = true;
 function frame(dt, draw = true) {
-  frameN++; Perf.update(dt); FRAME_DRAW = draw;
+  frameN++; Perf.update(dt); FRAME_DRAW = draw; if(frameN%90===0) updateLightBudget();
   updateMovement(dt); applyRig(dt);
   Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); updateGames(dt);
   updateXR(dt); VRPanel.update(dt);
-  if (frameN % 2 === 0) updateHover();
+  if (frameN % 3 === 0) updateHover();
   updateZones(dt); updateTweens(dt); Research.update(dt);
   REFS.sky.uniforms.uTime.value = Show.elapsed;
   if (REFS.fx.aviationPts) REFS.fx.aviationPts.visible = Math.sin(Show.elapsed * 3) > 0;
-  Sound.update(dt); MiniMap.update(dt); AutoQ.update(dt);
+  Sound.update(dt); if (frameN % 2 === 0) MiniMap.update(dt * 2); AutoQ.update(dt);
   hudT += dt; if (hudT > 0.5) { hudT = 0; updateShowChip(); updateSubs(); if (REFS.screens.schedule) REFS.screens.schedule.invalidate(); }
-  screenT += dt; const liveTick = screenT > 1 / 12; if (liveTick) screenT = 0;
-  if (draw || frameN % 30 === 0) for (const s of SCREENS) if (s.dirty || (s.live && liveTick)) { if (s.mesh.visible || s.live) s.redraw(Show.elapsed); }
-  const every = QUALITY === 'high' ? 2 : 4; if (frameN % every === 0 || frameN < 5) renderer.shadowMap.needsUpdate = true;
-  if (!draw) return;
+  screenT += dt; const liveTick = screenT > 1 / 6; if (liveTick) screenT = 0;
+  if (!S.ui.modal && (draw || frameN % 30 === 0)) for (const s of SCREENS) if (s.dirty || (s.live && liveTick)) { if (s.mesh.visible || s.live) s.redraw(Show.elapsed); }
+  const every = QUALITY === 'high' ? 8 : 16; if (frameN % every === 0 || frameN < 4) renderer.shadowMap.needsUpdate = true;
+  if (!draw || (S.ui.modal && frameN % 4 !== 0)) return;
   renderer.info.reset();
   if (Booth.recording) { const shot = captureCamera(Booth.cam, 720); Booth.recording.ctx.drawImage(shot, 0, 0); }
   else Post.render(dt);
@@ -4041,16 +4084,32 @@ async function init() {
   await Assets.loadAll(p => setLoad(0.05 + p * 0.8, p > 0.5 ? T('loadingPeople') : T('loading')));
   setLoad(0.88);
   buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); VRPanel.init();
-  setupInput(); setupXR(); bindUI(); Post.init(); Tour.init(); AutoQ.init(); MiniMap.init();
+  setupInput(); setupXR(); bindUI(); Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
+  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, PEOPLE_BY,
+    capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
+
+  window.brandArtReady = window.TrustBrandArt.mount({THREE,REFS,WORLD,SCREENS,drawMark,Person});
   RAY_TARGETS = [...interactables, ...occluders];
   setLang(S.lang); buildStartPanel();
   player.x = START.x; player.z = START.z; player.yaw = START.yaw; player.pitch = START.pitch || 0; applyRig(1);
   Show.update(0.001); renderer.shadowMap.needsUpdate = true;
   setLoad(1);
+  setLoad(.97, 'Preparing the festival lights…');
+  await renderer.compileAsync(scene, camera);
   if (!TEST_MODE) renderer.setAnimationLoop(loop); else frame(0.016, true);
   setTimeout(() => { $('loader').classList.add('hidden'); if (!S.started) $('start').classList.remove('hidden'); }, 250);
   window.TrustArcade = debugAPI(); window.TrustArcade.ready = true;
+  window.TrustWorldVisuals?.mountGalleryLightboxes(THREE, REFS);
+  window.TrustArcade.modelsReady = window.TrustModelSlots.tryLoadCuratedSlots(THREE, gltfLoader, REFS, realtimeMaterial).then(result => { window.TrustArcade.modelStatus = result; renderer.shadowMap.needsUpdate = true; return result; });
+
 }
+window.TrustArcadeBridge = {
+  onLabOpen(id) { S.ui.modal = id; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; keys.clear(); releasePointer(); applyHover(null); },
+  onLabClose(id) { if (S.ui.modal === id) S.ui.modal = null; if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone); },
+  jumpToZone(id) {
+    if (TRAVEL[id]) fastTravel(TRAVEL[id]);
+  },
+};
 function debugAPI() {
   return {
     ready: false, S, Show, PEOPLE_BY, Games, Booth, Tour, REFS,
@@ -4078,5 +4137,11 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
+<script src="js/trust-labs.js" defer></script>
+<script src="js/model-slots.js" defer></script>
+<script src="js/dj-deck.js" defer></script>
+<script src="js/world-visuals.js" defer></script>
+<script src="js/social-spaces.js" defer></script><script src="js/brand-art.js" defer></script>
 </body>
 </html>
+
