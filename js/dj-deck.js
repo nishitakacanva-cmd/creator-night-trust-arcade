@@ -1,10 +1,10 @@
 /* Trust Arcade v3 — Bollywood Party DJ Deck (Synced to Stage DJ Segment + Manual HUD Control) */
 (function () {
-  const MIX_PATH = 'assets/audio/bollywood_dj_mix.mp3';
+  const MIX_PATH = 'assets/audio/bollywood_dj_mix.mp3?v=20261126-user';
   const CUES = [
-    { label: 'Dus Bahane + Jaane Jaana', time: 0 },
-    { label: 'Mauja Hi Mauja + Marjaani', time: 50 },
-    { label: 'Om Shanti Om + Jhalak', time: 86 },
+    { label: 'Start the mashup · 0:00', time: 0 },
+    { label: 'Jump to 1:00', time: 60 },
+    { label: 'Jump to 2:00', time: 120 },
   ];
 
   let audio = null;
@@ -79,7 +79,7 @@
       if (playing) setPlaying(false, false);
       return;
     }
-    const isParty = segId === 'dj' || segId === 'finale';
+    const isParty = ['dj', 'finale', 'interval', 'change'].includes(segId);
     if (isParty) {
       if (!playing) {
         // Pick a lively cue point when the DJ party starts

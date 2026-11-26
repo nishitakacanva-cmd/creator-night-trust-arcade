@@ -921,6 +921,7 @@ const Sound = {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.12);
       setTimeout(() => { if (!this.on) for (const e of Object.values(this.el)) { try { e.el.pause(); } catch (err) { /* ignore */ } } }, 600);
     }
+    window.TrustDJ?.onShowSegment(Show?.seg?.id || 'interval', this.on);
     if (typeof updateSoundBtn === 'function') updateSoundBtn();
   },
   decode(ab) { return new Promise((res, rej) => { const p = this.ctx.decodeAudioData(ab, res, rej); if (p && p.then) p.then(res, rej); }); },
@@ -945,8 +946,7 @@ const Sound = {
     st.lp.type = 'lowpass'; st.lp.frequency.value = 16000; st.lp.Q.value = 0.5; st.lp.connect(this.bus.music);
     st.pan = this.panner(SND_STAGE.x, SND_STAGE.y, SND_STAGE.z, 9, 1.0, st.lp);
     const lo = this.em.lounge = { pan: this.panner(CORNERS.lounge.cx, 1.8, CORNERS.lounge.cz, 2.6, 2.2, this.bus.music) };
-    for (const [k, dest] of [['music_main', st.pan], ['music_awards', st.pan], ['music_finale', st.pan], ['music_lounge', lo.pan]]) this.el[k] = this.mkEl(k, dest);
-    this.el.music_lounge.target = 0.55;
+    // Music is owned by TrustDJ so the supplied mashup never competes with legacy loops.
     const jobs = Object.entries(AUDIO_MAP.sprites).map(([k, sp]) => this.fetchBuf('sp_' + k, sp.file));
     for (const k of ['sfx_applause', 'sfx_applause_small', 'amb_crowd', 'amb_fountain', 'amb_fireworks', 'sting_fanfare']) jobs.push(this.fetchBuf(k, AUDIO_MAP.files[k]));
     this.loading = Promise.all(jobs).then(() => { this.ready = true; this.startLoops(); });
