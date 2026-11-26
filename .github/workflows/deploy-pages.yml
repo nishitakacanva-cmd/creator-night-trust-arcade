@@ -1,0 +1,50 @@
+name: Deploy Creator Night to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+      - name: Wait for Pages artifact availability
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'JS'
+          const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts`;
+          for (let attempt = 0; attempt < 20; attempt++) {
+            const response = await fetch(url, {headers: {Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json'}});
+            if (!response.ok) throw new Error(`Artifact lookup failed: ${response.status}`);
+            const result = await response.json();
+            if (result.artifacts?.some(item => item.name === 'github-pages' && !item.expired)) process.exit(0);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          throw new Error('Pages artifact is not yet available.');
+          JS
+  deploy:
+    needs: package
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
