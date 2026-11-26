@@ -2646,6 +2646,9 @@ function updatePeople(dt) {
   for (let i = 0; i < PEOPLE.length; i++) {
     const p = PEOPLE[i]; if (p === Self.p) continue;
     const d2 = (pp.x - p.pos.x) ** 2 + (pp.z - p.pos.z) ** 2;
+    // Avatar meshes disable automatic frustum culling; bound their visible range explicitly.
+    const avatarRange = QUALITY === 'high' ? 36 : QUALITY === 'medium' ? 28 : 22;
+    if(p.model) p.model.visible = d2 < avatarRange * avatarRange;
     if (d2 < 484) { p.update(dt, pp); }
     else if (d2 < 1764) { if ((_pplTick + i) % 3 === 0) p.update(dt * 3, pp); }
     else { if ((_pplTick + i) % 6 === 0) p.update(dt * 6, pp); }
@@ -3464,7 +3467,7 @@ function passImage() {
 /* ---------- map ---------- */
 const TRAVEL = {
   entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: 0, z: -17.8, yaw: 0 },
-  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 23.0, z: 26.5, yaw: -Math.PI / 2 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.5, z: -25.5, yaw: Math.PI / 2 },
+  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 24.8, z: 30.0, yaw: -0.55 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.5, z: -25.5, yaw: Math.PI / 2 },
 };
 for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 23.0, z: p.z + 1.5, yaw: p.side < 0 ? Math.PI / 2 : -Math.PI / 2 }; }
 /* ---------- map: live minimap in the HUD, full map with tap-to-jump ---------- */
@@ -4144,4 +4147,3 @@ init().catch(e => { console.error(e); $('ldText').textContent = 'Something went 
 <script src="js/social-spaces.js" defer></script><script src="js/brand-art.js" defer></script>
 </body>
 </html>
-
