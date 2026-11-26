@@ -18,3 +18,5 @@ Downloaded and optimised on 26 November 2026. All listed sources explicitly rele
 | fashion_jacket | [Polygonal Mind](https://poly.pizza/m/eeKk3ObCbf) | CC0-1.0 | 588 | 72892 | 0 |
 
 Terrazzo colour, OpenGL normal and roughness: [ambientCG Terrazzo001](https://ambientcg.com/view?id=Terrazzo001), Lennart Demes, CC0-1.0. 1K maps converted to WebP. Existing timber, rubber and woven canvas maps retained. Brand-market names are concept wordmarks, not partnerships or endorsements.
+
+The v3.2 twilight environment uses the CC0 [Qwantani Dusk 2 (Pure Sky) panorama](https://polyhaven.com/a/qwantani_dusk_2_puresky). The 1K HDR reflection source is 1,166,018 bytes. A 5,486-byte colour-graded WebP made from that same capture supplies the visible sky. Both are textures, with no triangles. Counter displays, canopy edges, gallery stands and lighting tracks are original geometry built in the scene. The shipping binary copies of the existing rigged characters, animations and props retain their original licences.

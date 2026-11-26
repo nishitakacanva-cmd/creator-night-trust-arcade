@@ -14,6 +14,15 @@
     lawn: { kicker: 'MAIN STAGE · TRUST REPAIR FINALE', title: 'Attach a Visible Correction', btn: 'Open Trust Repair Case' },
   };
 
+  const hiLabs = {
+    fashion:['गिफ़्ट मिली जैकेट की जाँच करें','जैकेट और पोस्ट देखें','कफ़ को पास से देखें। फिर तय करें कि पोस्ट में गिफ़्ट, इस्तेमाल और कमी के बारे में क्या बताएँगे।'],
+    beauty:['स्टूडियो की चमक या इस्तेमाल का सबूत?','सीरम की डायरी देखें','रोशनी बदलें, फिर 21 दिन की डायरी खोलें। दोनों में आपको क्या पता चलता है?'],
+    food:['पहले डिश चुनें, फिर स्पॉन्सर देखें','टेस्टिंग टेबल खोलें','तीनों डिश देखकर अपनी पसंद चुनें। अब स्पॉन्सर की जानकारी खोलकर देखें कि आपकी राय बदलती है या नहीं।'],
+    fitness:['दावे के पीछे कितना सबूत है?','दावे जाँचें','दावे जोड़ें या हटाएँ। देखें कि निजी अनुभव और जाँच रिपोर्ट किस दावे का साथ देते हैं।'],
+    travel:['इस तस्वीर के बाहर क्या है?','पूरा नज़ारा देखें','स्लाइडर दाईं ओर खिसकाएँ। बुक करने से पहले रिसॉर्ट की पूरी तस्वीर देखें।'],
+    education:['सबूत कहाँ से आया?','स्रोत जाँचें','स्रोतों को चुनें। क्या ये अलग-अलग सबूत हैं या सब एक ही दावे को दोहरा रहे हैं?'],
+    stage:['पुरानी पोस्ट पर सुधार लगाएँ','सुधार की कहानी खोलें','चारों कदम देखें। गलती मानने से लेकर सुधार दिखाने तक दर्शक क्या देख पाएँगे?']
+  };
   function loadNotes() {
     try {
       return JSON.parse(sessionStorage.getItem(NOTES_KEY) || '{}');
@@ -22,6 +31,7 @@
     }
   }
   function saveNote(zone, summary) {
+    window.TrustArcadeBridge?.awardLab(zone);
     const notes = loadNotes();
     notes[zone] = { summary, at: new Date().toISOString() };
     try { sessionStorage.setItem(NOTES_KEY, JSON.stringify(notes)); } catch (_) {}
@@ -97,9 +107,12 @@
     }
     const modal = document.getElementById('dlgLab');
     modal.classList.remove('hidden');
+    modal.dataset.zone = key;
+    modal.querySelector('.lab-shell').scrollTop = 0;
     document.getElementById('labKicker').textContent = meta.kicker;
-    document.getElementById('labTitle').textContent = meta.title;
+    document.getElementById('labTitle').textContent = document.documentElement.lang === 'hi' ? hiLabs[key][0] : meta.title;
     renderLabBody(key);
+    document.getElementById('labLaunchBar').classList.add('hidden');
     const closeBtn = document.getElementById('labCloseBtn');
     if (closeBtn) closeBtn.focus();
   }
@@ -130,14 +143,14 @@
   /* 1. FASHION (F01 + F02) */
   function renderFashion(body, sub) {
     const st = LAB_STATE.fashion;
-    sub.textContent = 'Sponsorship does not make a recommendation useless. Edit what the audience actually gets to see.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.fashion[2] : 'Sponsorship does not make a recommendation useless. Edit what the audience actually gets to see.';
     const imgSrc = st.view === 'hero' ? ASSET_BASE + 'fashion_jacket_hero.webp' : ASSET_BASE + 'fashion_jacket_detail.webp';
     const postParts = ['"Wore this plum cotton-twill jacket on a humid Mumbai evening commute."'];
     if (st.condition) postParts.push('Tested across 3 washes and 2 rainy walks; heavy weave holds structure well.');
     if (st.limitation) postParts.push('Drawback: unlined inner cuff seam had one minor loose thread out of the box and runs warm above 30°C.');
     if (!st.condition && !st.limitation) postParts.push('Obsessed with the colour and fit! Link in bio.');
 
-    saveNote('fashion', `Fashion: Built post with ${[st.disclose && 'gifted disclosure', st.condition && 'use conditions', st.limitation && 'inner-seam limitation'].filter(Boolean).join(', ') || 'basic hype only'}.`);
+
 
     body.innerHTML = `
       <div class="lab-stage-card">
@@ -145,8 +158,8 @@
           <img src="${imgSrc}" alt="${st.view === 'hero' ? 'Plum cotton twill jacket' : 'Close-up of unlined inner cuff seam with minor loose thread'}">
         </div>
         <div class="lab-toggle-grid" style="margin-top:12px;margin-bottom:0">
-          <button type="button" class="lab-pill ${st.view === 'hero' ? 'active' : ''}" data-fview="hero">Full Jacket (F01)</button>
-          <button type="button" class="lab-pill ${st.view === 'detail' ? 'active' : ''}" data-fview="detail">Inspect Inner Seam (F02)</button>
+          <button type="button" class="lab-pill ${st.view === 'hero' ? 'active' : ''}" data-fview="hero">Full jacket</button>
+          <button type="button" class="lab-pill ${st.view === 'detail' ? 'active' : ''}" data-fview="detail">Inspect the cuff</button>
         </div>
       </div>
       <div>
@@ -170,13 +183,13 @@
       </div>
     `;
     body.querySelectorAll('[data-fview]').forEach(b => b.onclick = () => { st.view = b.dataset.fview; renderFashion(body, sub); });
-    body.querySelectorAll('[data-ftog]').forEach(b => b.onclick = () => { st[b.dataset.ftog] = !st[b.dataset.ftog]; renderFashion(body, sub); });
+    body.querySelectorAll('[data-ftog]').forEach(b => b.onclick = () => { st[b.dataset.ftog] = !st[b.dataset.ftog]; saveNote('fashion', `Fashion: Built post with ${[st.disclose && 'gifted disclosure', st.condition && 'use conditions', st.limitation && 'inner-seam limitation'].filter(Boolean).join(', ') || 'basic hype only'}.`); renderFashion(body, sub); });
   }
 
   /* 2. FOOD (D01 + D02 + D03) */
   function renderFood(body, sub) {
     const st = LAB_STATE.food;
-    sub.textContent = 'Simulated digital tasting: inspect all three dishes and form a preference before seeing who sponsored a plate.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.food[2] : 'Simulated digital tasting: inspect all three dishes and form a preference before seeing who sponsored a plate.';
     const dishes = [
       { id: 'A', name: 'Charred Paneer Tikka', img: 'food_dish_a.webp', note: 'Smoky char, bright mint-yogurt balance, pomegranate crunch.', sponsored: false },
       { id: 'B', name: 'Tamarind Cauliflower', img: 'food_dish_b.webp', note: 'Crisp glaze, sweet-tangy sesame finish, sharp pickled onion.', sponsored: true },
@@ -186,12 +199,12 @@
       <div class="lab-stage-card">
         <div class="food-grid">
           ${dishes.map((d, idx) => `
-            <div class="food-card ${st.initialPick === d.id ? 'selected' : ''}" data-pick="${d.id}" tabindex="0" role="button">
+            <button type="button" class="food-card ${st.initialPick === d.id ? 'selected' : ''}" data-pick="${d.id}" aria-pressed="${st.initialPick === d.id}">
               <img src="${ASSET_BASE + d.img}" alt="${d.name}">
               <div style="font-size:12px;font-weight:700;margin-top:4px">Dish ${d.id}</div>
               <div style="font-size:11px;color:#544E63">${d.name}</div>
               ${st.revealed ? (d.sponsored ? '<span class="lab-tag sponsor" style="margin-top:6px">Paid Partner</span>' : '<span class="lab-tag" style="margin-top:6px">Unsponsored</span>') : ''}
-            </div>
+            </button>
           `).join('')}
         </div>
         <p style="font-size:11.5px;color:#6B637A;margin:10px 0 0">Note: Digital tasting is simulated. Identical plates & lighting ensure presentation does not signal sponsorship.</p>
@@ -236,7 +249,7 @@
   /* 3. BEAUTY (B01 + B02) */
   function renderBeauty(body, sub) {
     const st = LAB_STATE.beauty;
-    sub.textContent = 'Toggle studio polish on the bottle, then inspect the dated use record separately. Notice what changes and what stays fixed.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.beauty[2] : 'Toggle studio polish on the bottle, then inspect the dated use record separately. Notice what changes and what stays fixed.';
     const isBottle = st.tab === 'bottle';
     const filterCss = isBottle && st.glow ? 'brightness(1.1) contrast(1.06) saturate(1.18) drop-shadow(0 12px 24px rgba(225,48,108,0.28))' : 'none';
     body.innerHTML = `
@@ -280,7 +293,7 @@
   /* 4. FITNESS (P01) */
   function renderFitness(body, sub) {
     const st = LAB_STATE.fitness;
-    sub.textContent = 'Load, unload, or reset claims freely. Stronger, broader promises demand stronger evidence than personal stories.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.fitness[2] : 'Load, unload, or reset claims freely. Stronger, broader promises demand stronger evidence than personal stories.';
     const claims = [
       { id: 'personal', label: 'Personal experience: "Mixed well after my runs"', req: 'Supported by personal use log', heavy: false },
       { id: 'ingredient', label: 'Label fact: "20g plant protein per scoop (batch COA)"', req: 'Supported by verifiable lab report', heavy: false },
@@ -328,7 +341,7 @@
   /* 5. TRAVEL (T01 — Continuous Crop Widening) */
   function renderTravel(body, sub) {
     const st = LAB_STATE.travel;
-    sub.textContent = 'Drag the slider to widen the exact same photograph. The pool view is real—what matters is what sat outside the frame.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.travel[2] : 'Drag the slider to widen the exact same photograph. The pool view is real—what matters is what sat outside the frame.';
     // At 45% crop, scale image to ~220% aligned left; at 100%, show entire continuous frame
     const scalePct = Math.round(10000 / st.cropPct);
     body.innerHTML = `
@@ -337,7 +350,7 @@
           <img src="${ASSET_BASE}travel_full_context.webp" style="width:${scalePct}%;height:100%;object-fit:cover;object-position:left center" alt="Continuous resort scene widening from sunlit infinity pool to adjacent renovation scaffolding and service road">
         </div>
         <label style="display:block;font-size:12px;font-weight:700;margin-top:10px;color:#1D1A26">
-          Visible Frame Width: ${st.cropPct}% ${st.cropPct <= 50 ? '(Postcard Crop)' : st.cropPct >= 95 ? '(Full Context Revealed)' : '(Widening Frame...)'}
+          <span id="cropReadout">Visible frame · ${st.cropPct}% ${st.cropPct <= 50 ? '(Postcard Crop)' : st.cropPct >= 95 ? '(Full Context Revealed)' : '(Widening Frame...)'}</span>
           <input type="range" min="45" max="100" value="${st.cropPct}" class="travel-slider" id="travelRange">
         </label>
       </div>
@@ -346,9 +359,9 @@
         <div class="lab-preview-box">
           <div class="lab-badge-row">
             <span class="lab-tag">Golden-Hour Pool: Real</span>
-            ${st.cropPct > 65 ? '<span class="lab-tag limit">East Wing Renovation Active</span><span class="lab-tag sponsor">Service Road Access</span>' : '<span class="lab-tag">Slide frame wider to inspect surroundings</span>'}
           </div>
-          <div>${st.cropPct > 65 ? '<b>Current dates & terms:</b> East wing scaffolding active 9 AM–6 PM through next month. Cancellation window is 72 hours. Ask for recent guest photos before booking.' : 'A cropped frame can be 100% authentic and still omit noise, access, and seasonal renovation.'}</div>
+          <div id="cropContext" ${st.cropPct <= 65 ? 'hidden' : ''}><b>East wing under renovation.</b> Work runs 9 AM–6 PM. The service road and the 72-hour cancellation window matter when you book.</div>
+          <div id="cropHint" ${st.cropPct > 65 ? 'hidden' : ''}>Widen the frame to inspect the surroundings.</div>
         </div>
         <div class="lab-section-lbl">Your Next Step</div>
         <div class="lab-toggle-grid">
@@ -363,7 +376,10 @@
     `;
     body.querySelector('#travelRange').oninput = e => {
       st.cropPct = Number(e.target.value);
-      renderTravel(body, sub);
+      body.querySelector('.travel-crop-wrap img').style.width = (10000 / st.cropPct) + '%';
+      body.querySelector('#cropReadout').textContent = 'Visible frame · ' + st.cropPct + '%';
+      body.querySelector('#cropContext').hidden = st.cropPct <= 65;
+      body.querySelector('#cropHint').hidden = st.cropPct > 65;
     };
     body.querySelectorAll('[data-tdec]').forEach(b => b.onclick = () => {
       st.decision = b.dataset.tdec;
@@ -375,7 +391,7 @@
   /* 6. EDUCATION (E01 — Source Independence Trail) */
   function renderEducation(body, sub) {
     const st = LAB_STATE.education;
-    sub.textContent = 'Three reposts can still be one single claim. Select sources to check which ones are genuinely independent.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.education[2] : 'Three reposts can still be one single claim. Select sources to check which ones are genuinely independent.';
     const sources = [
       { id: 'creator', label: 'Original Creator Reel', kind: 'Origin #1 (Anecdote)', indep: true },
       { id: 'repost1', label: 'Viral Repost A (Quotes Reel)', kind: 'Echo of Origin #1', indep: false },
@@ -433,7 +449,7 @@
   /* 7. MAIN STAGE — TRUST REPAIR (R01 + R02) */
   function renderStageRepair(body, sub) {
     const st = LAB_STATE.stage;
-    sub.textContent = 'Walk through how visible accountability works when new evidence arrives after a recommendation is already live.';
+    sub.textContent = document.documentElement.lang === 'hi' ? hiLabs.stage[2] : 'Walk through how visible accountability works when new evidence arrives after a recommendation is already live.';
     const steps = [
       { label: '1. Original Post', img: 'repair_bottle_hero.webp', opaque: false, tag: 'Initial Recommendation', text: '"Used this matte-coral insulated bottle all week at my desk—kept water cold for 12 hours and looked clean on camera."' },
       { label: '2. New Evidence', img: 'repair_bottle_leak_detail.webp', opaque: true, tag: 'New Issue Found', text: 'After carrying the bottle sideways in a backpack, water visibly leaked from the brushed steel lid seam onto notebooks.' },
@@ -482,7 +498,10 @@
       if (!entries.length) {
         box.innerHTML = `<h4>Your Field-Note Takeaway</h4><div>Explore any learning pavilion and tap <b>Inspect Lab</b> to record your own evidence notes here.</div>`;
       } else {
-        box.innerHTML = `<h4>Your Field-Note Takeaway (${entries.length} recorded)</h4><ul>${entries.map(e => `<li>${e.summary}</li>`).join('')}</ul>`;
+        box.innerHTML = `<h4>Your Field-Note Takeaway (${entries.length} recorded)</h4><ul></ul>`;
+        for (const entry of entries) {
+          const line = document.createElement('li'); line.textContent = entry.summary; box.lastElementChild.append(line);
+        }
       }
     });
   }
@@ -494,7 +513,7 @@
     const txt = document.getElementById('labLaunchText');
     const meta = ZONE_LAB_META[zoneId];
     if (meta && !document.querySelector('.modal:not(.hidden)')) {
-      txt.textContent = meta.btn;
+      txt.textContent = document.documentElement.lang === 'hi' ? hiLabs[zoneId === 'lawn' ? 'stage' : zoneId][1] : meta.btn;
       bar.classList.remove('hidden');
     } else {
       bar.classList.add('hidden');

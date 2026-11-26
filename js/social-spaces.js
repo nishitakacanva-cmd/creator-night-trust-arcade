@@ -63,24 +63,77 @@
     ['Iced matcha','Cold brew','Adrak chai'].forEach((label,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=label;b.onclick=()=>{$('drinkStatus').textContent=label+' is ready. Find a seat and enjoy the evening.';ctx.Sound.play('select')};$('drinkChoices').append(b)});
     const menu=g.children.find(x=>x.name==='social_Caffeine Corner');if(menu)ctx.setInteractable(menu,{cue:()=> 'Pick your caffeine',onClick:openDrink,reach:5});
   }
+  function nearestBrand(x,z) {
+    return brands.reduce((near,b) => Math.hypot(x-b.x,z-b.z)<Math.hypot(x-near.x,z-near.z)?b:near);
+  }
   function openMarket(brand){activeBrand=brand;$('marketBrand').textContent=brand.name+' · '+brand.cat;$('marketItem').textContent='Try '+brand.item+'. Make a story that tells people what you actually know.';$('storyText').value='I received '+brand.item+' from '+brand.name+'. Here’s my first impression — I haven’t tested it long term.';$('giftDisclosure').checked=true;$('storyStatus').textContent='';updateStory();open('dlgMarket')}
-  function updateStory(){ $('storyDisclosure').textContent=$('giftDisclosure').checked?'Gifted · '+activeBrand.name:'Disclosure hidden';$('storyWords').textContent=$('storyText').value;$('previewStory').disabled=!$('giftDisclosure').checked||!$('storyText').value.trim();}
+  function updateStory(){ $('storyDisclosure').textContent=$('giftDisclosure').checked?'Gifted · '+activeBrand.name:'Disclosure hidden';$('storyWords').textContent=$('storyText').value;$('previewStory').disabled=!$('giftDisclosure').checked||!$('storyText').value.trim();
+    $('storyStatus').textContent=!$('giftDisclosure').checked?'Add the Gifted label so viewers know where the sample came from.':!$('storyText').value.trim()?'Write your own first impression before collecting the sample.':'';}
+  function dressCounter(g, brand, accent) {
+    const {THREE, MAT, Merger, rboxGeo, torusGeo} = ctx;
+    const parts = new Merger();
+    const at = (x,y,z) => new THREE.Matrix4().makeTranslation(x,y,z);
+    const round = (mat,w,h,d,x,y,z,r=.025) => parts.add(rboxGeo(w,h,d,r),mat,at(x,y,z));
+    // Fluted timber fronts, edge lighting and a woven scalloped awning share a batch per finish.
+    for (let i=0;i<26;i++) parts.box(MAT.woodSlat,.045,.76,.045,-1.36+i*.109,.60,.844);
+    parts.box(MAT.bulb,2.82,.014,.023,0,1.107,.87);
+    for (let i=0;i<14;i++) round(i%2 ? MAT.cream : accent,.232,.19,.07,-1.5+i*.231,2.80,1.09,.035);
+    const top=1.181;
+    if (brand.cat==='Coffee' || brand.cat==='Food & drinks') {
+      for (let i=0;i<3;i++){
+        const x=-.72+i*.29;
+        parts.cyl(MAT.cream,.114,.071,.18,x,top+.09,.52,24);
+        parts.cyl(brand.cat==='Coffee'?MAT.woodSlat:accent,.101,.101,.006,x,top+.18,.52,24);
+        if(brand.cat==='Coffee') parts.add(torusGeo(.044,.010,6,14),MAT.cream,at(x+.108,top+.10,.52));
+      }
+    } else if (brand.cat==='Fashion' || brand.cat==='Education') {
+      for(let i=0;i<4;i++) {
+        round(i%2?accent:MAT.cream,.55,.045,.36,-.36+i*.015,top+.025+i*.045,.52);
+        parts.box(MAT.woodSlat,.012,.013,.32,-.59+i*.015,top+.05+i*.045,.52);
+      }
+      if(brand.cat==='Education') { round(MAT.metal,.57,.028,.37,.52,top+.014,.48);round(MAT.black,.57,.31,.025,.52,top+.18,.31); }
+    } else if (brand.cat==='Travel') {
+      for(const x of [-.43,.23]){
+        round(accent,.36,.45,.18,x,top+.225,.51,.056);
+        for(let j=0;j<5;j++) round(MAT.cream,.009,.34,.009,x-.12+j*.06,top+.22,.602,.003);
+        round(MAT.metal,.14,.025,.03,x,top+.47,.51);
+      }
+    } else if(brand.cat==='Fitness') {
+      for(let i=0;i<3;i++)parts.add(torusGeo(.14-i*.021,.018,8,24),i%2?accent:MAT.black,at(-.48+i*.22,top+.15,.48));
+      parts.cyl(MAT.metal,.065,.072,.29,.5,top+.145,.5);parts.cyl(MAT.black,.045,.045,.035,.5,top+.307,.5);
+    } else {
+      const tones=[MAT.cream,accent,MAT.black];
+      for(let i=0;i<3;i++){
+        const x=-.70+i*.24, h=.13+i*.045;
+        parts.cyl(tones[i],.057,.061,h,x,top+h/2,.48,18);
+        parts.cyl(MAT.alu,.046,.051,.035,x,top+h+.017,.48,16);
+        parts.cyl(accent,.027,.034,.068,x,top+h+.068,.48,14);
+      }
+      round(MAT.black,.43,.033,.26,.55,top+.017,.52);
+      for(let i=0;i<6;i++)parts.cyl(tones[i%3],.045,.045,.01,.42+i%3*.123,top+.04,.456+Math.floor(i/3)*.12,16);
+    }
+    parts.build(g,{name:'market_counter_details',shadow:false});
+  }
   function buildMarket(){const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,Person}=ctx;
     dialog('dlgMarket','Creator market · concept stalls','Make something worth trusting',`<h3 id="marketBrand"></h3><p id="marketItem" class="social-copy"></p><form class="social-form" id="marketForm"><label for="storyText">Your first-impression story</label><textarea id="storyText" maxlength="250"></textarea><label class="check"><input id="giftDisclosure" type="checkbox" checked>Keep “Gifted” visible, before people tap or expand.</label><div class="story-preview"><span class="disclosure" id="storyDisclosure"></span><p id="storyWords"></p><small>CONCEPT PREVIEW · NO REAL BRAND PARTNERSHIP</small></div><p class="fine">Describe your own experience. Skip results you cannot support. A free sample doesn’t buy a positive review.</p><div class="btnrow"><button class="btn pri" id="previewStory" type="submit">Preview story & collect demo sample</button><button class="btn" id="marketPhoto" type="button">Make a content photo</button></div></form><p id="storyStatus" class="social-status" role="status"></p><p class="fine">Educational concept. Nothing is sent to Instagram. Samples are virtual.</p>`);
     $('storyText').oninput=updateStory;$('giftDisclosure').onchange=updateStory;
     $('marketForm').onsubmit=e=>{e.preventDefault();if(!$('giftDisclosure').checked||!$('storyText').value.trim())return;let samples=[];try{samples=JSON.parse(sessionStorage.getItem(sampleKey)||'[]')}catch{}if(!samples.includes(activeBrand.name))samples.push(activeBrand.name);try{sessionStorage.setItem(sampleKey,JSON.stringify(samples))}catch{}$('storyStatus').textContent='Story preview ready. '+activeBrand.item+' added to your demo sample bag. No real post was made.';ctx.Sound.play('stamp')};
     $('marketPhoto').onclick=()=>{ctx.Booth.last=ctx.capture();ctx.showPhoto(ctx.Booth.last)};
     brands.forEach((b,i)=>{const g=new THREE.Group();g.name='market_'+b.name;g.position.set(b.x,0,b.z);g.rotation.y=b.rot;WORLD.add(g);
-      mesh(boxGeo(3.05,.13,2.15),MAT.deck,g,0,.065,0);const colored=std(b.color,{roughness:.7});mesh(boxGeo(2.9,1,.65),colored,g,0,.62,.5);mesh(boxGeo(3,.06,.75),MAT.cream,g,0,1.15,.5);mesh(boxGeo(2.9,1.55,.09),colored,g,0,1.6,-.8);
-      for(const x of [-1.46,1.46])mesh(cylGeo(.035,.035,2.8,8),MAT.alu,g,x,1.4,0);
-      mesh(boxGeo(3.3,.1,2.35),colored,g,0,2.87,-.05);sign(g,0,2.4,.12,2.7,b.name,'CONCEPT STALL · '+b.cat.toUpperCase(),b.color);
+      const colored=std(b.color,{roughness:.7}),shell=new ctx.Merger();
+      shell.box(MAT.deck,3.05,.13,2.15,0,.065,0);
+      shell.box(colored,2.9,1,.65,0,.62,.5);shell.box(MAT.cream,3,.06,.75,0,1.15,.5);
+      shell.box(colored,2.9,1.55,.09,0,1.6,-.8);
+      for(const x of [-1.46,1.46])shell.cyl(MAT.alu,.035,.035,2.8,x,1.4,0,8);
+      shell.box(colored,3.3,.1,2.35,0,2.87,-.05);shell.build(g,{name:'market_shell'});
+      sign(g,0,2.4,.12,2.7,b.name,'CONCEPT STALL · '+b.cat.toUpperCase(),b.color);
       const invite=sign(g,0,.75,.85,2.5,'Try. Create. Disclose.','CLICK FOR YOUR STORY + SAMPLE',b.color);ctx.setInteractable(invite.mesh,{cue:()=>b.name+' · create a story',onClick:()=>openMarket(b),reach:4.8,outline:false});
       // Rounded sample packaging and a single shared attendant rig per stall.
-      for(let j=0;j<4;j++){mesh(cylGeo(.065,.065,.18+j%2*.08,12),MAT.cream,g,-.7+j*.37,1.28,.5);mesh(cylGeo(.067,.067,.025,12),MAT.metal,g,-.7+j*.37,1.38+j%2*.08,.5)}
+      dressCounter(g,b,colored);
       const pos=g.localToWorld(new THREE.Vector3(.6,0,-.2));new Person({key:'market_host_'+i,name:['Riya','Maya','Kabir','Zoya','Naina','Arun','Anya','Neel','Tara'][i]+' · '+b.name,model:i%2?'Female_Adult_08':'Business_Male_05',x:pos.x,z:pos.z,ry:b.rot,interact:()=>openMarket(b)});
       ctx.colBox(b.x-1.55,b.z-.9,b.x+1.55,b.z+.95,'marketStall');
     });
-    ctx.TRAVEL.market={x:-6.6,z:-12.3,yaw:.85};
+    ctx.TRAVEL.market={x:-8.05,z:-8.70,yaw:.38};
   }
   function buildExit(){const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,TRAVEL}=ctx,g=new THREE.Group();g.name='exit_sample_lounge';g.position.set(9,0,29);WORLD.add(g);
     mesh(boxGeo(8,.12,5.6),MAT.deck,g,0,.06,0);sign(g,0,3.25,-1.3,4.7,'One last little joy','EXIT LOUNGE · THE FREEBIE CLUB');
@@ -116,9 +169,9 @@
     sign(ctx.WORLD,3.7,2.65,-10.6,2.8,'Reel together','MAKE A MOMENT. KEEP IT HONEST.');
   }
   function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();
-    const action=document.createElement('button');action.id='socialAction';action.className='btn pri hidden';document.body.append(action);action.onclick=()=>{const id=action.dataset.action;if(id==='photo')openStudio();else if(id==='wall'){renderNotes();open('dlgTrustWall')}else if(id==='chai')open('dlgCaffeine');else if(id==='freebies')open('dlgFreebies');else openMarket(brands[0])};
-    let prev='';setInterval(()=>{if(!ctx.S.started)return;const x=ctx.player.x,z=ctx.player.z;const a=x<-20&&z>21?'photo':x>20&&z>21?'chai':Math.hypot(x+15,z-27)<5?'wall':Math.hypot(x-9,z-30)<5?'freebies':z<-10&&z>-21&&Math.abs(x)>6&&Math.abs(x)<18?'market':'';
-      if(a!==prev){prev=a;action.dataset.action=a;action.textContent={photo:'Ask Dev: take my photo',wall:'Leave a trust note',chai:'Pick your caffeine',freebies:'Play for a demo freebie',market:'Visit a concept stall'}[a]||''}action.classList.toggle('hidden',!a||!!ctx.S.ui.modal)},250);
+    const action=document.createElement('button');action.id='socialAction';action.className='btn pri hidden';document.body.append(action);action.onclick=()=>{const id=action.dataset.action;if(id==='photo')openStudio();else if(id==='wall'){renderNotes();open('dlgTrustWall')}else if(id==='chai')open('dlgCaffeine');else if(id==='freebies')open('dlgFreebies');else openMarket(nearestBrand(ctx.player.x,ctx.player.z))};
+    let prev='';setInterval(()=>{if(!ctx.S.started)return;const x=ctx.player.x,z=ctx.player.z;const a=x<-20&&z>21?'photo':x>20&&z>21?'chai':Math.hypot(x+15,z-27)<5?'wall':Math.hypot(x-9,z-30)<5?'freebies':z<-8&&z>-23&&Math.abs(x)>=6&&Math.abs(x)<18?'market':'';
+      const destination=a==='market'?nearestBrand(x,z).name:a; if(destination!==prev){prev=destination;action.dataset.action=a;action.textContent={photo:'Ask Dev: take my photo',wall:'Leave a trust note',chai:'Pick your caffeine',freebies:'Play for a demo freebie',market:'Visit '+destination}[a]||''}action.classList.toggle('hidden',!a||!!ctx.S.ui.modal)},250);
     // One focus trap serves both existing and new dialogs, including the Visual Labs.
     let visible=null;const observer=new MutationObserver(()=>{const next=document.querySelector('.modal:not(.hidden)');if(next===visible)return;visible=next;if(next){lastFocus=document.activeElement;next.setAttribute('role','dialog');next.setAttribute('aria-modal','true');if(!next.getAttribute('aria-labelledby')){const h=next.querySelector('h2');if(h){h.id||=next.id+'Title';next.setAttribute('aria-labelledby',h.id)}}next.querySelectorAll('button.x').forEach(b=>b.setAttribute('aria-label','Close'));next.querySelector('button,textarea,input')?.focus()}else lastFocus?.focus?.()});observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
     document.addEventListener('keydown',e=>{const modal=document.querySelector('.modal:not(.hidden)');if(!modal)return;if(e.key==='Tab'){const items=[...modal.querySelectorAll('button:not(:disabled),input,textarea,select,[tabindex="0"]')].filter(x=>x.offsetParent!==null);if(!items.length)return;const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}});

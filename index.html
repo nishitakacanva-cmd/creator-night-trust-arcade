@@ -3,15 +3,13 @@
 <head>
 <meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="css/editorial-hud.css?v=3.1.1">
+<link rel="stylesheet" href="css/editorial-hud.css?v=3.2.0">
 <title>Trust Arcade · Creator Night</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fonts.css">
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  "three": "./vendor/three-r170/build/three.module.min.js",
+  "three/addons/": "./vendor/three-r170/examples/jsm/"
 } }
 </script>
 <style>
@@ -176,7 +174,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css?v=3.1.1">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.2.0">
 </head>
 <body>
 <div id="stage"></div>
@@ -189,7 +187,8 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
 </div>
 
 <div id="start" class="hidden">
-  <div class="card">
+  <div class="card admission">
+    <img class="admission-art" src="assets/banners/stage_led.webp" alt="" width="960" height="540">
     <h2><span data-t="brand">Trust Arcade · Creator Night</span></h2>
     <p class="sub" data-t="tagline">Learn what builds trust, and what breaks it.</p>
     <div class="lbl" data-t="language">Language</div>
@@ -262,7 +261,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.1.1';
+const VERSION = '3.2.0';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -305,6 +304,8 @@ const CORNERS = {
 
 /* Presence zones for the HUD, logging and dwell (first match wins). [x0, z0, x1, z1] */
 const ZONES = [
+  {id:'freebies', r:[5,26,13,33]}, {id:'wall',r:[-18,24,-12,30]},
+  {id:'market',r:[-17.5,-22,-6,-8]}, {id:'market',r:[6,-22,17.5,-8]},
   { id: 'stage', r: [STAGE.x0 - 4, STAGE.z0 - 3, STAGE.x1 + 4, STAGE.z1 + 2.5] },
   { id: 'lawn', r: [LAWN.x0, LAWN.z0, LAWN.x1, LAWN.z1 + 0.6] },
   { id: 'hub', r: [MAZE.hub.x0, MAZE.hub.z0, MAZE.hub.x1, MAZE.hub.z1] },
@@ -456,6 +457,7 @@ const PLACES = {
   fashion: { en: 'Fashion', hi: 'फ़ैशन' }, beauty: { en: 'Beauty', hi: 'ब्यूटी' }, fitness: { en: 'Fitness', hi: 'फ़िटनेस' },
   food: { en: 'Food', hi: 'फ़ूड' }, travel: { en: 'Travel', hi: 'ट्रैवल' }, education: { en: 'Education', hi: 'एजुकेशन' },
   photo: { en: 'Photobooth', hi: 'फ़ोटोबूथ' }, chai: { en: 'Caffeine Corner', hi: 'कैफ़ीन कॉर्नर' }, lounge: { en: 'Creator lounge', hi: 'क्रिएटर लाउंज' },
+  market: {en:'Creator market',hi:'क्रिएटर बाज़ार'}, wall:{en:'Trust wall',hi:'भरोसा दीवार'}, freebies:{en:'Sample lounge',hi:'सैंपल लाउंज'},
   arcade: { en: 'Arcade tent', hi: 'आर्केड टेंट' }, entry: { en: 'Entry and exit', hi: 'एंट्री और एग्ज़िट' }, ground: { en: 'Festival ground', hi: 'फ़ेस्टिवल ग्राउंड' },
 };
 const STAMPS = ['maze', 'fashion', 'beauty', 'fitness', 'food', 'travel', 'education'];
@@ -743,7 +745,7 @@ const SIGNS = {
   arch: { en: 'CREATOR NIGHT', hi: 'क्रिएटर नाइट' },
   archSub: { en: 'Trust Arcade · build trust, not just reach', hi: 'ट्रस्ट आर्केड · सिर्फ़ रीच नहीं, भरोसा बनाइए' },
   mazeIn: { en: 'TRUST MAZE · enter here', hi: 'ट्रस्ट मेज़ · यहाँ से अंदर' },
-  mazeSub: { en: 'Three forks. Pick the lane that builds trust.', hi: 'तीन मोड़। वह लेन चुनें जो भरोसा बनाए।' },
+  mazeSub: { en: 'Three forks. Tap a sign to choose.', hi: 'तीन मोड़। जवाब चुनने के लिए बोर्ड पर टैप करें।' },
   plaza: { en: 'TRUST PLAZA', hi: 'ट्रस्ट प्लाज़ा' },
   toStage: { en: 'Main stage', hi: 'मुख्य स्टेज' },
   schedule: { en: 'TONIGHT ON THE MAIN STAGE', hi: 'आज रात मुख्य स्टेज पर' },
@@ -837,7 +839,7 @@ const T = (key, ctx) => L(TXT[key] || { en: key }, ctx);
 const LANG_HOOKS = [];
 function setLang(lang) {
   if (lang !== 'en' && lang !== 'hi') return;
-  S.lang = lang; document.documentElement.lang = lang;
+  S.lang = lang; document.documentElement.lang = lang; window.TrustWorldVisuals?.syncNav(S.zone, lang);
   document.querySelectorAll('[data-t]').forEach(el => { const k = el.getAttribute('data-t'); if (TXT[k]) el.textContent = T(k); });
   SCREENS.forEach(s => s.invalidate());
   LANG_HOOKS.forEach(fn => { try { fn(); } catch (e) { console.warn(e); } });
@@ -1071,7 +1073,7 @@ const MAX_ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#06060c');
-scene.fog = new THREE.FogExp2('#0b0a16', 0.0105);
+scene.fog = new THREE.FogExp2('#534252', 0.009);
 const pmrem = new THREE.PMREMGenerator(renderer);
 const rig = new THREE.Group(); rig.name = 'player_rig'; scene.add(rig);
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.05, 1600);
@@ -1304,22 +1306,10 @@ function toast(msg, kind = '') {
 const gltfLoader = new GLTFLoader(); gltfLoader.setMeshoptDecoder(MeshoptDecoder);
 // decode embedded images with <img> elements (blob: URLs) rather than fetch(), which sandboxed hosts may block
 gltfLoader.register(parser => { parser.textureLoader = new THREE.TextureLoader(parser.options.manager); parser.textureLoader.setCrossOrigin(parser.options.crossOrigin); return { name: 'TA_imageElementTextures' }; });
-/* The artifact host serves only web text and image types, so binary assets ship as base64 text (*.glb.txt, *.hdr.txt). */
-async function fetchBin(url) {
-  const r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status);
-  const s = (await r.text()).replace(/\s+/g, '');
-  if (typeof Uint8Array.fromBase64 === 'function') return Uint8Array.fromBase64(s).buffer;
-  const bin = atob(s), n = bin.length, u8 = new Uint8Array(n); for (let i = 0; i < n; i++) u8[i] = bin.charCodeAt(i); return u8.buffer;
-}
-function loadGLB(path) { return fetchBin(path + '.txt').then(buf => new Promise((res, rej) => gltfLoader.parse(buf, '', res, rej))); }
-async function loadHDR(path) {
-  const rl = new RGBELoader(); rl.setDataType(THREE.HalfFloatType); const d = rl.parse(await fetchBin(path + '.txt'));
-  const t = new THREE.DataTexture(d.data, d.width, d.height, THREE.RGBAFormat, d.type);
-  t.colorSpace = THREE.LinearSRGBColorSpace; t.minFilter = t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.flipY = true; t.needsUpdate = true; return t;
-}
+function loadGLB(path) { return gltfLoader.loadAsync(path); }
 const texLoader = new THREE.TextureLoader();
 const AVATAR_MODELS = ['Business_Female_01', 'Business_Male_05', 'Chef_Female_01', 'Female_Adult_03', 'Female_Adult_05', 'Female_Adult_08', 'Female_Adult_11', 'Female_Adult_12', 'Female_Adult_15', 'Female_Party_02', 'Male_Adult_04', 'Male_Adult_06', 'Male_Adult_08', 'Male_Adult_09', 'Male_Adult_10', 'Male_Adult_12', 'Male_Adult_17', 'Sports_Female_02', 'Sports_Male_04'];
-const PROP_FILES = ['Lantern', 'GlamVelvetSofa', 'SheenChair', 'SpecularSilkPouf', 'IridescentDishWithOlives', 'WaterBottle', 'MaterialsVariantsShoe', 'GlassVaseFlowers', 'DiffuseTransmissionPlant', 'TrafficCone', 'BoomBox', 'PotOfCoals', 'AnisotropyBarnLamp', 'Avocado', 'Bench'];
+const PROP_FILES = ['Lantern', 'GlamVelvetSofa', 'SheenChair', 'SpecularSilkPouf', 'IridescentDishWithOlives', 'WaterBottle', 'MaterialsVariantsShoe', 'GlassVaseFlowers', 'DiffuseTransmissionPlant', 'BoomBox', 'PotOfCoals', 'AnisotropyBarnLamp', 'Avocado', 'Bench'];
 const TEX_FILES = {
   grass: ['env/grass_col.jpg', true], grassN: ['env/grass_nrm.jpg', false],
   gravel: ['tex/gravel_col.jpg', true], gravelN: ['tex/gravel_nrm.jpg', false],
@@ -1342,7 +1332,7 @@ const Assets = {
     let done = 0; const tick = () => { done++; onProgress && onProgress(done / jobs.length); };
     const wrap = (p, label) => p.then(v => { tick(); return v; }, e => { tick(); this.failed.push(label); console.warn('asset failed', label, e && e.message); return null; });
     for (const [k, [file, srgb]] of Object.entries(TEX_FILES)) jobs.push(wrap(new Promise((res, rej) => texLoader.load('assets/' + file, t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAX_ANISO; if (srgb) t.colorSpace = THREE.SRGBColorSpace; this.tex[k] = t; res(t); }, undefined, rej)), file));
-    jobs.push(wrap(loadHDR('assets/env/moonless_golf_1k.hdr').then(t => { t.mapping = THREE.EquirectangularReflectionMapping; this.env = pmrem.fromEquirectangular(t).texture; t.dispose(); return this.env; }), 'hdri'));
+    jobs.push(wrap(new RGBELoader().loadAsync('assets/env/qwantani_dusk_2_1k.hdr').then(t => { t.mapping = THREE.EquirectangularReflectionMapping; this.env = pmrem.fromEquirectangular(t).texture; t.dispose(); pmrem.dispose(); return this.env; }), 'hdri'));
     for (const p of PROP_FILES) jobs.push(wrap(loadGLB('assets/props/' + p + '.glb').then(g => { this.props[p] = this.prepProp(g.scene, p); }), p));
     for (const g of ['f', 'm']) jobs.push(wrap(loadGLB(`assets/anims/anim_${g}.glb`).then(r => { this.clips[g] = r.animations; }), 'anim_' + g));
     for (const a of AVATAR_MODELS) jobs.push(wrap(loadGLB('assets/avatars/' + a + '.glb').then(r => { this.avatars[a] = this.prepAvatar(r.scene, a); }), a));
@@ -1649,32 +1639,14 @@ function addPlatform(x0, z0, x1, z1, h) { PLATFORMS.push({ x0: Math.min(x0, x1),
 /* ---------- sky dome: gradient, stars, moon, distant city glow ---------- */
 const MOON_DIR = new THREE.Vector3(-0.45, 0.5, -0.74).normalize();
 function buildSky() {
-  const m = new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uMoon: { value: MOON_DIR } }, side: THREE.BackSide, depthWrite: false, fog: false,
-    vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
-    fragmentShader: `uniform float uTime; uniform vec3 uMoon; varying vec3 vDir;
-      float h3(vec3 p){ p = fract(p*0.3183099+vec3(.11,.17,.13)); p *= 17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
-      void main(){
-        vec3 d = normalize(vDir); float h = d.y;
-        vec3 zen = vec3(0.006,0.008,0.026), hor = vec3(0.055,0.04,0.095);
-        vec3 col = mix(hor, zen, smoothstep(-0.02, 0.6, h));
-        float g = pow(1.0 - clamp(h*3.2,0.0,1.0), 3.0);
-        float north = max(0.0, -d.z);
-        col += vec3(0.42,0.20,0.26) * g * (0.25 + 0.75*north) * 0.42;
-        col += vec3(0.30,0.10,0.30) * g * 0.10;
-        vec3 sp = d * 380.0; vec3 cell = floor(sp); float s = h3(cell);
-        if (s > 0.9965 && h > 0.04) { vec3 f = fract(sp) - 0.5; float dd = length(f); float tw = 0.65 + 0.35*sin(uTime*1.7 + s*200.0);
-          col += vec3(1.0,0.96,0.9) * smoothstep(0.3,0.0,dd) * tw * (s-0.9965)*260.0 * smoothstep(0.04,0.3,h); }
-        float m = dot(d, uMoon);
-        col += vec3(1.0,0.97,0.9) * smoothstep(0.99955, 0.99975, m) * 2.2;
-        col += vec3(0.32,0.34,0.45) * pow(max(m,0.0), 250.0) * 0.8 + vec3(0.06,0.07,0.1) * pow(max(m,0.0), 12.0) * 0.25;
-        if (h < 0.0) col = mix(col, vec3(0.012,0.012,0.022), smoothstep(0.0,-0.06,h));
-        gl_FragColor = vec4(col, 1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }`,
+  scene.background = new THREE.Color('#51435c');
+  texLoader.load('assets/env/festival_dusk.webp', sky => {
+    sky.mapping = THREE.EquirectangularReflectionMapping;
+    sky.colorSpace = THREE.SRGBColorSpace;
+    scene.background = sky;
   });
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(1200, 48, 24), m); sky.name = 'sky'; sky.renderOrder = -10; sky.frustumCulled = false; noRay(sky); scene.add(sky); REFS.sky = m;
+  scene.backgroundIntensity = .78;
+  scene.backgroundRotation.y = scene.environmentRotation.y = 2.35;
   // distant skyline (north arc + flanks): merged boxes with a lit-window texture
   const win = canvasTex(256, 512, (c, w, h) => {
     c.fillStyle = '#07070c'; c.fillRect(0, 0, w, h); const r = rng(9);
@@ -1990,6 +1962,9 @@ function buildGates() {
         fitPara(c, L(label), s < 0 ? 64 : 18, 8, w - 84, h - 18, 40, { w: 700, color: '#1A1522', align: 'left' });
       } });
       o.mesh.position.set(s * half / 2, 2.85, 0.03); g.add(o.mesh); opts.push({ screen: o, good: isGood });
+      o.mesh.raycast = THREE.Mesh.prototype.raycast;
+      setInteractable(o.mesh, { cue: () => L(label), reach: 6, outline: false,
+        onClick: () => Maze.choose(gt, isGood) });
     });
     // dead-end board on the blocking hedge
     const bad = 1 - gt.good; const board = new CanvasScreen({ name: 'gateBad_' + gt.id, w: 1.9, h: 1.25, ppm: 420, interactive: false, emissive: 1.1, draw: (c, w, h) => {
@@ -2052,6 +2027,17 @@ function buildPavilion(id) {
   }
   M.box(MAT.plumMatte, W + 0.8, 0.24, D + 0.8, 0, H + 0.12, 0); M.box(MAT.whiteGloss, W + 0.8, 0.04, D + 0.8, 0, H + 0.26, 0);
   M.box(MAT.grad, W + 0.8, 0.07, 0.07, 0, H + 0.02, D / 2 + 0.42);
+  // Track lights, recessed skirting and a stepped threshold give the six rooms depth.
+  for (const side of [-1, 1]) {
+    const x=side*2.65;
+    M.box(MAT.metal,.052,.064,9.8,x,H-.12,-.35);
+    M.box(MAT.bulb,.024,.018,7.3,side*3.93,.21,-2.15);
+    for (const z of [-4,-1.2,1.6]) {
+      M.cyl(MAT.metal,.10,.13,.21,x,H-.24,z);
+      M.cyl(MAT.bulb,.114,.114,.014,x,H-.351,z);
+    }
+    M.box(MAT.alu,.026,.034,4.6,side*3.91,.14,3.63);
+  }
   M.build(g, { name: 'pav_shell_' + id });
   const hl = halo(1.9, 0.04, 1.5); hl.rotation.x = Math.PI / 2; hl.position.set(0, H - 0.3, -0.6); g.add(hl);
   // fascia sign
@@ -2108,12 +2094,15 @@ function buildPavDecor(id, g, p) {
     M.box(MAT.whiteGloss, 0.35, 3.6, 0.35, -2.25, 1.92, -0.6); M.box(MAT.whiteGloss, 0.35, 3.6, 0.35, 2.25, 1.92, -0.6); M.box(MAT.whiteGloss, 4.85, 0.35, 0.35, 0, 3.72, -0.6);
     pavColBox(p, -2.45, -0.8, -2.05, -0.4, 'frame'); pavColBox(p, 2.05, -0.8, 2.45, -0.4, 'frame');
     for (const s of [-1, 1]) { M.box(MAT.plum, 1.6, 3.6, 0.15, s * 3.25, 1.92, -0.6); pavColBox(p, s * 2.4, -0.7, s * 4.0, -0.5, 'wall'); }
-    for (const [x, z] of [[-2.8, -3.0], [2.6, -4.2], [-1.0, -4.8]]) Assets.prop('TrafficCone', { x, y: 0.12, z, h: 0.7, parent: g });
-    M.box(std('#e8a33a', { roughness: 0.6 }), 3.0, 0.9, 0.08, 1.4, 0.57, -2.6); for (const x of [0.2, 2.6]) M.box(MAT.black, 0.06, 0.9, 0.06, x, 0.57, -2.6); pavColBox(p, -0.1, -2.75, 2.9, -2.45, 'barrier');
-    for (const [x, z] of [[-1.6, -3.4], [1.0, -4.0], [-2.4, -4.6]]) { const d = new THREE.Mesh(new THREE.CircleGeometry(0.6 + Math.random() * 0.4, 24), std('#0a0a12', { roughness: 0.02, metalness: 0.6, envMapIntensity: 2.5 })); d.rotation.x = -Math.PI / 2; d.position.set(x, 0.125, z); g.add(d); noRay(d); }
+    // The viewfinder frames the uncropped photo on the far side of the portal.
+    for (const side of [-1, 1]) {
+      M.box(MAT.alu, .05, 3.4, .55, side * 2.04, 1.87, -.82);
+      M.box(MAT.bulb, .014, 3.32, .02, side * 2.00, 1.85, -.51);
+    }
   } else if (id === 'education') {
-    for (const s of [-1, 1]) { M.box(MAT.woodSlat, 0.45, 2.8, 4.4, s * 3.6, 1.52, -3.2); pavColBox(p, s * 3.3, -5.4, s * 3.9, -1.0, 'shelf');
-      for (let sh = 0; sh < 5; sh++) for (let b = 0; b < 16; b++) { const hh = 0.32 + ((b * 7 + sh * 3) % 5) * 0.03; M.add(boxGeo(0.28, hh, 0.07 + (b % 3) * 0.02), colorMat(['#833AB4', '#C13584', '#F77737', '#2d2a36', '#efe6dc', '#5851DB', '#FCAF45'][(b + sh) % 7], 0.8), new THREE.Matrix4().makeTranslation(s * 3.45, 0.32 + sh * 0.55 + hh / 2, -5.15 + b * 0.27)); } }
+    for (const s of [-1, 1]) { M.box(MAT.woodSlat, .08, 2.85, 4.5, s * 3.86, 1.54, -3.2);
+      for (let tier = 0; tier < 5; tier++) M.box(MAT.woodSlat, .50, .045, 4.48, s * 3.62, .30 + tier * .55, -3.2); pavColBox(p, s * 3.3, -5.4, s * 3.9, -1.0, 'shelf');
+      for (let sh = 0; sh < 5; sh++) for (let b = 0; b < 14; b++) { const hh = 0.32 + ((b * 7 + sh * 3) % 5) * 0.03; M.add(boxGeo(0.28, hh, 0.07 + (b % 3) * 0.02), colorMat(['#885b47', '#516365', '#b68c56', '#342c37', '#efe6dc', '#59556c', '#9c724f'][(b + sh) % 7], 0.8), new THREE.Matrix4().makeTranslation(s * 3.57, 0.32 + sh * 0.55 + hh / 2, -5.15 + b * 0.27)); } }
     pavColBox(p, -2.45, -2.15, -0.15, -1.05, 'desk');
     Assets.prop('AnisotropyBarnLamp', { x: -1.9, y: 0.87, z: -1.7, h: 0.4, parent: g });
   }
@@ -2153,7 +2142,14 @@ function buildPhotobooth() {
   frame.mesh.position.set(-2.4, 1.15, 0.6); frame.mesh.rotation.y = 0.45; g.add(frame.mesh); const fw = toW(-2.4, 0.6); colCircle(fw.x, fw.z, 0.35, 'postFrame');
   // props table
   const pt = new THREE.Group(); pt.position.set(2.5, 0.1, 0.4); g.add(pt); mesh(cylGeo(0.45, 0.45, 0.8, 24), MAT.whiteGloss, pt, 0, 0.4, 0);
-  for (let i = 0; i < 3; i++) { const b = mesh(sphGeo(0.22, 20, 14), new THREE.MeshStandardMaterial({ color: [PALETTE.pink, PALETTE.amber, PALETTE.purple][i], roughness: 0.15, metalness: 0.3 }), pt, -0.2 + i * 0.2, 1.8 + i * 0.25, 0); b.scale.set(1, 1.15, 1); mesh(cylGeo(0.003, 0.003, 1.0, 4), MAT.white, pt, -0.2 + i * 0.2, 1.1 + i * 0.12, 0); }
+  for (const x of [-.34, .34]) mesh(cylGeo(.017, .017, .62, 8), MAT.alu, pt, x, 1.11, 0);
+  mesh(boxGeo(.70, .018, .018), MAT.alu, pt, 0, 1.41, 0);
+  for (let i = 0; i < 3; i++) {
+    const x = -.21 + i * .21;
+    mesh(boxGeo(.17,.22,.012), MAT.cream, pt, x, 1.29, .006);
+    mesh(boxGeo(.143,.144,.006), colorMat(['#975f85','#cb9270','#776987'][i], .82), pt, x, 1.31, .017);
+    mesh(boxGeo(.018,.045,.026), MAT.alu, pt, x, 1.40, .015);
+  }
   const pw = toW(2.5, 0.4); colCircle(pw.x, pw.z, 0.5, 'propsTable');
   REFS.boothCamPos = toW(0, 1.95).setY(1.42); REFS.boothLook = toW(0, -1.0).setY(1.08);
   REFS.boothKioskPos = toW(-1.2, 2.3); REFS.boothRy = g.rotation.y;
@@ -2318,9 +2314,9 @@ function makeMover(parent, pos, color, { spot = false, len = 17, radius = 2.2 } 
   LIGHTS.movers.push(m); return m;
 }
 function setupLights() {
-  scene.environment = Assets.env || null; scene.environmentIntensity = 0.62;
-  const hemi = reg(new THREE.HemisphereLight('#929bb6', '#463026', 0.95)); scene.add(hemi); LIGHTS.hemi = hemi;
-  const moon = reg(new THREE.DirectionalLight('#9fb4ff', 0.55)); moon.position.copy(MOON_DIR).multiplyScalar(60); moon.target.position.set(0, 0, 0);
+  scene.environment = Assets.env || null; scene.environmentIntensity = 0.28;
+  const hemi = reg(new THREE.HemisphereLight('#d4c9e4', '#936954', 1.0)); scene.add(hemi); LIGHTS.hemi = hemi;
+  const moon = reg(new THREE.DirectionalLight('#ffcfad', 1.05)); moon.position.copy(MOON_DIR).multiplyScalar(60); moon.target.position.set(0, 0, 0);
   moon.castShadow = true; moon.shadow.mapSize.set(QUALITY === 'high' ? 4096 : 2048, QUALITY === 'high' ? 4096 : 2048);
   Object.assign(moon.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 5, far: 140 }); moon.shadow.bias = -0.0004; moon.shadow.normalBias = 0.03;
   scene.add(moon, moon.target); LIGHTS.moon = moon;
@@ -2366,6 +2362,17 @@ function applyQuality(q, xr) {
 
 // Bound actual PBR lights; decorative fixtures retain their emissive glow.
 function updateLightBudget() {
+  // Keep the architectural silhouette. Tiny interior exhibits do not need a distant draw.
+  for (const room of Object.values(REFS.pav)) {
+    const near = (room.group.position.x-player.x)**2 + (room.group.position.z-player.z)**2 < (QUALITY==='high'?42:30)**2;
+    for (const child of room.group.children) {
+      if (child.name.startsWith('curated_') || child.name.startsWith('gallery_lightbox_')) child.visible = near;
+    }
+  }
+  for(const group of WORLD.children) if (group.name.startsWith('market_')) {
+    const distance = Math.hypot(group.position.x-player.x,group.position.z-player.z);
+    for (const child of group.children) if (child.name==='market_counter_details') child.visible = distance < (QUALITY==='high'?20:14);
+  }
   const points=LIGHTS.all.filter(l=>l.isPointLight).sort((a,b)=>((a.position.x-player.x)**2+(a.position.z-player.z)**2)-((b.position.x-player.x)**2+(b.position.z-player.z)**2));
   const n=QUALITY==='high'?8:QUALITY==='medium'?6:4;
   points.forEach((l,i)=>l.visible=i<n);
@@ -2450,7 +2457,7 @@ class Person {
     this.play('walk', { timeScale: speed / WALK_REF, fade: 0.3 });
   }
   teleport(x, z, ry) { this.pos.set(x, groundAt(x, z), z); if (ry !== undefined) this.yaw = this.targetYaw = ry; this.path = null; this.sync(); }
-  sync() { this.group.position.set(this.pos.x, groundAt(this.pos.x, this.pos.z) + this.sitY, this.pos.z); this.group.rotation.y = this.yaw; }
+  sync() { this.group.position.set(this.pos.x + (this.clearX || 0), groundAt(this.pos.x, this.pos.z) + this.sitY, this.pos.z + (this.clearZ || 0)); this.group.rotation.y = this.yaw; }
   update(dt, pp) {
     if (!this.ok) return;
     const d2 = (this.pos.x - pp.x) ** 2 + (this.pos.z - pp.z) ** 2;
@@ -2648,14 +2655,24 @@ function updatePeople(dt) {
     const d2 = (pp.x - p.pos.x) ** 2 + (pp.z - p.pos.z) ** 2;
     // Avatar meshes disable automatic frustum culling; bound their visible range explicitly.
     const avatarRange = QUALITY === 'high' ? 36 : QUALITY === 'medium' ? 28 : 22;
-    if(p.model) p.model.visible = d2 < avatarRange * avatarRange;
+    if (p.model) {
+      // Walkers keep to their route. Ease the visible rig aside inside personal space.
+      const distance = Math.sqrt(d2);
+      const push = Math.max(0, 1.16 - distance);
+      const dx = distance > .01 ? (p.pos.x - pp.x) / distance : Math.cos(p.yaw);
+      const dz = distance > .01 ? (p.pos.z - pp.z) / distance : -Math.sin(p.yaw);
+      const ease = 1 - Math.exp(-dt * 14);
+      p.clearX = lerp(p.clearX || 0, push * dx, ease);
+      p.clearZ = lerp(p.clearZ || 0, push * dz, ease);
+      p.model.visible = d2 < avatarRange * avatarRange && Math.hypot(p.pos.x + p.clearX - pp.x, p.pos.z + p.clearZ - pp.z) > .48;
+    }
     if (d2 < 484) { p.update(dt, pp); }
     else if (d2 < 1764) { if ((_pplTick + i) % 3 === 0) p.update(dt * 3, pp); }
     else { if ((_pplTick + i) % 6 === 0) p.update(dt * 6, pp); }
   }
   // mentors greet the visitor when they come close
   for (const id of NICHES) { const m = PEOPLE_BY['mentor_' + id]; if (!m || !m.ok) continue; const d = Math.hypot(pp.x - m.pos.x, pp.z - m.pos.z);
-    if (d < 4.2) { m.faceTo(pp.x, pp.z); if (!m.greeted) { m.greeted = true; m.once('wave'); m.say(L(MENTORS[id].hello), 5); } } else if (d > 9) m.greeted = false; }
+    if (d < 4.2) { m.faceTo(pp.x, pp.z); if (!m.greeted) { m.greeted = true; m.once('wave'); m.say(L(MENTORS[id].hello), 5); } } }
   Card.update();
 }
 
@@ -2952,6 +2969,7 @@ const Games = {
     if (g.step === 'done') { p.once('nod'); p.say(L(GATE_TEXT[id].whyGood), 5); }
     else if (g.step === 'intro') { p.once('talk'); p.say(L(GAME[id].intro), 7); this.go(id, this.firstStep[id]); }
     else { p.once('talk2'); p.say(L(GAME[id].intro), 6); }
+    if (!XRS.active) window.TrustLabs?.openLab(id);
     logEvent('mentor_talk', { niche: id, step: g.step });
   },
   firstStep: { fashion: 'toStart', food: 'taste', beauty: 'filter', fitness: 'load', travel: 'through', education: 'cards' },
@@ -2996,6 +3014,15 @@ function standScreen(id, name, lx, lz, w, h, draw, y = 1.55) {
 
 /* ---------- maze gates ---------- */
 const Maze = {
+  choose(gt, correct) {
+    const st = S.gates[gt.id] ||= { passed: false, wrong: 0 };
+    if (correct && !st.passed) S.meter = clamp(S.meter + 10, 0, 100);
+    if (correct) st.passed = true;
+    else { st.wrong++; st.showT = 4; }
+    toast(L(correct ? GATE_TEXT[gt.id].whyGood : GATE_TEXT[gt.id].whyBad), correct ? 'ok' : '');
+    playFeedback(correct ? 'success' : 'select');
+    logEvent('maze_choice', { gate: gt.id, correct }); persistSoon(); updateHUD();
+  },
   inLane(gt, p) {
     if (gt.axis === 'z') { if (p.z > gt.at || p.z < gt.at - gt.len) return -1; if (p.x >= gt.c - 2.6 && p.x <= gt.c - 0.2) return 0; if (p.x >= gt.c + 0.2 && p.x <= gt.c + 2.6) return 1; return -1; }
     const x0 = Math.min(gt.at, gt.at + gt.dir * gt.len), x1 = Math.max(gt.at, gt.at + gt.dir * gt.len); if (p.x < x0 || p.x > x1) return -1;
@@ -3004,18 +3031,9 @@ const Maze = {
   update(dt, p) {
     for (const gt of GATES) {
       const st = (S.gates[gt.id] = S.gates[gt.id] || { passed: false, wrong: 0, inBad: false });
-      const lane = this.inLane(gt, p), bad = 1 - gt.good, R = REFS.gates[gt.id];
-      if (lane >= 0) st.lane = lane;
-      const deep = gt.axis === 'z' ? p.z < gt.at - 0.9 : (gt.dir < 0 ? p.x < gt.at - 0.9 : p.x > gt.at + 0.9);
-      if (lane === bad && deep) {
-        if (!st.inBad) { st.inBad = true; st.wrong++; S.meter = clamp(S.meter - 12, 0, 100); playFeedback('deny'); toast('✗ ' + L(GATE_TEXT[gt.id].bad) + ' · ' + T('closedGate'), 'bad'); logEvent('maze_choice', { gate: gt.id, correct: false }); updateHUD(); persistSoon(); }
-        st.showT = 5; if (R) R.red.intensity = 6 + Math.sin(performance.now() / 120) * 2;
-      } else { if (st.inBad) st.inBad = false; if (R && R.red.intensity) R.red.intensity = Math.max(0, R.red.intensity - dt * 20); }
-      if (st.showT > 0) st.showT -= dt; if (R) R.board.mesh.visible = st.showT > 0;
-      const near = gt.axis === 'z' ? Math.abs(p.x - gt.c) < 3 : Math.abs(p.z - gt.c) < 2.6;
-      const beyond = near && (gt.axis === 'z' ? p.z < gt.at - gt.len - 0.3 && p.z > gt.at - gt.len - 3 : (gt.dir < 0 ? p.x < gt.at - gt.len - 0.3 && p.x > gt.at - gt.len - 3 : p.x > gt.at + gt.len + 0.3 && p.x < gt.at + gt.len + 3));
-      if (beyond && !st.passed && st.lane === gt.good) { st.passed = true; S.meter = clamp(S.meter + 10, 0, 100); playFeedback('success'); toast('✓ ' + L(GATE_TEXT[gt.id].whyGood), 'ok'); logEvent('maze_choice', { gate: gt.id, correct: true, wrong_tries: st.wrong }); persistSoon(); updateHUD(); }
-      if (!beyond && lane < 0 && !near) st.lane = st.lane;
+      if (st.showT > 0) st.showT -= dt;
+      const state = REFS.gates[gt.id];
+      if (state) state.board.mesh.visible = st.showT > 0;
     }
     const h = MAZE.hub; if (p.x > h.x0 && p.x < h.x1 && p.z > h.z0 && p.z < h.z1 && ['core1', 'core2', 'core3'].every(k => S.gates[k] && S.gates[k].passed) && !S.stamps.maze) { Games.stamp('maze'); toast(T('mazeDone'), 'ok'); }
   },
@@ -3183,18 +3201,21 @@ function setupFitness() {
 /* ---------- TRAVEL: Postcard vs Reality ---------- */
 function setupTravel() {
   const id = 'travel', P = REFS.pav[id], G = GAME.travel;
+  const postcard = new Image();
   const card = new CanvasScreen({ name: 'postcard', w: 4.1, h: 3.35, ppm: 250, interactive: false, emissive: 1.1, draw: (c, w, h) => {
-    const sky = c.createLinearGradient(0, 0, 0, h * 0.6); sky.addColorStop(0, '#3fa9f5'); sky.addColorStop(1, '#bfe9ff'); c.fillStyle = sky; c.fillRect(0, 0, w, h);
-    c.fillStyle = '#ffe9a8'; c.beginPath(); c.arc(w * 0.78, h * 0.2, h * 0.09, 0, 7); c.fill();
-    const sea = c.createLinearGradient(0, h * 0.55, 0, h * 0.75); sea.addColorStop(0, '#1fb5c9'); sea.addColorStop(1, '#5fd8d0'); c.fillStyle = sea; c.fillRect(0, h * 0.55, w, h * 0.2);
-    c.fillStyle = '#f6dfae'; c.fillRect(0, h * 0.74, w, h * 0.26);
-    const palm = (x, s) => { c.strokeStyle = '#6b4a2b'; c.lineWidth = 14 * s; c.beginPath(); c.moveTo(x, h * 0.9); c.quadraticCurveTo(x + 30 * s, h * 0.6, x + 10 * s, h * 0.42); c.stroke(); c.fillStyle = '#2f9a4a'; for (let k = 0; k < 6; k++) { c.beginPath(); c.ellipse(x + 10 * s + Math.cos(k) * 60 * s, h * 0.42 + Math.sin(k) * 18 * s, 80 * s, 16 * s, k, 0, 7); c.fill(); } };
-    palm(w * 0.12, 1.2); palm(w * 0.86, 1.0);
-    c.fillStyle = 'rgba(255,255,255,.95)'; rrect(c, 40, 40, w * 0.58, 140, 24); c.fill();
-    txt(c, S.lang === 'hi' ? 'पैराडाइज़ कोव रिसॉर्ट' : 'Paradise Cove Resort', 70, 105, 54, { d: true, w: 800, color: '#0f4c6b' });
-    txt(c, S.lang === 'hi' ? 'हमेशा धूप ☀ (ब्रांड फ़ोटो)' : 'Always sunny ☀ (brand photo)', 70, 155, 34, { w: 600, color: '#0f4c6b' });
-    txt(c, S.lang === 'hi' ? '▼ फ़्रेम से अंदर जाइए ▼' : '▼ step through the frame ▼', w / 2, h - 40, 40, { align: 'center', w: 800, color: '#0f4c6b' });
+    c.fillStyle = '#1d2530'; c.fillRect(0, 0, w, h);
+    if (postcard.complete && postcard.naturalWidth) {
+      const sw = postcard.naturalHeight * w / h;
+      c.drawImage(postcard, 0, 0, Math.min(sw, postcard.naturalWidth), postcard.naturalHeight, 0, 0, w, h);
+    }
+    const shade = c.createLinearGradient(0, h * .50, 0, h);
+    shade.addColorStop(0, 'transparent'); shade.addColorStop(1, '#151122ed');
+    c.fillStyle = shade; c.fillRect(0, 0, w, h);
+    txt(c, S.lang === 'hi' ? 'पैराडाइज़ कोव' : 'Paradise Cove', 48, h - 100, 70, { d: true, w: 700 });
+    txt(c, S.lang === 'hi' ? 'पूरा नज़ारा देखने के लिए अंदर जाएँ' : 'Step through to see the whole view', 50, h - 46, 32, { w: 500 });
   } });
+  postcard.onload = () => card.invalidate();
+  postcard.src = 'assets/gemini/travel_full_context.webp';
   card.mesh.position.set(0, 1.9, -0.55); P.group.add(card.mesh); LANG_HOOKS.push(() => card.invalidate());
   // rain behind the frame (reality side)
   const N = 420, pos = new Float32Array(N * 6), rr = rng(4); for (let i = 0; i < N; i++) { const x = (rr() - 0.5) * 7.4, y = rr() * 4.2, z = -0.9 - rr() * 4.9; pos.set([x, y, z, x + 0.02, y - 0.28, z], i * 6); }
@@ -3388,7 +3409,7 @@ function openModal(id) {
   Sound.play('open');
   logEvent('ui_open', { dialog: id });
 }
-function closeModal(id, silent) { $(id).classList.add('hidden'); if (S.ui.modal === id) S.ui.modal = null; if (!silent) Sound.play('close'); }
+function closeModal(id, silent) { $(id).classList.add('hidden'); if (S.ui.modal === id) S.ui.modal = null; if (!silent) Sound.play('close'); window.TrustLabs?.updateZoneTrigger(S.zone); }
 function releasePointer() { if (document.pointerLockElement) document.exitPointerLock(); }
 
 function buildStartPanel() {
@@ -3467,9 +3488,9 @@ function passImage() {
 /* ---------- map ---------- */
 const TRAVEL = {
   entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: 0, z: -17.8, yaw: 0 },
-  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 24.8, z: 30.0, yaw: -0.55 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.5, z: -25.5, yaw: Math.PI / 2 },
+  photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 24.3, z: 32.3, yaw: -0.48 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.0, z: -23.5, yaw: 1.39 },
 };
-for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 23.0, z: p.z + 1.5, yaw: p.side < 0 ? Math.PI / 2 : -Math.PI / 2 }; }
+for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 22.15, z: p.z + .68, yaw: -p.side * Math.PI / 2 + p.side * .075 }; }
 /* ---------- map: live minimap in the HUD, full map with tap-to-jump ---------- */
 const MAP_W = 80, MAP_H = 74;
 const mapToPx = (x, z, w, h) => [(x + 40) * w / MAP_W, (z + 37) * h / MAP_H];
@@ -3479,6 +3500,7 @@ function mapPins() {
   if (MAP_PIN_CACHE) return MAP_PIN_CACHE;
   MAP_PIN_CACHE = [{ id: 'entry', x: 0, z: 30.6 }, { id: 'maze', x: 0, z: 18.5 }, { id: 'hub', x: 0, z: 6 }, { id: 'lawn', x: 0, z: -15.5 }, { id: 'stage', x: 0, z: -26 },
     ...NICHES.map(id => ({ id, x: PAV[id].cx, z: PAV[id].z })),
+    {id:'wall',x:-15,z:25}, {id:'market',x:-10,z:-15}, {id:'freebies',x:9,z:29},
     ...['photo', 'chai', 'lounge', 'arcade'].map(id => ({ id, x: CORNERS[id].cx, z: CORNERS[id].cz }))];
   return MAP_PIN_CACHE;
 }
@@ -3597,7 +3619,7 @@ function drawMapDialog() {
   const list = $('mapList');
   if (list.dataset.lang !== S.lang) {
     list.innerHTML = ''; list.dataset.lang = S.lang;
-    for (const k of ['entry', 'maze', 'hub', 'lawn', 'stage', ...NICHES, 'photo', 'chai', 'lounge', 'arcade']) {
+    for (const k of ['entry', 'maze', 'hub', 'lawn', 'stage', ...NICHES, 'photo', 'chai', 'market', 'wall', 'freebies', 'lounge', 'arcade']) {
       const b = document.createElement('button'); b.textContent = L(PLACES[k]);
       b.onclick = () => { closeModal('dlgMap', true); MapUI.sel = null; fastTravel(TRAVEL[k]); logEvent('fast_travel', { to: k, via: 'list' }); };
       list.appendChild(b);
@@ -3621,7 +3643,7 @@ async function fastTravel(t) {
     const f = $('fade'); f.style.opacity = '1'; Sound.play('whoosh'); await wait(0.3);
     if (XRS.active) { renderer.xr.getCamera().getWorldPosition(_hp); rig.position.x += t.x - _hp.x; rig.position.z += t.z - _hp.z; }
     else { player.x = t.x; player.z = t.z; player.yaw = t.yaw; player.pitch = -0.04; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; }
-    Tour.stop(true); await wait(0.1); f.style.opacity = '0'; Sound.play('teleport');
+    updateLightBudget(); Tour.stop(true); await wait(0.1); f.style.opacity = '0'; Sound.play('teleport');
   } finally { _isTraveling = false; }
 }
 /* ---------- photo dialog ---------- */
@@ -3734,8 +3756,9 @@ function setupInput() {
   cv.addEventListener('contextmenu', e => e.preventDefault());
   cv.addEventListener('wheel', e => { if (!S.started || S.ui.modal) return; e.preventDefault(); const d = e.deltaMode === 1 ? e.deltaY * 30 : e.deltaY; if (Tour.on) Tour.nudge(-d * 0.012); else { player.scrollV = clamp(player.scrollV - d * 0.02, -SPEED.scroll, SPEED.scroll); } }, { passive: false });
   window.addEventListener('keydown', e => {
-    const tag = (e.target && e.target.tagName) || ''; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+    const tag = e.target?.tagName || ''; if (e.key !== 'Escape' && ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
     if (e.key === 'Escape') { if (S.ui.modal && S.ui.modal !== 'dlgEnd') { closeModal(S.ui.modal); e.preventDefault(); return; } if (Shot.active) { Shot.exit(); return; } if (Tour.on) { Tour.stop(); return; } if (Research.open) { Research.toggle(false); return; } return; }
+    if (S.ui.modal) return;
     keys.add(e.code);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && S.started && !S.ui.modal) e.preventDefault();
     if (e.repeat || !S.started) return;
@@ -3871,11 +3894,10 @@ function updateHover() {
 let pathTimer = 0;
 function zoneAt(x, z) { for (const zn of ZONES) { const [x0, z0, x1, z1] = zn.r; if (x >= x0 && x <= x1 && z >= z0 && z <= z1) return zn.id; } return 'ground'; }
 function updateZones(dt) {
-  if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone);
   if (!S.started) return; const pp = playerPos(), z = zoneAt(pp.x, pp.z);
   if (z !== S.zone) {
     if (S.zone) { const dw = (performance.now() - S.zoneSince) / 1000; S.dwell[S.zone] = (S.dwell[S.zone] || 0) + dw; logEvent('zone_exit', { zone: S.zone, dwell_s: Math.round(dw * 10) / 10 }); }
-    S.zone = z; S.zoneSince = performance.now(); S.visits[z] = (S.visits[z] || 0) + 1; logEvent('zone_enter', { zone: z }); updateHUD(); persistSoon();
+    S.zone = z; window.TrustLabs?.updateZoneTrigger(z); window.TrustWorldVisuals?.syncNav(z,S.lang); S.zoneSince = performance.now(); S.visits[z] = (S.visits[z] || 0) + 1; logEvent('zone_enter', { zone: z }); updateHUD(); persistSoon();
   }
   pathTimer += dt; if (pathTimer >= 2) { pathTimer = 0; if (S.consent && S.path.length < 4000) S.path.push({ ms: nowMs(), x: Math.round(pp.x * 10) / 10, z: Math.round(pp.z * 10) / 10, zone: z }); }
 }
@@ -4054,13 +4076,13 @@ let lastT = 0, frameN = 0, hudT = 0, screenT = 0;
 function loop(t) { const dt = Math.min(0.05, Math.max(0.0001, (t - (lastT || t)) / 1000)); lastT = t; frame(dt, true); }
 let FRAME_DRAW = true;
 function frame(dt, draw = true) {
-  frameN++; Perf.update(dt); FRAME_DRAW = draw; if(frameN%90===0) updateLightBudget();
+  frameN++; Perf.update(dt); FRAME_DRAW = draw; if (frameN % 30 === 0) updateLightBudget();
   updateMovement(dt); applyRig(dt);
   Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); updateGames(dt);
   updateXR(dt); VRPanel.update(dt);
-  if (frameN % 3 === 0) updateHover();
+  if (frameN % 3 === 0 && !S.ui.modal) updateHover();
   updateZones(dt); updateTweens(dt); Research.update(dt);
-  REFS.sky.uniforms.uTime.value = Show.elapsed;
+
   if (REFS.fx.aviationPts) REFS.fx.aviationPts.visible = Math.sin(Show.elapsed * 3) > 0;
   Sound.update(dt); if (frameN % 2 === 0) MiniMap.update(dt * 2); AutoQ.update(dt);
   hudT += dt; if (hudT > 0.5) { hudT = 0; updateShowChip(); updateSubs(); if (REFS.screens.schedule) REFS.screens.schedule.invalidate(); }
@@ -4083,12 +4105,11 @@ function setLoad(p, msg) { $('loadbar').firstElementChild.style.width = Math.rou
 renderer.info.autoReset = false;
 async function init() {
   document.documentElement.lang = S.lang; $('ldTitle').textContent = T('brand'); setLoad(0.02, T('loading'));
-  await loadFonts();
-  await Assets.loadAll(p => setLoad(0.05 + p * 0.8, p > 0.5 ? T('loadingPeople') : T('loading')));
+  await Promise.all([loadFonts(), Assets.loadAll(p => setLoad(0.05 + p * 0.8, p > 0.5 ? T('loadingPeople') : T('loading')))]);
   setLoad(0.88);
   buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); VRPanel.init();
   setupInput(); setupXR(); bindUI(); Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
-  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, PEOPLE_BY,
+  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, PEOPLE_BY, Merger, rboxGeo, torusGeo,
     capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
 
   window.brandArtReady = window.TrustBrandArt.mount({THREE,REFS,WORLD,SCREENS,drawMark,Person});
@@ -4096,17 +4117,17 @@ async function init() {
   setLang(S.lang); buildStartPanel();
   player.x = START.x; player.z = START.z; player.yaw = START.yaw; player.pitch = START.pitch || 0; applyRig(1);
   Show.update(0.001); renderer.shadowMap.needsUpdate = true;
-  setLoad(1);
   setLoad(.97, 'Preparing the festival lights…');
-  await renderer.compileAsync(scene, camera);
+  await renderer.compileAsync(scene, camera); setLoad(1);
   if (!TEST_MODE) renderer.setAnimationLoop(loop); else frame(0.016, true);
   setTimeout(() => { $('loader').classList.add('hidden'); if (!S.started) $('start').classList.remove('hidden'); }, 250);
   window.TrustArcade = debugAPI(); window.TrustArcade.ready = true;
-  window.TrustWorldVisuals?.mountGalleryLightboxes(THREE, REFS);
+  window.TrustWorldVisuals?.mountGalleryLightboxes(THREE, REFS, (obj, zone) => { setInteractable(obj, { cue: () => L(PLACES[zone]), onClick: () => XRS.active ? Games.screens[zone]?.invalidate() : window.TrustLabs.openLab(zone), enabled: () => !XRS.active, reach: 5 }); RAY_TARGETS = [...interactables, ...occluders]; });
   window.TrustArcade.modelsReady = window.TrustModelSlots.tryLoadCuratedSlots(THREE, gltfLoader, REFS, realtimeMaterial).then(result => { window.TrustArcade.modelStatus = result; renderer.shadowMap.needsUpdate = true; return result; });
 
 }
 window.TrustArcadeBridge = {
+  awardLab(zone) { if (NICHES.includes(zone) && S.started) Games.stamp(zone); },
   onLabOpen(id) { S.ui.modal = id; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; keys.clear(); releasePointer(); applyHover(null); },
   onLabClose(id) { if (S.ui.modal === id) S.ui.modal = null; if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone); },
   jumpToZone(id) {
@@ -4140,10 +4161,10 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
-<script src="js/trust-labs.js?v=3.1.1" defer></script>
-<script src="js/model-slots.js?v=3.1.1" defer></script>
-<script src="js/dj-deck.js?v=3.1.1" defer></script>
-<script src="js/world-visuals.js?v=3.1.1" defer></script>
-<script src="js/social-spaces.js?v=3.1.1" defer></script><script src="js/brand-art.js?v=3.1.1" defer></script>
+<script src="js/trust-labs.js?v=3.2.0" defer></script>
+<script src="js/model-slots.js?v=3.2.0" defer></script>
+<script src="js/dj-deck.js?v=3.2.0" defer></script>
+<script src="js/world-visuals.js?v=3.2.0" defer></script>
+<script src="js/social-spaces.js?v=3.2.0" defer></script><script src="js/brand-art.js?v=3.2.0" defer></script>
 </body>
 </html>

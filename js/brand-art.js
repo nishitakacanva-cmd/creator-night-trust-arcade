@@ -9,7 +9,7 @@
     for(const id of ['fashion','beauty','food','fitness','travel','education'])mappings['pav_back_'+id]='pav_'+id;
     await Promise.all(Object.entries(mappings).map(async([name,file])=>{const tex=await load('assets/banners/'+file+'.webp'),s=SCREENS.find(s=>s.name===name);if(s){s.drawFn=(c,w,h)=>fitted(c,w,h,tex.image);s.invalidate()}}));
     const back=REFS.booth.children.find(o=>o.geometry?.type==='CylinderGeometry'&&o.material?.side===THREE.BackSide);
-    if(back){const t=await load('assets/banners/photobooth_backdrop.webp');t.wrapS=THREE.RepeatWrapping;t.repeat.x=-1;t.offset.x=1;back.material.map=t;back.material.emissiveMap=t;back.material.emissiveIntensity=.25;back.material.needsUpdate=true}
+    if(back){const original=REFS.booth.getObjectByName('booth_neon');if(original)original.visible=false;const t=await load('assets/banners/photobooth_backdrop.webp');t.wrapS=THREE.RepeatWrapping;t.repeat.x=-1;t.offset.x=1;back.material.map=t;back.material.emissiveMap=t;back.material.emissiveIntensity=.25;back.material.needsUpdate=true}
     // The supplied stage art is a backdrop below the live show display, preserving live captions.
     const stage=await load('assets/banners/stage_led.webp');const oldLED=REFS.led.drawFn;REFS.led.drawFn=(c,w,h,s,t)=>{const seg=window.TrustArcade?.Show.seg?.id;if(['dj','interval','finale'].includes(seg))fitted(c,w,h,stage.image);else oldLED(c,w,h,s,t)};REFS.led.invalidate();
     const welcome=await load('assets/banners/welcome_totem.webp');const poster=new THREE.Mesh(new THREE.PlaneGeometry(1.66,2.475),new THREE.MeshBasicMaterial({map:welcome}));poster.name='welcome_brand_poster';poster.position.set(10.5,1.8,28);poster.rotation.y=-.3;WORLD.add(poster);

@@ -27,3 +27,34 @@
 #labLaunchBar{bottom:82px!important}#hint{bottom:68px}#cue{bottom:116px}
 @media(max-width:600px){.social-notes{grid-template-columns:1fr 1fr}.social-note{font-size:18px;padding:12px}#quickZoneNav{max-width:96vw!important;bottom:8px!important;left:2vw!important;transform:none!important;right:2vw}#socialAction{right:10px;bottom:78px;font-size:12px;max-width:165px;padding:10px}#labLaunchBar{bottom:138px!important;max-width:94vw}#hint{display:none}#cue{bottom:130px;font-size:12px;max-width:90vw;white-space:normal}.modal{padding:8px}.modal .card{max-height:calc(100dvh - 16px);padding:20px}.story-preview p{font-size:18px}#photoOut{max-height:56dvh}}
 @media(prefers-reduced-motion:reduce){.printing{animation:none}.claw-arm{transition:none}}
+#quickZoneNav{position:fixed;display:flex;gap:3px;padding:4px;left:50%;transform:translateX(-50%);z-index:40;border:1px solid #a28e986b;border-radius:20px;background:#211b24f5;box-shadow:0 6px 22px #130e1c66;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#8e7786 transparent}
+#quickZoneNav button{background:transparent;border:0;color:#f8efe9;border-radius:15px;font:600 12px var(--fb);padding:6px 12px;white-space:nowrap}
+#quickZoneNav button[aria-current],#quickZoneNav button:hover{color:#211820;background:#f0d9ba}
+body:has(#hud.hidden,#start:not(.hidden),.modal:not(.hidden)) #quickZoneNav,body:has(.modal:not(.hidden)) #labLaunchBar{display:none}
+:where(button,a,input,textarea,[tabindex]):focus-visible{outline:3px solid #e59540;outline-offset:3px}
+#start .admission{position:relative;background:#211b25f7;padding:0 28px 22px;width:min(640px,95vw);max-height:94dvh}
+.admission-art{display:block;width:calc(100% + 56px);margin:0 -28px 18px;height:clamp(75px,16vh,144px);object-fit:cover;object-position:50% 49%;border-bottom:1px solid #ad8a64}
+#start .admission h2{font-size:clamp(20px,3vw,29px);letter-spacing:-.035em}
+#start .admission .lbl{margin:12px 0 5px}
+#start .admission .avatars{gap:6px}
+#start .admission .avatars button{border-radius:9px}
+#start .admission .go{background:linear-gradient(100deg,#f3c99d,#f4c0c7);color:#211921;box-shadow:none}
+.lab-stage-card{background:linear-gradient(145deg,#e8ddce,#faf4eb 58%,#e6d8cf)}
+.lab-img-frame{background:radial-gradient(ellipse at 50% 74%,#dac7b8,#f6efe6 63%);border:1px solid #c9b9a9}
+.lab-header{background:linear-gradient(115deg,#fffaf1,#f2e9e1);border-bottom-color:#decec0}
+.travel-crop-wrap{height:auto;aspect-ratio:16/10}
+.travel-crop-wrap img{transition:none}
+@media(max-width:600px){#start .admission{padding:0 18px 16px}.admission-art{width:calc(100% + 36px);margin:0 -18px 14px}.lab-header,.lab-body{padding:16px}.lab-shell{max-height:94dvh}.lab-header{gap:8px}.lab-kicker{font-size:10px}.lab-title{font-size:20px}#quickZoneNav{border-radius:15px}#quickZoneNav button{padding-inline:11px}}
+@media(prefers-reduced-motion:reduce){.lab-launch-btn,.lab-pill,.travel-crop-wrap img{transition:none}}
+@media(max-width:600px){
+  #miniMap{width:92px}
+  #hudBL,#tMap,#tPass{display:none}
+  #joy{left:12px;bottom:70px;width:100px;height:100px}
+  #joyKnob{width:42px;height:42px;left:29px;top:29px}
+  #tBtns{bottom:68px;right:12px}
+  #tBtns button{width:48px;height:48px}
+  #socialAction{bottom:126px}
+  #cue{bottom:176px}
+  #labLaunchBar{bottom:178px!important;max-width:82vw}
+  body:has(.modal:not(.hidden)) #touchUI{visibility:hidden}
+}

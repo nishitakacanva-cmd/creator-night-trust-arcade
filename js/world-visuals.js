@@ -9,9 +9,13 @@
     { zone: 'education', file: 'assets/gemini/education_evidence_objects.webp', w: 1.8, h: 1.35, pos: [2.0, 1.55, -2.4], rotY: -0.35 },
   ];
 
-  function mountGalleryLightboxes(THREE, REFS) {
+  function mountGalleryLightboxes(THREE, REFS, register) {
     if (!THREE || !REFS || !REFS.pav) return;
     const loader = new THREE.TextureLoader();
+    const charcoal = new THREE.MeshStandardMaterial({color:0x2e2732, roughness:.45, metalness:.45});
+    const brass = new THREE.MeshStandardMaterial({color:0xc3a078, roughness:.34, metalness:.74});
+    const warm = new THREE.MeshBasicMaterial({color:0xffd9ad, toneMapped:false});
+    const palettes = {fashion:0xe6c9c4, beauty:0xe9dbce, food:0xd6bda4, fitness:0xbcb7b1, education:0xdfcfae, travel:0xe1d0b8};
 
     for (const item of GALLERY_PRINTS) {
       const pav = REFS.pav[item.zone];
@@ -24,7 +28,7 @@
         frameGroup.rotation.y = item.rotY;
 
         // Sleek brushed obsidian backing frame
-        const backMat = new THREE.MeshStandardMaterial({ color: 0x171421, roughness: 0.45, metalness: 0.35 });
+        const backMat = new THREE.MeshStandardMaterial({color:palettes[item.zone],roughness:.8});
         const back = new THREE.Mesh(new THREE.BoxGeometry(item.w + 0.14, item.h + 0.14, 0.06), backMat);
         frameGroup.add(back);
 
@@ -35,64 +39,56 @@
         frameGroup.add(face);
 
         // Subtle warm Instagram-coral top accent strip
-        const stripMat = new THREE.MeshBasicMaterial({ color: 0xE1306C });
+        const stripMat = warm;
         const strip = new THREE.Mesh(new THREE.BoxGeometry(item.w + 0.14, 0.03, 0.07), stripMat);
         strip.position.y = (item.h + 0.14) / 2 + 0.015;
         frameGroup.add(strip);
 
         frameGroup.name = 'gallery_lightbox_' + item.zone;
+        const floor = .12 - item.pos[1];
+        const lower = -(item.h + .14) / 2;
+        const leg = new THREE.BoxGeometry(.032, lower - floor, .045);
+        for (const side of [-1, 1]) {
+          const upright = new THREE.Mesh(leg, brass);
+          upright.position.set(side * item.w * .35, (floor + lower)/2, -.025);
+          frameGroup.add(upright);
+        }
+        const foot = new THREE.Mesh(new THREE.BoxGeometry(item.w * .9,.045,.38), charcoal);
+        foot.position.y = floor + .023; frameGroup.add(foot);
         pav.group.add(frameGroup);
+        register(face, item.zone);
       });
     }
   }
 
-  // Quick 1-click Zone Jump Bar (makes exploring during demos effortless)
+  const destinations = [
+    ['fashion','Fashion','फ़ैशन'], ['beauty','Beauty','ब्यूटी'], ['food','Food','फ़ूड'],
+    ['fitness','Fitness','फ़िटनेस'], ['travel','Travel','ट्रैवल'], ['education','Education','शिक्षा'],
+    ['stage','Stage','स्टेज'], ['market','Brand market','ब्रांड बाज़ार'], ['photo','Photo studio','फ़ोटो स्टूडियो'],
+    ['wall','Trust wall','भरोसा दीवार'], ['chai','Caffeine','कैफ़ीन'], ['freebies','Freebies','सैंपल']
+  ];
+  function syncNav(zone, lang = document.documentElement.lang) {
+    const nav = document.getElementById('quickZoneNav');
+    if (!nav) return;
+    nav.setAttribute('aria-label', lang === 'hi' ? 'सीधे यहाँ जाएँ' : 'Jump to a festival zone');
+    destinations.forEach(([id,en,hi],i) => {
+      const button = nav.children[i];
+      button.textContent = lang === 'hi' ? hi : en;
+      if (zone === id || (id === 'stage' && zone === 'lawn')) button.setAttribute('aria-current','location');
+      else button.removeAttribute('aria-current');
+    });
+  }
   function mountQuickNav() {
     if (document.getElementById('quickZoneNav')) return;
-    const zones = [
-      { id: 'fashion', label: 'Fashion' },
-      { id: 'beauty', label: 'Beauty' },
-      { id: 'food', label: 'Food' },
-      { id: 'fitness', label: 'Fitness' },
-      { id: 'travel', label: 'Travel' },
-      { id: 'education', label: 'Education' },
-      { id: 'stage', label: 'Stage' },
-      { id: 'market', label: 'Brand market' },
-      { id: 'photo', label: 'Photo studio' },
-      { id: 'wall', label: 'Trust wall' },
-      { id: 'chai', label: 'Caffeine' },
-      { id: 'freebies', label: 'Freebies' },
-    ];
-    const nav = document.createElement('div');
-    nav.id = 'quickZoneNav';
-    nav.style.cssText = [
-      'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:40;',
-      'display:flex;gap:6px;padding:6px 8px;border-radius:999px;',
-      'background:rgba(16,13,24,0.82);border:1px solid rgba(255,255,255,0.14);',
-      'backdrop-filter:blur(14px);box-shadow:0 10px 28px rgba(0,0,0,0.35);',
-      'max-width:94vw;overflow-x:auto;'
-    ].join('');
-    zones.forEach(z => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = z.label;
-      b.style.cssText = [
-        'padding:6px 11px;border-radius:999px;border:none;background:rgba(255,255,255,0.08);',
-        'color:#FAF7F4;font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;',
-        'cursor:pointer;white-space:nowrap;transition:background 0.15s ease;'
-      ].join('');
-      b.onmouseenter = () => { b.style.background = 'rgba(225,48,108,0.85)'; };
-      b.onmouseleave = () => { b.style.background = 'rgba(255,255,255,0.08)'; };
-      b.onclick = () => {
-        if (window.TrustArcadeBridge && window.TrustArcadeBridge.jumpToZone) {
-          window.TrustArcadeBridge.jumpToZone(z.id);
-        }
-      };
-      nav.appendChild(b);
-    });
-    document.body.appendChild(nav);
+    const nav = document.createElement('nav'); nav.id = 'quickZoneNav';
+    for (const [id] of destinations) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.zone = id;
+      button.onclick = () => window.TrustArcadeBridge?.jumpToZone(id);
+      nav.append(button);
+    }
+    document.body.append(nav); syncNav();
   }
-
-  window.TrustWorldVisuals = { mountGalleryLightboxes, mountQuickNav };
+  window.TrustWorldVisuals = { mountGalleryLightboxes, mountQuickNav, syncNav };
   document.addEventListener('DOMContentLoaded', mountQuickNav);
 })();
