@@ -79,7 +79,7 @@
       if (playing) setPlaying(false, false);
       return;
     }
-    const isParty = ['dj', 'finale', 'interval', 'change'].includes(segId);
+    const isParty = segId === 'dj';
     if (isParty) {
       if (!playing) {
         // Pick a lively cue point when the DJ party starts
@@ -89,7 +89,7 @@
         }
         setPlaying(true, false);
       }
-    } else if (!manualOverride && playing) {
+    } else if (playing) {
       setPlaying(false, false);
     }
   }

@@ -902,7 +902,7 @@ const Sound = {
       const c = this.ctx = new AC({ latencyHint: 'interactive' });
       const comp = c.createDynamicsCompressor(); comp.threshold.value = -12; comp.knee.value = 12; comp.ratio.value = 3; comp.attack.value = 0.008; comp.release.value = 0.3;
       this.master = c.createGain(); this.master.gain.value = 0; this.master.connect(comp); comp.connect(c.destination);
-      for (const [k, v] of Object.entries({ music: 0.85, amb: 0.8, sfx: 0.9, ui: 0.6, steps: 0.42 })) { const g = c.createGain(); g.gain.value = v; g.connect(this.master); this.bus[k] = g; }
+      for (const [k, v] of Object.entries({ music: 0.85, amb: 0.35, sfx: 0.9, ui: 0.6, steps: 0.42 })) { const g = c.createGain(); g.gain.value = v; g.connect(this.master); this.bus[k] = g; }
       document.addEventListener('visibilitychange', () => { if (!this.ctx) return; if (document.hidden) { try { this.ctx.suspend(); } catch (e) { /* ignore */ } } else if (this.on) { try { this.ctx.resume(); } catch (e) { /* ignore */ } } });
     } catch (e) { this.ctx = null; return false; }
     return true;
@@ -948,7 +948,7 @@ const Sound = {
     const lo = this.em.lounge = { pan: this.panner(CORNERS.lounge.cx, 1.8, CORNERS.lounge.cz, 2.6, 2.2, this.bus.music) };
     // Music is owned by TrustDJ so the supplied mashup never competes with legacy loops.
     const jobs = Object.entries(AUDIO_MAP.sprites).map(([k, sp]) => this.fetchBuf('sp_' + k, sp.file));
-    for (const k of ['sfx_applause', 'sfx_applause_small', 'amb_crowd', 'amb_fountain', 'amb_fireworks', 'sting_fanfare']) jobs.push(this.fetchBuf(k, AUDIO_MAP.files[k]));
+    for (const k of ['sfx_applause', 'sfx_applause_small', 'amb_crowd', 'amb_fireworks', 'sting_fanfare']) jobs.push(this.fetchBuf(k, AUDIO_MAP.files[k]));
     this.loading = Promise.all(jobs).then(() => { this.ready = true; this.startLoops(); });
     return this.loading;
   },
@@ -965,7 +965,7 @@ const Sound = {
       this.loopSrc(this.buf.amb_crowd, g, i * 6.7, 0.95 + 0.025 * i); this.em['crowd_' + id] = { g, cur: 0 };
     });
     const fg = c.createGain(); fg.gain.value = 0.85; fg.connect(this.panner(MAZE.cx, 1.0, MAZE.cz, 1.6, 2.4, this.bus.amb));
-    this.loopSrc(this.buf.amb_fountain, fg, 0, 0.94); this.loopSrc(this.buf.amb_fountain, fg, 2.3, 1.06);
+    // No wind, air/hiss or rushing-water bed: the ambience is soft crowd chatter only.
     const wg = c.createGain(); wg.gain.value = 0; wg.connect(this.bus.sfx); this.loopSrc(this.buf.amb_fireworks, wg, 0, 1); this.em.fwBed = { g: wg, cur: 0 };
   },
   setSegment(id) {
