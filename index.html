@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="css/editorial-hud.css">
+<link rel="stylesheet" href="css/editorial-hud.css?v=3.1.1">
 <title>Trust Arcade · Creator Night</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,7 +176,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.1.1">
 </head>
 <body>
 <div id="stage"></div>
@@ -262,7 +262,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.1.0';
+const VERSION = '3.1.1';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -4140,10 +4140,10 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
-<script src="js/trust-labs.js" defer></script>
-<script src="js/model-slots.js" defer></script>
-<script src="js/dj-deck.js" defer></script>
-<script src="js/world-visuals.js" defer></script>
-<script src="js/social-spaces.js" defer></script><script src="js/brand-art.js" defer></script>
+<script src="js/trust-labs.js?v=3.1.1" defer></script>
+<script src="js/model-slots.js?v=3.1.1" defer></script>
+<script src="js/dj-deck.js?v=3.1.1" defer></script>
+<script src="js/world-visuals.js?v=3.1.1" defer></script>
+<script src="js/social-spaces.js?v=3.1.1" defer></script><script src="js/brand-art.js?v=3.1.1" defer></script>
 </body>
 </html>
