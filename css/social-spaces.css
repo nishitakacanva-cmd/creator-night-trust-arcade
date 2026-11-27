@@ -135,4 +135,19 @@ body:has(#mazeGuide:not(.hidden)) #labLaunchBar{display:none!important}
 #avatarGrid canvas{display:block;width:100%;height:100%;object-fit:cover}#avatarGrid button{aspect-ratio:180/220}#avatarGrid .look-label{font-size:10px}
 .passport-art{float:right;width:100px;border-radius:10px;margin:0 0 12px 16px}.lab-header{background:#241a30 url("../assets/festival-art/activity_screen_background.webp") center/cover;color:#fff}.lab-header .lab-title{color:#fff}.lab-header .lab-kicker{color:#ffc9d9}#dlgBag .card{background:#231d2e}.passport-art+button{position:relative}@media(max-width:600px){.passport-art{width:72px}}
 
-#gymControls{background:#291f31}@media(max-width:600px){#hudTR{display:grid;grid-template-columns:repeat(6,36px);gap:5px;width:241px;max-width:calc(100vw - 120px)}#hudTR .ib{min-width:0;font-size:10px}#btnSelfie{font-size:9px}}
+#gymControls{background:#291f31}
+#hudTR{gap:6px;justify-content:flex-end;flex-wrap:wrap;max-width:calc(100vw - 220px)}
+#hudTR .ib{position:relative;flex:none;padding:0;color:#fff5ee}
+#hudTR .ib svg{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+#hudTR .ib[aria-pressed="true"]{background:#603b59;border-color:#eface1;color:#fff}
+#hudTR #btnDJ,#hudTR #btnQual{font-size:10px}
+#bagItemCount{position:absolute;right:2px;top:2px;min-width:14px;padding:0 3px;border-radius:8px;background:#ffc797;color:#331c29;font:700 9px/14px var(--fd)}
+@media(max-width:1100px){
+  #showChip:not(:has(#btnTakeUp)){display:none}
+  #showChip:has(#btnTakeUp){order:20;grid-column:1/-1}
+}
+@media(max-width:760px){#hudTR{max-width:calc(100vw - 120px)}}
+@media(max-width:600px){
+  #hudTR{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;width:241px}
+  #hudTR .ib{width:100%;min-width:0}
+}

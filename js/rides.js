@@ -325,7 +325,7 @@
   }
   function install(ctx){
     c=ctx;modal();panelUI();
-    const fireworks=document.createElement('button');fireworks.className='ib';fireworks.id='btnFireworks';fireworks.textContent='✦';fireworks.title='Watch fireworks';fireworks.setAttribute('aria-label','Watch fireworks');fireworks.onclick=()=>{if(c.S.ui.modal)return;stop();start('fireworks',true)};$('hudTR').append(fireworks);
+    $('btnFireworks').onclick=()=>{if(c.S.ui.modal)return;stop();start('fireworks',true)};
     cabinet();tower();pit();coaster();contentSpots();
     batchStatic(objects.collab,[objects.claw]);batchStatic(objects.fall,[harness]);batchStatic(objects.pit);
     batchStatic(c.WORLD.getObjectByName('ride_coaster'),[pod]);

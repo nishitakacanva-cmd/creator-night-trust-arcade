@@ -439,8 +439,8 @@
   }
   function equipBag(){
     if(!firstBag){
-      firstBag=bagModel(ctx.camera);
-      firstBag.position.set(-.22,-.25,-.52);
+      firstBag=bagModel(ctx.camera,.70);
+      firstBag.position.set(-.22,-.28,-.52);
       firstBag.rotation.y=.16;
     }
     const p=ctx.Self.p;
@@ -457,13 +457,13 @@
     }
     if(p.artFigure){
       p.artFigure.add(avatarBag);
-      avatarBag.scale.setScalar(1);
+      avatarBag.scale.setScalar(.76);
       avatarBag.position.set(-.24,.95,.08);
     }else{
       hand.add(avatarBag);
       hand.updateWorldMatrix(true,false);
       const scale=hand.getWorldScale(new ctx.THREE.Vector3());
-      avatarBag.scale.set(1/scale.x,1/scale.y,1/scale.z);
+      avatarBag.scale.set(.76/scale.x,.76/scale.y,.76/scale.z);
       avatarBag.position.set(.02,-.01,.01);
     }
   }
@@ -484,12 +484,21 @@
   }
   function setupBag(){
     dialog('dlgBag','Your festival collection','Everything you picked up', '<p class="fine">Virtual samples, activity rewards and your festival pass.</p><div id="bagItems"></div><p id="bagStatus" role="status"></p>');
-    const bag=document.createElement('button');bag.className='ib';bag.id='btnBag';bag.textContent='Bag';bag.title='Open your sample bag';bag.setAttribute('aria-label',bag.title);bag.onclick=showBag;$('hudTR').append(bag);
-    const selfie=document.createElement('button');selfie.className='ib';selfie.id='btnSelfie';selfie.textContent='Selfie';selfie.title='Take a selfie';selfie.setAttribute('aria-label',selfie.title);selfie.onclick=()=>{if(!ctx.S.ui.modal)ctx.selfie()};$('hudTR').append(selfie);
+    const bag=$('btnBag'),badge=$('bagItemCount');
+    bag.onclick=showBag;
+    $('btnSelfie').onclick=()=>{if(!ctx.S.ui.modal)ctx.selfie()};
     setInterval(()=>{
       if(!ctx.S.started)return;
       const items=inventory(),key=JSON.stringify(items.map(i=>i.title));
-      if(key!==lastInventory){if(lastInventory&&items.length>bagCount)ctx.Sound.play('stamp');lastInventory=key;bagCount=items.length;bag.textContent='Bag '+items.length;bag.setAttribute('aria-label','Open sample bag, '+items.length+' items')}
+      if(key!==lastInventory){
+        if(lastInventory&&items.length>bagCount)ctx.Sound.play('stamp');
+        lastInventory=key;
+        bagCount=items.length;
+        const samples=bagCount-1;
+        badge.textContent=samples>99?'99+':String(samples);
+        badge.classList.toggle('hidden',samples===0);
+        bag.setAttribute('aria-label','Open sample bag, '+samples+(samples===1?' sample':' samples'));
+      }
     },300);
   }
   function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();labelCreators();setupBag();

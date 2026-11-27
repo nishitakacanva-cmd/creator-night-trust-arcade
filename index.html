@@ -174,7 +174,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css?v=3.3.2">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.3.4">
 </head>
 <body>
 <div id="stage"></div>
@@ -209,15 +209,19 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
 <div id="hud" class="hidden">
   <div id="hudTL" class="chip"><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.3 3.6 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.7 0 5.9 3.8 4.6 7.3C19.5 16.4 12 21 12 21z"/></svg></div><div><b data-t="brandShort">Creator Night</b><span id="zoneName">Entry</span></div></div>
   <div id="miniMap" class="chip" role="button" tabindex="0" title="Map (M)"><canvas id="miniCanvas" width="368" height="340"></canvas><div class="cap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="mm-tap" data-t="mapTap">Map · tap to jump</span><span class="mm-zone" id="mmZone"></span></div></div>
-  <div id="hudTR">
+  <div id="hudTR" role="group" aria-label="Festival controls">
     <div id="showChip" class="chip"><b id="showNow">—</b><span id="showNext">—</span></div>
-    <button class="ib" id="btnLang" title="Language">हि</button>
     <button class="ib" id="btnMap" title="Map (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button>
     <button class="ib" id="btnPass" title="Passport (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/></svg></button>
+    <button class="ib" id="btnView" type="button" title="Switch to third person (V)" aria-label="Third-person view" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3"/><path d="M6.5 18v-1a3 3 0 0 1 3-3h5a3 3 0 0 1 3 3v1M7 3H3v4m14-4h4v4M3 17v4h4m14-4v4h-4"/></svg></button>
+    <button class="ib" id="btnBag" type="button" title="Open sample bag" aria-label="Open sample bag"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8zM9 9V6a3 3 0 0 1 6 0v3"/></svg><span id="bagItemCount" class="hidden" aria-hidden="true"></span></button>
+    <button class="ib" id="btnSelfie" type="button" title="Take a selfie" aria-label="Take a selfie"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="3.3"/></svg></button>
     <button class="ib" id="btnTour" title="Guided tour (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c4-1 3-7 7-7s3 6 7 5"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="17" r="1.6"/><path d="M12 4v5"/></svg></button>
+    <button class="ib" id="btnFireworks" type="button" title="Watch fireworks" aria-label="Watch fireworks"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3c0 5-2 7-7 7 5 0 7 2 7 7 0-5 2-7 7-7-5 0-7-2-7-7zM19 15v6m-3-3h6M5 3v4M3 5h4"/></svg></button>
     <button class="ib" id="btnSound" title="Sound (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg></button>
-    <button class="ib" id="btnQual" title="Graphics quality (cycle High / Med / Perf)" style="width:auto;padding:0 10px;font-size:11px;font-weight:700;letter-spacing:.04em">MED</button>
-    <button class="ib" id="btnHelp" title="Help (H)">?</button>
+    <button class="ib" id="btnLang" title="Language">हि</button>
+    <button class="ib" id="btnQual" title="Graphics quality (cycle High / Med / Perf)">MED</button>
+    <button class="ib" id="btnHelp" title="Help (H)" aria-label="Help"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1.2-1.5 2.5m0 3v.1"/></svg></button>
     <button class="ib" id="btnResearch" title="Researcher overlay (L)">L</button>
   </div>
   <div id="trustMeter" class="chip hidden"><b data-t="meterTitle">Audience trust in this post</b><div class="bar"><i id="meterFill" style="width:50%"></i></div><small data-t="meterNote">Fictional post. This is not a score of you.</small></div>
@@ -261,7 +265,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.3.3';
+const VERSION = '3.3.4';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -3452,13 +3456,16 @@ function captureFestivalPhoto(selfie=false){
 }
 function composePost(img) {
   const W = 1080, H = 1440, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const creator = window.TrustIllustrations?.roster.find(({id}) => id === S.characterId);
+  const handle = creator?.handle || handleOf(S.alias);
+  c.dataset.creatorHandle = handle;
   x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
   x.fillStyle = gradFill(x, 20, 120, 120, 20); x.beginPath(); x.arc(70, 70, 46, 0, 7); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.arc(70, 70, 40, 0, 7); x.fill(); drawMark(x, 70, 72, 30);
-  txt(x, handleOf(S.alias), 135, 64, 34, { w: 700, color: '#121018' }); txt(x, S.lang === 'hi' ? 'क्रिएटर नाइट · ट्रस्ट आर्केड' : 'Creator Night · Trust Arcade', 135, 104, 26, { w: 500, color: '#666' });
+  txt(x, handle, 135, 64, 34, { w: 700, color: '#121018' }); txt(x, S.lang === 'hi' ? 'क्रिएटर नाइट · ट्रस्ट आर्केड' : 'Creator Night · Trust Arcade', 135, 104, 26, { w: 500, color: '#666' });
   x.drawImage(img, 58, 140, W-116, W-116);
   const yI = 140 + W - 52; drawIcon(x, 'heartF', 60, yI, 58, '#E1306C'); drawIcon(x, 'chat', 148, yI, 52, '#121018'); drawIcon(x, 'send', 232, yI, 50, '#121018'); drawIcon(x, 'save', W - 60, yI, 50, '#121018');
   const lab = PHOTO_LABELS[Booth.label]; let cap = L(PHOTO_CAPTIONS[Booth.cap]); if (lab.id !== 'none') cap = (lab.id === 'ad' ? '#ad ' : '#gifted ') + cap;
-  const hd = handleOf(S.alias); txt(x, hd, 40, yI + 74, 32, { w: 800, color: '#121018' }); x.font = F(32, 800); const hw = x.measureText(hd).width;
+  txt(x, handle, 40, yI + 74, 32, { w: 800, color: '#121018' }); x.font = F(32, 800); const hw = x.measureText(handle).width;
   txt(x, cap, 40 + hw + 14, yI + 74, 32, { w: 500, color: '#121018', maxW: W - 100 - hw });
   txt(x, S.lang === 'hi' ? 'अनौपचारिक स्टूडेंट प्रदर्शनी · Instagram/Meta से संबद्ध नहीं' : 'Unofficial student exhibit · not affiliated with Instagram or Meta', 40, H - 30, 22, { w: 500, color: '#999' });
   return c;
@@ -3578,7 +3585,7 @@ function setCue(t) { const c = $('cue'); if (!t || XRS.active) { c.classList.add
 function updateReticle() { $('reticle').classList.toggle('hidden', !S.started || XRS.active || !(ptr.locked || IS_TOUCH_DEVICE)); }
 const ICON_SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 const ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg>';
-function updateSoundBtn() { const b = $('btnSound'); if (b) { b.classList.toggle('on', Sound.on); b.innerHTML = Sound.on ? ICON_SOUND_ON : ICON_SOUND_OFF; b.title = (Sound.on ? (S.lang === 'hi' ? 'आवाज़ बंद करें' : 'Mute') : (S.lang === 'hi' ? 'आवाज़ चालू करें' : 'Sound on')) + ' (N)'; } }
+function updateSoundBtn() { const b = $('btnSound'); if (b) { b.classList.toggle('on', Sound.on); b.setAttribute('aria-pressed',String(Sound.on)); b.setAttribute('aria-label',S.lang === 'hi' ? 'आवाज़' : 'Sound'); b.innerHTML = Sound.on ? ICON_SOUND_ON : ICON_SOUND_OFF; b.title = (Sound.on ? (S.lang === 'hi' ? 'आवाज़ बंद करें' : 'Mute') : (S.lang === 'hi' ? 'आवाज़ चालू करें' : 'Sound on')) + ' (N)'; } }
 function toggleSound() { Sound.set(!Sound.on); if (window.TrustDJ && window.TrustDJ.onShowSegment) window.TrustDJ.onShowSegment(Show && Show.seg ? Show.seg.id : 'interval', Sound.on); toast(Sound.on ? T('soundOn') : T('soundOff')); logEvent('sound', { on: Sound.on }); }
 
 /* ---------- passport ---------- */
@@ -3762,7 +3769,9 @@ async function fastTravel(t) {
 /* ---------- photo dialog ---------- */
 function showPhoto(canvas) {
   if (XRS.active) { VRPanel.photo(canvas); return; }
-  $('photoOut').src = canvas.toDataURL('image/jpeg', 0.92); $('photoOut').alt='Your Creator Night photo print'; openModal('dlgPhoto'); window.TrustSocial?.animatePrint();
+  $('photoOut').src = canvas.toDataURL('image/jpeg', 0.92);
+  $('photoOut').alt = 'Creator Night photo print for ' + canvas.dataset.creatorHandle;
+  openModal('dlgPhoto'); window.TrustSocial?.animatePrint();
 }
 /* ---------- help + credits ---------- */
 function fillHelp() {
@@ -3827,7 +3836,7 @@ let thirdPerson = false;
 function toggleView() {
   if (XRS.active || Shot.active || S.ui.modal) return;
   thirdPerson = !thirdPerson;
-  $('btnView').textContent = thirdPerson ? '1st' : '3rd';
+  $('btnView').title = thirdPerson ? 'Switch to first person (V)' : 'Switch to third person (V)';
   $('btnView').setAttribute('aria-pressed',String(thirdPerson));
   thirdPerson ? camera.layers.enable(LAYER_SELF) : camera.layers.disable(LAYER_SELF);
 }
@@ -4251,7 +4260,7 @@ async function init() {
   setLoad(0.88);
   buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); Maze.setup(); VRPanel.init();
   setupInput(); setupXR(); bindUI();
-  const view=document.createElement('button');view.id='btnView';view.className='ib';view.textContent='3rd';view.title='Switch first-person / third-person view';view.setAttribute('aria-label',view.title);view.setAttribute('aria-pressed','false');view.onclick=toggleView;$('hudTR').append(view);
+  $('btnView').onclick=toggleView;
  Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
   window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, camera, LAYER_SELF, TRAVEL, SAMPLE_LOUNGE, addPlatform, PEOPLE_BY, Merger, rboxGeo, torusGeo,
     selfie:()=>captureFestivalPhoto(true), capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
@@ -4330,10 +4339,10 @@ init().catch(e => { console.error(e); $('ldText').textContent = 'Something went 
 </script>
 <script src="js/trust-labs.js?v=3.3.2" defer></script>
 <script src="js/creator-art.js?v=3.3.2" defer></script>
-<script src="js/rides.js?v=3.3.2" defer></script>
+<script src="js/rides.js?v=3.3.4" defer></script>
 <script src="js/model-slots.js?v=3.3.2" defer></script>
-<script src="js/dj-deck.js?v=3.3.2" defer></script>
+<script src="js/dj-deck.js?v=3.3.4" defer></script>
 <script src="js/world-visuals.js?v=3.3.2" defer></script>
-<script src="js/social-spaces.js?v=3.3.3" defer></script><script src="js/brand-art.js?v=3.3.2" defer></script>
+<script src="js/social-spaces.js?v=3.3.4" defer></script><script src="js/brand-art.js?v=3.3.2" defer></script>
 </body>
 </html>

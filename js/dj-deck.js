@@ -107,9 +107,8 @@
       btn.id = 'btnDJ';
       btn.className = 'ib';
       btn.title = '2000s Bollywood Party DJ Deck';
-      btn.style.cssText = 'width:auto;padding:0 10px;font-size:11px;font-weight:700;letter-spacing:.04em';
       btn.textContent = 'DJ';
-      hudTR.insertBefore(btn, hudTR.firstChild);
+      hudTR.insertBefore(btn, document.getElementById('btnSound'));
       btn.addEventListener('click', () => {
         const d = document.getElementById('djDrawer');
         if (d) d.classList.toggle('hidden');
