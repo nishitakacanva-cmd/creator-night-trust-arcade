@@ -1,16 +1,17 @@
 /* Physical rides, bounded camera sequences and pavilion content spots. */
 (() => {
-  let c, clock=0, active=null, elapsed=0, boardTime=0, lastFocus;
+  let c, clock=0, active=null, elapsed=0, lastFocus;
+  const coasterDuration=24;
   const $=id=>document.getElementById(id);
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   const points={
     collab:{x:10.5,z:29,label:'Collab claw',hi:'कोलैब क्लॉ',file:'entry_collab_claw',poster:'poster_collab_claw'},
     fall:{x:-17,z:-28.6,label:'Trust Fall',hi:'ट्रस्ट फ़ॉल',file:'trust_fall_bungee',poster:'poster_trust_fall'},
     pit:{x:0,z:-16,label:'Claim Dunk',hi:'क्लेम डंक',file:'ball_pit_dunk',poster:'poster_ball_pit_dunk'},
-    coaster:{x:-17,z:-23,label:'Hype Coaster',hi:'हाइप कोस्टर',file:'trust_coaster',poster:'poster_hype_coaster'}
+    coaster:{x:-20.5,z:-24,label:'Hype Coaster',hi:'हाइप कोस्टर',file:'trust_coaster',poster:'poster_hype_coaster'}
   };
   const objects={}, ballMatrices=[], palette=['#833AB4','#E1306C','#ed896f','#FCAF45'];
-  let curve,pod,pitBalls,harness,fallChoice=0,dunkIndex=0,clawX=50,clawBusy=false;
+  let curve,pod,coasterEye,coasterLook,festivalView,pitBalls,harness,fallChoice=0,dunkIndex=0,clawX=50,clawBusy=false;
   const claims=[
     {text:'I used it for 21 days. Here is my diary, the ingredient list and the irritation I noticed.',proof:true,why:'A bounded observation with a visible method and limitation helps viewers judge fit.'},
     {text:'Miracle overnight results. Works for absolutely everyone.',proof:false,why:'A universal result needs evidence across people. An enthusiastic caption cannot supply it.'},
@@ -127,24 +128,30 @@
     for(const person of Object.values(c.people))if(person!==c.self.p && Math.hypot(person.pos.x,person.pos.z+16)<4.1)person.teleport(person.pos.x<0?-5:5,person.pos.z,person.yaw);
   }
   function coaster(){
-    const T=c.THREE,g=group('ride_coaster'),stations=[
-      [-19,3.2,-24],[-20,5,-29],[-17,8,-34],[-7,9.5,-34.2],[6,7,-34.2],[18,6,-34],[20,4.5,-29],[19,3.2,-24],[0,15.2,-21.5],[-12,12,-22.5]
+    const T=c.THREE,g=group('ride_coaster'),p=points.coaster,stations=[
+      [p.x,3,-25.1],[-22,6,-28.7],[-20,14,-32],[-13,22,-34],[-4,24,-34],
+      [5,20,-34],[13,11,-33],[20,5,-30],[21,5.5,-25],[15,12,-22.5],
+      [6,17,-20.5],[-5,16,-20.5],[-15,8,-22]
     ];
-    // The high front span clears the stage roof, screens and truss; the return hugs the north fence.
+    // The rear crest looks over the park. The front return clears the stage truss.
     curve=new T.CatmullRomCurve3(stations.map(p=>new T.Vector3(...p)),true,'centripetal',.3);
+    coasterEye=new T.Vector3();coasterLook=new T.Vector3();festivalView=new T.Vector3(0,2,1);
     const metal=c.std('#8c8c99',{roughness:.32,metalness:.80}),accent=c.std('#b85297',{emissive:'#d76aaa',emissiveIntensity:.55,roughness:.4});
     c.mesh(new T.TubeGeometry(curve,260,.075,8,true),metal,g);
     const line=new T.CatmullRomCurve3(curve.getPoints(260).map(p=>p.clone().add(new T.Vector3(0,.09,0))),true);
     c.mesh(new T.TubeGeometry(line,260,.017,5,true),accent,g);
-    const pillars=[[-19,3.2,-24],[-20,5,-29],[-17,8,-34],[-7,9.5,-34.2],[6,7,-34.2],[18,6,-34],[20,4.5,-29],[19,3.2,-24]];
+    const pillars=stations.filter((_,i)=>![0,5,6,8,10,11].includes(i));
     for(const [x,y,z] of pillars){tube(g,.07,y,x,y/2,z,metal);solid(g,.65,.14,.65,x,.07,z,c.MAT.concrete);c.colCircle(x,z,.25,'coasterFoot')}
     pod=new T.Group();pod.name='coasterPod';g.add(pod);
     const shell=c.std('#712a67',{roughness:.29,metalness:.48});
     solid(pod,1.45,.35,1.9,0,.24,0,shell);solid(pod,1.4,.68,.12,0,.66,-.72,shell);
     for(const x of [-.35,.35]){solid(pod,.55,.18,.9,x,.5,0,c.MAT.rubber);tube(pod,.024,.5,x,.9,-.40)}
-    const station=group('coaster_station',points.coaster.x,points.coaster.z);
-    solid(station,2.8,.16,2.6,0,.08,0,c.MAT.deck);plaque(station,'coaster',0,.4);
-    c.colBox(-18.4,-24.3,-15.6,-24.1,'stationBack');c.TRAVEL.coaster={x:-17,z:-20.3,yaw:0};
+    const station=group('coaster_station',p.x,p.z);
+    solid(station,3,.16,2.6,0,.08,0,c.MAT.deck);
+    plaque(station,'coaster',0,-.22);
+    sign(station,'HYPE COASTER · BOARD HERE',2.75,2.05,-.2,()=>open('coaster'));
+    c.addPlatform(p.x-1.5,p.z-1.3,p.x+1.5,p.z+1.3,.16);
+    c.TRAVEL.coaster={x:p.x,z:p.z+2.9,yaw:0,ride:'coaster'};
   }
   function batchStatic(root, moving = []) {
     root.updateMatrixWorld(true);
@@ -197,8 +204,11 @@
       $('startFall').onclick=()=>{const still=$('rideStill').checked;c.closeModal('dlgRide');note('fall','Trust Fall: '+claims[fallChoice].why);start('fall',still)};
     }else if(id==='pit'){renderDunk()}
     else {
-      body.innerHTML='<p>A 20-second loop through the pull of hype, a viral peak and an evidence check. You can exit at any time.</p><label class="toggle"><input type="checkbox" id="rideStill" '+(reduced()?'checked':'')+'>Use a still view and step through the story. This ride moves the camera along an elevated track.</label><button class="btn pri" id="startCoaster">Ride the Hype Coaster</button>';
-      $('startCoaster').onclick=()=>{const still=$('rideStill').checked;c.closeModal('dlgRide');start('coaster',still)};
+      body.innerHTML='<p>Climb above the lights, take in the whole festival, then dive back toward the stage. The moving ride lasts 24 seconds.</p><div class="btnrow"><button class="btn pri" id="startCoaster">Start moving ride</button><button class="btn" id="previewCoaster">See the view without motion</button></div>';
+      const board=still=>{c.closeModal('dlgRide');start('coaster',still)};
+      $('startCoaster').onclick=()=>board(false);
+      $('previewCoaster').onclick=()=>board(true);
+      $(reduced()?'previewCoaster':'startCoaster').focus();
     }
   }
   const pause=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?40:ms));
@@ -234,18 +244,29 @@
     $('dunkProof').onclick=()=>dunk(true);$('dunkHype').onclick=()=>dunk(false);$('nextDunk').onclick=()=>{dunkIndex++;renderDunk()};
   }
   function start(id,still){
-    c.stopMotion();c.S.ui.modal='ride-motion';active={id,still};elapsed=0;
+    c.stopMotion();c.S.ui.modal='ride-motion';active={id,still,fov:c.camera.fov};elapsed=0;
     $('exitRide').textContent=id==='fireworks'?'Return to festival · Esc':'Exit ride · Esc';
     $('rideHUD').classList.remove('hidden');$('rideLaunch').classList.add('hidden');
     if(id==='fireworks'){c.fireworks();c.Shot.enter([0,3,-12],[0,25,-34]);$('rideCaption').textContent='Creator Night · Fireworks and drone finale'}
-    else if(still){c.Shot.enter(id==='fall'?[-17,2,-23]:[-17,5,-22],[0,3,-25]);$('rideCaption').textContent=id==='fall'?claims[fallChoice].why:'Hype build-up → viral spike → evidence check. A feeling can lead you to look. Evidence helps you decide.'}
-    else if(id==='coaster'){boardTime=clock/32;c.Shot.enter([pod.position.x,pod.position.y+1,pod.position.z],[0,4,-25])}
+    else if(id==='coaster'){
+      c.camera.fov=76;c.camera.updateProjectionMatrix();
+      if(still){
+        c.Shot.enter([-4,25,-34],[0,2,1]);
+        $('rideCaption').textContent='Creator Night from above · still view';
+      }else{
+        const seat=curve.getPointAt(0),ahead=curve.getPointAt(.016);
+        c.Shot.enter([seat.x,seat.y+1.02,seat.z],[ahead.x,ahead.y+.8,ahead.z]);
+        $('rideCaption').textContent='Climb · the festival is opening up below you';
+      }
+    }
+    else if(still){c.Shot.enter([-17,2,-23],[0,3,-25]);$('rideCaption').textContent=claims[fallChoice].why}
     else {c.Shot.enter([-17,7.7,-28.6],[-16.3,5,-24]);}
     document.body.classList.add('riding');$('exitRide').focus();
   }
   function stop(){
     if(!active)return;
-    const id=active.id;active=null;c.Shot.exit();c.stopMotion();c.S.ui.modal=null;
+    const {id,fov}=active;active=null;c.Shot.exit();c.stopMotion();c.S.ui.modal=null;
+    if(id==='coaster'){c.camera.fov=fov;c.camera.updateProjectionMatrix()}
     if(harness)harness.position.y=6.8;
     $('rideHUD').classList.add('hidden');document.body.classList.remove('riding');
     if(id==='coaster')note('coaster','Hype Coaster: emotional momentum creates interest. An evidence check supports a grounded decision.');
@@ -278,10 +299,18 @@
   }
   function update(dt){
     if(!c)return;clock+=dt;
-    const u=active?.id==='coaster'&&!active.still?(boardTime+elapsed/20)%1:(clock/32)%1;
+    const ridingCoaster=active?.id==='coaster'&&!active.still;
+    const u=ridingCoaster?Math.min(1,elapsed/coasterDuration):(clock/32)%1;
     if(curve){
       const at=curve.getPointAt(u),next=curve.getPointAt((u+.008)%1);pod.position.copy(at);pod.lookAt(next);
-      if(active?.id==='coaster'&&!active.still){c.camera.position.copy(at).add(new c.THREE.Vector3(0,1.02,0));c.camera.lookAt(next.clone().add(new c.THREE.Vector3(0,.8,0)))}
+      if(ridingCoaster){
+        coasterEye.copy(at);coasterEye.y+=1.02;
+        coasterLook.copy(curve.getPointAt((u+.018)%1));coasterLook.y+=.8;
+        const scenic=c.THREE.MathUtils.smoothstep(at.y,14,22)*c.THREE.MathUtils.smoothstep(-at.z,27,33);
+        coasterLook.sub(coasterEye).normalize().lerp(festivalView.clone().sub(coasterEye).normalize(),scenic*.94);
+        c.camera.position.copy(coasterEye);
+        c.camera.lookAt(coasterLook.add(coasterEye));
+      }
     }
     // Keep ambient routes around the pit rim and away from its play floor.
     for(const person of Object.values(c.people)){
@@ -313,15 +342,23 @@
         $('rideCaption').textContent=elapsed<2?'What is holding up this claim?':claims[fallChoice].why;
         if(elapsed>=6.4)stop();
       }else if(active.id==='coaster'&&!active.still){
-        $('rideCaption').textContent=elapsed<7?'Hype build-up · anticipation pulls us forward':elapsed<13?'Viral spike · popularity feels like certainty':'Evidence check · slow down and inspect the support';
-        if(elapsed>=20)stop();
+        const caption=elapsed<4?'Climb · the festival is opening up below you':elapsed<9?'The summit · take in Creator Night':elapsed<14?'The drop · hype makes everything feel bigger':'The return · look for the evidence behind the hype';
+        if($('rideCaption').textContent!==caption)$('rideCaption').textContent=caption;
+        if(elapsed>=coasterDuration)stop();
       }
     }
     $('panelActions').classList.toggle('hidden',(Math.abs(c.player.x)>7||c.player.z> -16.8||c.player.z< -25.5)||!c.S.started||!!c.S.ui.modal||!!active);
-    const near=Object.entries(points).find(([id,p])=>Math.hypot(c.player.x-p.x,c.player.z-p.z)<(id==='pit'?5.8:6));
+    let near,nearest=Infinity;
+    for(const [id,p] of Object.entries(points)){
+      const distance=Math.hypot(c.player.x-p.x,c.player.z-p.z);
+      if(distance<(id==='pit'?5.8:6)&&distance<nearest){near=[id,p];nearest=distance}
+    }
     document.body.classList.toggle('nearRide',!!near&&!active);
     const launch=$('rideLaunch');launch.classList.toggle('hidden',!near||!c.S.started||!!c.S.ui.modal||!!active);
-    if(near){launch.dataset.ride=near[0];launch.textContent=near[1].label+' · play'}
+    if(near&&launch.dataset.ride!==near[0]){
+      launch.dataset.ride=near[0];
+      launch.textContent=near[0]==='coaster'?'Board the Hype Coaster':near[1].label+' · play';
+    }
   }
   function install(ctx){
     c=ctx;modal();panelUI();

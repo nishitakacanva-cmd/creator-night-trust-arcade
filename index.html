@@ -265,7 +265,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.3.4';
+const VERSION = '3.3.5';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -3764,6 +3764,7 @@ async function fastTravel(t) {
     if (XRS.active) { renderer.xr.getCamera().getWorldPosition(_hp); rig.position.x += t.x - _hp.x; rig.position.z += t.z - _hp.z; }
     else { player.x = t.x; player.z = t.z; player.yaw = t.yaw; player.pitch = -0.04; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; }
     updateLightBudget(); Tour.stop(true); await wait(0.1); f.style.opacity = '0'; Sound.play('teleport');
+    if(t.ride&&!XRS.active&&!S.ui.modal)window.TrustRides?.open(t.ride);
   } finally { _isTraveling = false; }
 }
 /* ---------- photo dialog ---------- */
@@ -4339,7 +4340,7 @@ init().catch(e => { console.error(e); $('ldText').textContent = 'Something went 
 </script>
 <script src="js/trust-labs.js?v=3.3.2" defer></script>
 <script src="js/creator-art.js?v=3.3.2" defer></script>
-<script src="js/rides.js?v=3.3.4" defer></script>
+<script src="js/rides.js?v=3.3.5" defer></script>
 <script src="js/model-slots.js?v=3.3.2" defer></script>
 <script src="js/dj-deck.js?v=3.3.4" defer></script>
 <script src="js/world-visuals.js?v=3.3.2" defer></script>

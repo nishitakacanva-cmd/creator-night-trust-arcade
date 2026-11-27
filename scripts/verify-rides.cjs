@@ -5,16 +5,58 @@ const errors=[],shots='output/playwright/polish/rides-';let p;
 try{
 p=await browser.newPage({viewport:{width:1440,height:900},ignoreHTTPSErrors:true});
 p.on('pageerror',e=>{errors.push(String(e));console.log('ERROR',String(e))});p.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url())});
-await p.goto((process.argv[2]||'http://127.0.0.1:8130/')+'?test=1&q=low&v=3.3.2',{waitUntil:'domcontentloaded'});
+await p.goto((process.argv[2]||'http://127.0.0.1:8130/')+'?test=1&q=low&v=3.3.5',{waitUntil:'domcontentloaded'});
 await p.waitForFunction(()=>window.TrustArcade?.ready,null,{timeout:120000});await p.evaluate(()=>Promise.all([TrustArcade.modelsReady,brandArtReady]));
 await p.locator('#btnStart').waitFor();await p.evaluate(()=>TrustArcade.start({sound:false}));
 const tick=async(n=3,dt=.05)=>p.evaluate(([n,dt])=>TrustArcade.tick(n,dt,true),[n,dt]);
 const jump=async id=>{await p.evaluate(async id=>{TrustArcadeBridge.jumpToZone(id);for(let i=0;i<20;i++){TrustArcade.tick(1,.04,false);await Promise.resolve()}TrustArcade.tick(2,.03,true)},id);await p.waitForTimeout(350)};
 const snap=async name=>{await tick();await p.screenshot({path:shots+name+'.jpg',quality:78})};
+async function checkCoaster(){
+  await p.locator('#quickZoneNav [data-zone="coaster"]').click();
+  for(let i=0;i<3;i++)await tick(20,.04);
+  await p.locator('#startCoaster').click();
+  const heights=await p.evaluate(()=>{
+    const a=TrustArcade;
+    let scene=a.PEOPLE_BY.self.group;
+    while(scene.parent)scene=scene.parent;
+    const camera=scene.getObjectByName('player_camera');
+    const values=[camera.position.y];
+    for(let i=0;i<3;i++){a.tick(40,.05,false);values.push(camera.position.y)}
+    a.tick(1,.05,true);
+    return values;
+  });
+  assert.ok(heights[0]<5&&heights[2]>15&&heights[3]>22,heights.join(','));
+  assert.equal(await p.evaluate(()=>TrustRides.active.still),false);
+  await p.screenshot({path:shots+'coaster-summit.jpg',quality:78});
+  await tick(122);
+  const drop=await p.evaluate(()=>{
+    let scene=TrustArcade.PEOPLE_BY.self.group;
+    while(scene.parent)scene=scene.parent;
+    return scene.getObjectByName('player_camera').position.y;
+  });
+  assert.ok(drop<12,'Ride camera descends after the crest: '+drop);
+  await tick(250);
+  assert.equal(await p.evaluate(()=>TrustRides.active),null);
+  await p.setViewportSize({width:390,height:844});
+  await p.emulateMedia({reducedMotion:'reduce'});
+  await p.locator('#rideLaunch').click();
+  await p.locator('#previewCoaster').click();
+  assert.equal(await p.evaluate(()=>TrustRides.active.still),true);
+  await p.locator('#exitRide').click();
+  await tick();
+  assert.equal(await p.evaluate(()=>TrustArcade.S.ui.modal),null);
+}
+if(process.env.COASTER_ONLY){
+  await checkCoaster();
+  assert.deepEqual(errors,[]);
+  console.log('COASTER PASS');
+  return;
+}
 for(const id of ['fashion','beauty','food','fitness','travel','education','collab','fall','pit','coaster']){
 await jump(id);await snap(id);
 if(['collab','fall','pit','coaster'].includes(id)){
-await p.locator('#rideLaunch').click();await snap(id+'-open');
+if(id!=='coaster')await p.locator('#rideLaunch').click();
+await snap(id+'-open');
 if(id==='collab'){
 await p.locator('#collabPosition').fill('70');await p.locator('#collabDrop').click();await p.locator('[data-decision]').first().waitFor();await p.locator('[data-decision]').first().click();
 assert.ok(await p.evaluate(()=>JSON.parse(sessionStorage.getItem('trust_arcade_v3_field_notes')).collab));await snap('collab-done');
@@ -43,7 +85,7 @@ for(const index of [0,1,0]){await p.locator('#mazeGuide button').nth(index).clic
 assert.equal(await p.evaluate(()=>['core1','core2','core3'].every(id=>TrustArcade.S.gates[id].passed)),true);await snap('maze-cleared');
 console.log('EXTRA FEATURES PASS');
 await p.setViewportSize({width:390,height:844});
-for(const id of ['collab','fall','pit','coaster']){await jump(id);await p.locator('#rideLaunch').click();await snap('mobile-'+id);await p.keyboard.press('Escape')}
+for(const id of ['collab','fall','pit','coaster']){await jump(id);if(id!=='coaster')await p.locator('#rideLaunch').click();await snap('mobile-'+id);await p.keyboard.press('Escape')}
 assert.deepEqual(errors,[]);console.log('RIDES PASS',await p.evaluate(()=>TrustArcade.stats()));
 }catch(e){console.log(e);if(p)await p.screenshot({path:shots+'failure.jpg'}).catch(()=>{});process.exitCode=1}finally{await browser.close()}
 })();
