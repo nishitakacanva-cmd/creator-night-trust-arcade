@@ -186,7 +186,20 @@
   function buildMarket(){const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,Person}=ctx;
     dialog('dlgMarket','Creator market · concept stalls','Make something worth trusting',`<h3 id="marketBrand"></h3><p id="marketItem" class="social-copy"></p><form class="social-form" id="marketForm"><label for="storyText">Your first-impression story</label><textarea id="storyText" maxlength="250"></textarea><label class="check"><input id="giftDisclosure" type="checkbox" checked>Keep “Gifted” visible, before people tap or expand.</label><div class="story-preview"><span class="disclosure" id="storyDisclosure"></span><p id="storyWords"></p><small>CONCEPT PREVIEW · NO REAL BRAND PARTNERSHIP</small></div><p class="fine">Describe your own experience. Skip results you cannot support. A free sample doesn’t buy a positive review.</p><div class="btnrow"><button class="btn pri" id="previewStory" type="submit">Preview story & collect demo sample</button><button class="btn" id="marketPhoto" type="button">Make a content photo</button></div></form><p id="storyStatus" class="social-status" role="status"></p><p class="fine">Educational concept. Nothing is sent to Instagram. Samples are virtual.</p>`);
     $('storyText').oninput=updateStory;$('giftDisclosure').onchange=updateStory;
-    $('marketForm').onsubmit=e=>{e.preventDefault();if(!$('giftDisclosure').checked||!$('storyText').value.trim())return;let samples=[];try{samples=JSON.parse(sessionStorage.getItem(sampleKey)||'[]')}catch{}if(!samples.includes(activeBrand.name))samples.push(activeBrand.name);try{sessionStorage.setItem(sampleKey,JSON.stringify(samples))}catch{}$('storyStatus').textContent='Story preview ready. '+activeBrand.item+' added to your demo sample bag. No real post was made.';ctx.Sound.play('stamp')};
+    $('marketForm').onsubmit=e=>{
+      e.preventDefault();
+      if(!$('giftDisclosure').checked||!$('storyText').value.trim())return;
+      try{
+        const samples=JSON.parse(sessionStorage.getItem(sampleKey)||'[]');
+        if(!samples.includes(activeBrand.name)){
+          samples.push(activeBrand.name);
+          sessionStorage.setItem(sampleKey,JSON.stringify(samples));
+          revealBag();
+        }
+      }catch{}
+      $('storyStatus').textContent='Story preview ready. '+activeBrand.item+' added to your demo sample bag. No real post was made.';
+      ctx.Sound.play('stamp');
+    };
     $('marketPhoto').onclick=()=>{ctx.Booth.last=ctx.capture();ctx.showPhoto(ctx.Booth.last)};
     brands.forEach((b,i)=>{b.rot=Math.atan2(-b.x,-26-b.z);const g=new THREE.Group();g.name='market_'+b.name;g.position.set(b.x,0,b.z);g.rotation.y=b.rot;WORLD.add(g);
       const colored=std(b.color,{roughness:.7}),shell=new ctx.Merger();
@@ -299,7 +312,7 @@
       const gifts=['a mini skincare sample','a luggage tag','a fabric swatch set','a matcha token'];
       const item=gifts[capsules.indexOf(picked)%gifts.length];
       $('freebieResult').textContent='You picked '+item+'. A gift never requires praise.';
-      try{const bag=JSON.parse(sessionStorage.getItem('creator-night-claw-bag')||'[]');bag.push(item);sessionStorage.setItem('creator-night-claw-bag',JSON.stringify(bag.slice(-40)))}catch{}
+      try{const bag=JSON.parse(sessionStorage.getItem('creator-night-claw-bag')||'[]');bag.push(item);sessionStorage.setItem('creator-night-claw-bag',JSON.stringify(bag.slice(-40)));revealBag()}catch{}
       ctx.Sound.play('stamp');
     }finally{
       picked.style.transform='';arm.style.left=clawX+'%';arm.style.height='60px';clawBusy=false;
@@ -330,7 +343,7 @@
   function updateHeldProps(){
     if(!ctx)return;
     for(const label of nameplates)label.sprite.visible=Math.hypot(label.person.pos.x-ctx.player.x,label.person.pos.z-ctx.player.z)<12;
-    if(firstBag)firstBag.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
+    updateBagVisibility();
     if(handDrink)handDrink.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
     for(const cup of heldCups){
       if(!cup.person.model.visible)continue;
@@ -380,7 +393,32 @@
 
     sign(ctx.WORLD,3.7,2.65,-10.6,2.8,'Reel together','MAKE A MOMENT. KEEP IT HONEST.');
   }
-  let bagOwner=null,firstBag,lastInventory='',bagCount=0;
+  let bagOwner=null,avatarBag,firstBag,lastInventory='',bagCount=0;
+  let pendingBagReveal=false,bagRevealUntil=0;
+  function revealBag(){
+    pendingBagReveal=true;
+  }
+  function updateBagVisibility(){
+    const {started,ui}=ctx.S;
+    const bagOpen=ui.modal==='dlgBag';
+    const viewAvailable=started&&!document.body.matches('.riding,.shotmode');
+    const now=performance.now();
+    if(pendingBagReveal&&viewAvailable&&!ui.modal){
+      pendingBagReveal=false;
+      bagRevealUntil=now+1600;
+    }
+    const show=viewAvailable&&(bagOpen||(!ui.modal&&now<bagRevealUntil));
+    if(show)equipBag();
+    const thirdPerson=window.TrustArcade?.view();
+    if(firstBag)firstBag.visible=show&&!thirdPerson;
+    if(avatarBag){
+      avatarBag.visible=show&&!!thirdPerson;
+      if(avatarBag.visible){
+        avatarBag.parent.updateWorldMatrix(true,false);
+        avatarBag.quaternion.copy(avatarBag.parent.getWorldQuaternion(cupWorldQuaternion.q ||= new ctx.THREE.Quaternion())).invert();
+      }
+    }
+  }
   function inventory(){
     const list=[{title:'Creator Night pass',image:'assets/festival-art/creator_sample_bag_card.webp',detail:'Your festival keepsake',kind:'pass'}];
     let samples=[],rewards=[],capsules=[];
@@ -400,14 +438,38 @@
     g.scale.setScalar(scale);return g;
   }
   function equipBag(){
-    const p=ctx.Self.p;if(!p?.model||bagOwner===p)return;
-    bagOwner=p;let hand;p.model.traverse(o=>{if(o.isBone&&/hand/i.test(o.name)&&/(left|[ _]l[ _]|l_hand|hand_l)/i.test(o.name))hand=o});
-    if(hand){
-      p.group.updateMatrixWorld(true);const g=bagModel(hand),scale=hand.getWorldScale(new ctx.THREE.Vector3());g.scale.set(1/scale.x,1/scale.y,1/scale.z);g.position.set(.02,-.01,.01);if(p.artFigure){p.artFigure.add(g);g.scale.setScalar(1);g.position.set(-.24,.95,.08)}g.traverse(o=>o.layers.set(ctx.LAYER_SELF));heldCups.push({person:p,hand,group:g});
+    if(!firstBag){
+      firstBag=bagModel(ctx.camera);
+      firstBag.position.set(-.22,-.25,-.52);
+      firstBag.rotation.y=.16;
     }
-    if(firstBag)firstBag.remove();firstBag=bagModel(ctx.camera);firstBag.position.set(-.22,-.25,-.52);firstBag.rotation.y=.16;
+    const p=ctx.Self.p;
+    if(!p?.model||bagOwner===p)return;
+    let hand;
+    p.model.traverse(o=>{
+      if(o.isBone&&/hand/i.test(o.name)&&/(left|[ _]l[ _]|l_hand|hand_l)/i.test(o.name))hand=o;
+    });
+    if(!p.artFigure&&!hand)return;
+    bagOwner=p;
+    if(!avatarBag){
+      avatarBag=bagModel(p.artFigure||hand);
+      avatarBag.traverse(o=>o.layers.set(ctx.LAYER_SELF));
+    }
+    if(p.artFigure){
+      p.artFigure.add(avatarBag);
+      avatarBag.scale.setScalar(1);
+      avatarBag.position.set(-.24,.95,.08);
+    }else{
+      hand.add(avatarBag);
+      hand.updateWorldMatrix(true,false);
+      const scale=hand.getWorldScale(new ctx.THREE.Vector3());
+      avatarBag.scale.set(1/scale.x,1/scale.y,1/scale.z);
+      avatarBag.position.set(.02,-.01,.01);
+    }
   }
   function showBag(){
+    pendingBagReveal=false;
+    bagRevealUntil=0;
     const grid=$('bagItems');grid.replaceChildren();
     for(const item of inventory()){
       const card=document.createElement('article');card.className='bag-item';
@@ -425,8 +487,7 @@
     const bag=document.createElement('button');bag.className='ib';bag.id='btnBag';bag.textContent='Bag';bag.title='Open your sample bag';bag.setAttribute('aria-label',bag.title);bag.onclick=showBag;$('hudTR').append(bag);
     const selfie=document.createElement('button');selfie.className='ib';selfie.id='btnSelfie';selfie.textContent='Selfie';selfie.title='Take a selfie';selfie.setAttribute('aria-label',selfie.title);selfie.onclick=()=>{if(!ctx.S.ui.modal)ctx.selfie()};$('hudTR').append(selfie);
     setInterval(()=>{
-      if(!ctx.S.started)return;equipBag();
-      if(firstBag)firstBag.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
+      if(!ctx.S.started)return;
       const items=inventory(),key=JSON.stringify(items.map(i=>i.title));
       if(key!==lastInventory){if(lastInventory&&items.length>bagCount)ctx.Sound.play('stamp');lastInventory=key;bagCount=items.length;bag.textContent='Bag '+items.length;bag.setAttribute('aria-label','Open sample bag, '+items.length+' items')}
     },300);
@@ -439,7 +500,7 @@
     let visible=null;const observer=new MutationObserver(()=>{const next=document.querySelector('.modal:not(.hidden)');if(next===visible)return;visible=next;if(next){lastFocus=document.activeElement;next.setAttribute('role','dialog');next.setAttribute('aria-modal','true');if(!next.getAttribute('aria-labelledby')){const h=next.querySelector('h2');if(h){h.id||=next.id+'Title';next.setAttribute('aria-labelledby',h.id)}}next.querySelectorAll('button.x').forEach(b=>b.setAttribute('aria-label','Close'));next.querySelector('button,textarea,input')?.focus()}else lastFocus?.focus?.()});observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
     document.addEventListener('keydown',e=>{const modal=document.querySelector('.modal:not(.hidden)');if(!modal)return;if(e.key==='Tab'){const items=[...modal.querySelectorAll('button:not(:disabled),input,textarea,select,[tabindex="0"]')].filter(x=>x.offsetParent!==null);if(!items.length)return;const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}});
   }
-  window.TrustSocial={install,updateHeldProps,countdown,photoFinished,animatePrint,brands};
+  window.TrustSocial={install,updateHeldProps,countdown,photoFinished,animatePrint,brands,revealBag};
 })();
 
 

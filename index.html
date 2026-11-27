@@ -261,7 +261,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.3.2';
+const VERSION = '3.3.3';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -4285,7 +4285,14 @@ async function init() {
 window.TrustArcadeBridge = {
   awardLab(zone) { if (NICHES.includes(zone) && S.started) {
       Games.stamp(zone);
-      try {const bag=JSON.parse(sessionStorage.getItem('creator-night-pavilion-rewards')||'[]');if(!bag.includes(zone)){bag.push(zone);sessionStorage.setItem('creator-night-pavilion-rewards',JSON.stringify(bag))}} catch {}
+      try {
+        const bag=JSON.parse(sessionStorage.getItem('creator-night-pavilion-rewards')||'[]');
+        if(!bag.includes(zone)){
+          bag.push(zone);
+          sessionStorage.setItem('creator-night-pavilion-rewards',JSON.stringify(bag));
+          window.TrustSocial?.revealBag();
+        }
+      } catch {}
     } },
   onLabOpen(id) { S.ui.modal = id; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; keys.clear(); releasePointer(); applyHover(null); },
   onLabClose(id) { if (S.ui.modal === id) S.ui.modal = null; if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone); },
@@ -4327,6 +4334,6 @@ init().catch(e => { console.error(e); $('ldText').textContent = 'Something went 
 <script src="js/model-slots.js?v=3.3.2" defer></script>
 <script src="js/dj-deck.js?v=3.3.2" defer></script>
 <script src="js/world-visuals.js?v=3.3.2" defer></script>
-<script src="js/social-spaces.js?v=3.3.2" defer></script><script src="js/brand-art.js?v=3.3.2" defer></script>
+<script src="js/social-spaces.js?v=3.3.3" defer></script><script src="js/brand-art.js?v=3.3.2" defer></script>
 </body>
 </html>
