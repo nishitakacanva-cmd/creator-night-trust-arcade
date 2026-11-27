@@ -18,3 +18,9 @@ node scripts/verify-festival.cjs mobile http://localhost:8080/
 ```
 
 The test writes screenshots and JSON under the ignored output/playwright/polish directory. QA_OUTPUT changes the destination, CHROME_PATH selects a system Chromium executable, and AXE_PATH selects a local axe-core script. Frame stepping makes interaction captures repeatable. The separately timed readback samples in the JSON do not measure steady-state real-device FPS.
+
+## v3.3 ride pass
+
+The ride checks capture all four attractions in world and interaction states, the Collab Claw decision, Claim Dunk response, moving tower/coaster camera and Escape return. They also capture all six pavilion sightlines, the Travel screen at close range, merchandise, third-person view and all four ride dialogs at phone width.
+
+Additional checks cover a ₹30 demo chai order and resulting wallet balance, cup orientation, the heart portrait, opt-in captions and a panel answer, the fireworks viewing action, and the three maze choices with forward progression. See scripts/verify-rides.cjs for the repeatable checks. The screenshot captures use a headless Chromium browser. Physical phones and headsets remain unverified.

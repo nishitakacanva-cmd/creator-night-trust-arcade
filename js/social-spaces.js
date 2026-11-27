@@ -109,10 +109,26 @@
     const shape=[new THREE.Vector2(.0,0),new THREE.Vector2(.075,0),new THREE.Vector2(.08,.02),new THREE.Vector2(.09,.22),new THREE.Vector2(.084,.23),new THREE.Vector2(.075,.02)];
     const cup=new THREE.LatheGeometry(shape,16);for(let i=0;i<3;i++){const x=2.4+i*.38;mesh(cup,MAT.glass,g,x,1.18,-2.4);mesh(new THREE.CylinderGeometry(.074,.063,.17,16),std(['#8d9d53','#573c2d','#b57b40'][i],{roughness:.45}),g,x,1.27,-2.4)}
     sign(g,2.6,3.95,-1.65,3.6,'Caffeine Corner','MATCHA · COFFEE · CHAI');
-    dialog('dlgCaffeine','A little pause','What’s your caffeine mood?',`<p class="social-copy">Matcha, cold brew or adrak chai. Pick your cup and take a moment away from the feed.</p><div class="btnrow" id="drinkChoices"></div><p id="drinkStatus" role="status" class="social-status"></p><p class="fine">A virtual refreshment. No purchase or personal details needed.</p>`);
-    // Register the extra dialog with the shared movement freeze.
+    ctx.Assets.prop('GlamVelvetSofa',{x:ctx.REFS.chai.position.x+1.0,y:.14,z:ctx.REFS.chai.position.z+2.5,w:2.3,ry:Math.PI,parent:ctx.WORLD});
+    ctx.colBox(ctx.REFS.chai.position.x-.2,ctx.REFS.chai.position.z+1.95,ctx.REFS.chai.position.x+2.2,ctx.REFS.chai.position.z+3.1,'cafeSofa');
+    dialog('dlgCaffeine','Caffeine Corner · demo wallet','Your usual, or something new?',`<p class="social-copy">Order your cup, choose the sweetness and pay with festival demo credits.</p><div id="drinkChoices" class="btnrow"></div><label for="drinkSweet">Sweetness</label><select id="drinkSweet"><option>No added sugar</option><option>A little sweet</option><option>Regular</option></select><p id="drinkWallet"></p><button class="btn pri" id="payDrink">Pay with demo credits</button><p id="drinkStatus" role="status" class="social-status"></p><p class="fine">Virtual drinks and demo credits. Each visit starts with ₹500 demo credit.</p>`);
+    let selected=0,balance=500;
+    try{balance=Number(sessionStorage.getItem('creator-night-wallet')??500)}catch{}
+    const menuItems=[{name:'Iced matcha',price:160,kind:'matcha'},{name:'Cold brew',price:120,kind:'coffee'},{name:'Adrak chai',price:30,kind:'chai'}];
+    const update=()=>{$('drinkWallet').textContent='Demo balance · ₹'+balance;$('payDrink').textContent='Pay ₹'+menuItems[selected].price+' · demo';$('payDrink').disabled=balance<menuItems[selected].price};
+    menuItems.forEach((item,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=item.name+' · ₹'+item.price;b.setAttribute('aria-pressed',String(!i));b.onclick=()=>{selected=i;$('drinkChoices').querySelectorAll('button').forEach((button,j)=>button.setAttribute('aria-pressed',String(j===i)));$('drinkStatus').textContent='';update()};$('drinkChoices').append(b)});
+    $('payDrink').onclick=()=>{
+      const item=menuItems[selected];if(balance<item.price)return;balance-=item.price;
+      handProp(ctx.Self.p,item.kind);
+      if(handDrink)handDrink.remove();
+      handDrink=new THREE.Group();handDrink.name='first_person_drink';ctx.camera.add(handDrink);
+      ctx.mesh(new THREE.CylinderGeometry(.048,.035,.14,20),item.kind==='chai'?ctx.std('#b57752',{roughness:.8}):MAT.cream,handDrink,.20,-.16,-.43);
+      ctx.mesh(new THREE.CylinderGeometry(.043,.043,.007,20),ctx.std(item.kind==='matcha'?'#8c9d5b':item.kind==='coffee'?'#482f25':'#a8703f'),handDrink,.20,-.087,-.43);
+      try{sessionStorage.setItem('creator-night-wallet',String(balance))}catch{}
+      $('drinkStatus').textContent=item.name+' · '+$('drinkSweet').value+'. Paid ₹'+item.price+' demo credit. Your cup is in hand. Switch to third person to see your full look.';ctx.Sound.play('stamp');update();
+    };
+    update();
     const openDrink=()=>{lastFocus=document.activeElement;ctx.openModal('dlgCaffeine');$('dlgCaffeine').querySelector('button').focus()};
-    ['Iced matcha','Cold brew','Adrak chai'].forEach((label,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=label;b.onclick=()=>{$('drinkStatus').textContent=label+' is ready. Find a seat and enjoy the evening.';ctx.Sound.play('select')};$('drinkChoices').append(b)});
     const menu=g.children.find(x=>x.name==='social_Caffeine Corner');if(menu)ctx.setInteractable(menu,{cue:()=> 'Pick your caffeine',onClick:openDrink,reach:5});
   }
   function nearestBrand(x,z) {
@@ -290,20 +306,49 @@
   }
   function photoFinished(){if($('takeMyPhoto'))$('takeMyPhoto').disabled=false}
   function animatePrint(){const img=$('photoOut');img.classList.remove('printing');void img.offsetWidth;img.classList.add('printing')}
+  const heldCups=[];let handDrink;
   function handProp(p,kind){
     if(!p?.model)return;const {THREE,MAT}=ctx;let hand;p.model.traverse(o=>{if(o.isBone&&/hand/i.test(o.name)&&/(right|[ _]r[ _]|r_hand|hand_r)/i.test(o.name))hand=o});
     if(!hand){p.model.traverse(o=>{if(!hand&&o.isBone&&/hand/i.test(o.name))hand=o})}if(!hand)return;
     hand.children.filter(o=>o.name==='held_content_prop').forEach(o=>hand.remove(o));const g=new THREE.Group();g.name='held_content_prop';
     // Bone scale is inherited from the original avatar; compensate to world metres.
+    p.group.updateMatrixWorld(true);
     const sc=hand.getWorldScale(new THREE.Vector3());g.scale.set(1/sc.x,1/sc.y,1/sc.z);g.position.set(.02,0,.025);hand.add(g);
     if(kind==='phone'){ctx.mesh(new THREE.BoxGeometry(.074,.15,.012),MAT.blackGloss,g,0,.055,0);ctx.mesh(new THREE.PlaneGeometry(.064,.13),new THREE.MeshBasicMaterial({color:'#ce9bbc'}),g,0,.055,.007)}
-    else {ctx.mesh(new THREE.CylinderGeometry(.045,.034,.13,16),MAT.cream,g,0,.04,0);ctx.mesh(new THREE.CylinderGeometry(.04,.04,.008,16),ctx.std(kind==='matcha'?'#8c9d5b':'#a8703f'),g,0,.108,0)}
+    else {heldCups.push({person:p,hand,group:g});ctx.mesh(new THREE.CylinderGeometry(.045,.034,.13,16),MAT.cream,g,0,.04,0);ctx.mesh(new THREE.CylinderGeometry(.04,.04,.008,16),ctx.std(kind==='matcha'?'#8c9d5b':'#a8703f'),g,0,.108,0)}
+    if(p.def.self)g.traverse(o=>o.layers.set(ctx.LAYER_SELF));
+  }
+  const cupWorldQuaternion = new Object();
+  function updateHeldProps(){
+    if(!ctx)return;
+    if(handDrink)handDrink.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
+    for(const cup of heldCups){
+      if(!cup.person.model.visible)continue;
+      cup.hand.updateWorldMatrix(true,false);
+      cup.group.quaternion.copy(cup.hand.getWorldQuaternion(cupWorldQuaternion.q ||= new ctx.THREE.Quaternion())).invert();
+    }
   }
   function buildReelCrew(){
     const {Person,PEOPLE_BY}=ctx;for(const p of Object.values(PEOPLE_BY))if(p.base==='drink')handProp(p,p.key==='extra1'?'matcha':'chai');
     const a=new Person({key:'reel_dancer_1',name:'Meera · Reel crew',model:'Female_Party_02',x:3,z:-10.4,ry:0,base:'dance'});
     const b=new Person({key:'reel_dancer_2',name:'Aarav · Reel crew',model:'Male_Adult_12',x:4.4,z:-10.4,ry:0,base:'dance'});
     const filmer=new Person({key:'reel_camera',name:'Ira · Recording a reel',model:'Female_Adult_15',x:3.7,z:-7.8,ry:Math.PI,base:'phone'});handProp(filmer,'phone');
+    const vlogger=new Person({key:'reel_vlogger',name:'Aditi · Festival vlog',model:'Female_Adult_05',x:-4.5,z:10.2,ry:-.6,base:'phone'});
+    const reviewer=new Person({key:'reel_reviewer',name:'Rohan · Product close-up',model:'Male_Adult_06',x:5.1,z:4.0,ry:1.0,base:'phone'});
+    const stylist=new Person({key:'reel_stylist',name:'Tara · Outfit check',model:'Female_Adult_08',x:-5.0,z:-6.0,ry:.9,base:'phone'});
+    for(const creator of [vlogger,reviewer,stylist])handProp(creator,'phone');
+    handProp(a,'phone');handProp(b,'phone');
+    const {THREE,MAT,mesh,cylGeo,boxGeo}=ctx;
+    for(const [x,z] of [[-4.25,9.5],[4.8,3.6],[-4.6,-5.5]]){
+      const rig=new THREE.Group();rig.position.set(x,0,z);ctx.WORLD.add(rig);
+      mesh(cylGeo(.016,.023,1.45,8),MAT.metal,rig,0,.725,0);
+      const rim=mesh(ctx.torusGeo(.19,.018,6,28),MAT.bulbCool,rig,0,1.55,0);
+      mesh(boxGeo(.074,.15,.012),MAT.blackGloss,rig,0,1.52,.017);
+      mesh(new THREE.PlaneGeometry(.06,.12),new THREE.MeshBasicMaterial({color:'#b773a8'}),rig,0,1.52,.026);
+      for(const side of [-1,1]){const leg=mesh(cylGeo(.014,.014,.34,6),MAT.metal,rig,side*.11,.16,0);leg.rotation.z=side*.7}
+      ctx.colCircle(x,z,.16,'reelTripod');
+    }
+
     sign(ctx.WORLD,3.7,2.65,-10.6,2.8,'Reel together','MAKE A MOMENT. KEEP IT HONEST.');
   }
   function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();
@@ -314,7 +359,7 @@
     let visible=null;const observer=new MutationObserver(()=>{const next=document.querySelector('.modal:not(.hidden)');if(next===visible)return;visible=next;if(next){lastFocus=document.activeElement;next.setAttribute('role','dialog');next.setAttribute('aria-modal','true');if(!next.getAttribute('aria-labelledby')){const h=next.querySelector('h2');if(h){h.id||=next.id+'Title';next.setAttribute('aria-labelledby',h.id)}}next.querySelectorAll('button.x').forEach(b=>b.setAttribute('aria-label','Close'));next.querySelector('button,textarea,input')?.focus()}else lastFocus?.focus?.()});observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
     document.addEventListener('keydown',e=>{const modal=document.querySelector('.modal:not(.hidden)');if(!modal)return;if(e.key==='Tab'){const items=[...modal.querySelectorAll('button:not(:disabled),input,textarea,select,[tabindex="0"]')].filter(x=>x.offsetParent!==null);if(!items.length)return;const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}});
   }
-  window.TrustSocial={install,countdown,photoFinished,animatePrint,brands};
+  window.TrustSocial={install,updateHeldProps,countdown,photoFinished,animatePrint,brands};
 })();
 
 

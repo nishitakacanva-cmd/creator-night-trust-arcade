@@ -28,3 +28,21 @@ The older hosted entry reached readiness in 20.5 seconds and the local v3.2 entr
 Moved the prize counter and exit-survey kiosk from the arrival forecourt to a dedicated deck beside the Creator Lounge, past the market. The site map, walking path, quick travel, interaction radius and colliders use the new position. The Capsule Club cabinet has enamel housing, a brass three-jaw claw, joystick, delivery chute and two-piece capsules. Its game lifts the selected capsule and records the prize in the session bag.
 
 Rebuilt the Trust Wall lettering. Each sheet resets its canvas alignment, measures and wraps the handwriting within its margins, reserves a separate footer, and fits long messages and single unbroken words. The grid responds to the number of posted notes. The editable note list preserves the full text.
+
+## v3.3 creator rides and interaction fixes
+
+Added Collab Claw, Trust Fall, Claim Dunk and a rideable Hype Coaster using the supplied render/poster pack. The Collab Claw grabs and delivers a capsule, reveals a collaboration dilemma and records the visitor's decision in Field Notes. Claim Dunk classifies four evidence statements with a visible ball flight. Trust Fall contrasts evidence-supported and unsupported claims over a cushioned pad. The coaster offers one 20-second camera loop, an immediate exit and a still alternative.
+
+The ride locations follow the existing world geometry. The tower is at (-17, -28.6), the ball arena occupies the audience lawn at (0, -16), and the coaster's front span rises above the stage roof. The entry claw stays at (10.5, 29). The supplied master-map image remains a concept illustration. Actual navigation pins and quick travel use the implemented positions. The show schedule, sound desk and stage arrival were moved to keep access clear.
+
+Moved pavilion artwork to side walls, moved the Travel postcard to the rear, and brought the operating screens forward. Desktop and phone visitors can open the illustrated lab by clicking its physical screen. Headset canvas button handling is retained. Mentors greet once and stand beside the activity sightlines.
+
+Added first/third-person switching with a camera boom that shortens near fixtures, upright held cups, physical player avoidance around people, ring-light phone rigs and six creators filming/dancing. The heart and all six pavilions have portrait spots and a framed downloadable photo. Completing the supported evidence activity unlocks the corresponding virtual pavilion sample.
+
+Caffeine Corner now has matcha, coffee and chai ordering, sweetness selection, a finite demo wallet and a held drink in both views. Payments and merchandise are simulated. Timber slat benches replace the old bench model, with an additional sofa at the cafe.
+
+Panel captions require Listen to panel near the stage. Visitors can stop listening and select a prepared question for a scripted answer. The panelists use the existing talking and seated speaking animations. Fireworks now burst on visible stage flanks and have a dedicated viewing action.
+
+Character faces use the licensed generic Rocketbox models. The new party outfit choice and portrait are rendered from the existing character asset. Celebrity or influencer likeness models were not supplied or built in this pass.
+
+Repeated balls and capsules use InstancedMesh. Static ride parts are merged by material. Animated ride cameras render continuously, while ordinary modal backgrounds keep the lower redraw cadence. A real-device sustained FPS measurement remains outstanding.

@@ -74,3 +74,48 @@ body:has(#hud.hidden,#start:not(.hidden),.modal:not(.hidden)) #quickZoneNav,body
 .claw-window .capsule:nth-child(3n + 1){--shell:#d9ae67}
 @media(prefers-reduced-motion:reduce){.claw-window .capsule,.claw-window .claw-arm{transition:none}}
 .social-note{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+/* Rides and creator capture controls */
+.ride-card{width:min(680px,96vw);background:#251c2d!important}
+#rideArt{width:100%;max-height:210px;object-fit:cover;border-radius:14px;margin:0 0 15px}
+.ride-card h2{letter-spacing:-.035em}
+.ride-card p{line-height:1.6}
+.ride-card input[type=range]{display:block;width:100%;accent-color:#dc789c;margin:14px 0}
+.ride-options{display:grid;gap:10px;margin:18px 0}
+.ride-options button{text-align:left;line-height:1.5}
+.ride-options button[aria-pressed=true]{border-color:#f0c288;background:#4b3247}
+#rideHUD{position:fixed;inset:20px 0 auto;display:grid;justify-items:center;gap:10px;z-index:100;pointer-events:none}
+#rideHUD p{background:#201823ed;border:1px solid #c99d7b;border-radius:16px;max-width:min(620px,90vw);padding:16px 22px;line-height:1.6;box-shadow:0 8px 24px #0006}
+#exitRide{background:#fff3df;color:#292033;pointer-events:auto}
+#rideLaunch{position:fixed;bottom:145px;left:50%;transform:translateX(-50%);z-index:41}
+#contentCapture{position:fixed;right:16px;bottom:80px;z-index:39;background:#241d2dee}
+#pavilionReward{position:fixed;right:16px;bottom:135px;max-width:260px;background:#fff0d4;color:#332737;border-radius:13px;padding:10px 14px;font-size:12px;z-index:39}
+body:has(.modal:not(.hidden)) #pavilionReward,body:has(.modal:not(.hidden)) #contentCapture,body.riding #touchUI,body.riding #quickZoneNav,body.riding #contentCapture,body.riding #socialAction,body.riding #pavilionReward,body.riding #labLaunchBar{display:none!important}
+.collab-game{position:relative;height:240px;margin:20px 0;overflow:hidden;border:5px solid #98769a;border-radius:22px;background:radial-gradient(at 50% 0,#8e637d,#2b1e36 65%)}
+.collab-rail{position:absolute;top:20px;left:8%;right:8%;border-top:3px solid #c5afb4}
+#collabArm{position:absolute;left:50%;top:22px;height:58px;width:2px;background:#d4c4b0;transition:height .6s,left .4s;z-index:3}
+#collabArm.descend{height:155px}
+#collabArm i{position:absolute;bottom:-5px;left:-13px;width:28px;height:20px;border:4px solid #d6ba94;border-top:0;border-radius:0 0 12px 12px}
+.collab-ball{position:absolute;bottom:40px;width:30px;height:30px;background:radial-gradient(at 35% 25%,#fff8,transparent 40%),linear-gradient(var(--ball) 48%,#ffe4bb 50%);border-radius:50%;transition:bottom .6s,left .4s,transform .4s}
+.collab-ball.caught{bottom:135px}.collab-ball.delivered{left:86%!important;bottom:8px;transform:scale(.65)}
+.collab-hatch{position:absolute;bottom:0;right:0;padding:10px;background:#18111c;font-size:10px;letter-spacing:.08em}
+.dunk-court{display:flex;justify-content:space-between;align-items:center;position:relative;height:180px;padding:15px;background:linear-gradient(#78465e,#32223b);border:2px solid #c39c80;border-radius:15px;margin:18px 0}
+.dunk-court div{border-bottom:5px solid #eeb97b;border-radius:0 0 12px 12px;padding:12px;font-weight:700}
+#dunkBall{position:absolute;left:calc(50% - 20px);bottom:12px;width:40px;height:40px;border-radius:50%;background:radial-gradient(at 30% 25%,#ffddb6,#bc668d);box-shadow:0 4px 8px #251d3355}
+#dunkBall.shoot{animation:dunkFlight .85s ease-in-out forwards}
+@keyframes dunkFlight{50%{transform:translate(calc(var(--target)/2),-125px)}100%{transform:translate(var(--target),-60px)}}
+@media(max-width:600px){#rideLaunch{bottom:180px;max-width:85vw;font-size:13px}#contentCapture{bottom:126px;right:12px;max-width:150px;font-size:12px;padding:8px}#pavilionReward{bottom:227px;max-width:190px;font-size:11px}.ride-card{padding:18px!important}#rideArt{max-height:150px}.ride-options .btn{font-size:13px}.dunk-court{padding:6px}}
+@media(prefers-reduced-motion:reduce){#collabArm,.collab-ball{transition:none}#dunkBall.shoot{animation-duration:.01s}}
+body.nearRide #labLaunchBar{display:none!important}
+.look-label{position:absolute;left:0;right:0;bottom:0;padding:5px 2px;background:#201824de;color:#fff5ed;font:600 10px/1.2 Poppins,sans-serif}
+#drinkSweet{width:100%;padding:12px;margin:8px 0;background:#33243c;color:#fff2de;border:1px solid #a88694;border-radius:12px}
+#drinkChoices button[aria-pressed=true]{border-color:#f7bd8c;background:#58324b}
+#mazeGuide{position:fixed;right:16px;bottom:80px;width:min(385px,calc(100vw - 32px));padding:20px;background:linear-gradient(145deg,#382738f5,#1f1b2af8);border:1px solid #c19388;border-top:3px solid #e992ae;border-radius:20px;z-index:44;box-shadow:0 14px 38px #0005}
+#mazeGuide h3{font-size:17px;line-height:1.5;margin:10px 0}
+#mazeGuide small{color:#f2c69c;letter-spacing:.12em}
+#mazeGuide .btn{display:block;width:100%;text-align:left;margin-top:9px;line-height:1.5}
+#mazeGuide p{font-size:12px;color:#edcdd8;margin:12px 0 0}
+#panelActions{position:fixed;left:50%;transform:translateX(-50%);bottom:85px;display:flex;gap:8px;z-index:42}
+#panelActions .btn{background:#2d2134f5;border-color:#ceaa94}
+body:has(#mazeGuide:not(.hidden)) #labLaunchBar{display:none!important}
+@media(max-width:600px){#mazeGuide{bottom:182px;max-height:50dvh;overflow:auto;padding:14px}#mazeGuide h3{font-size:15px}#mazeGuide .btn{font-size:13px;padding:10px}#panelActions{bottom:226px;max-width:94vw}#panelActions .btn{font-size:11px;padding:10px}.look-label{font-size:8px}}
+@media(min-width:601px){#panelActions{left:auto;right:16px;transform:none;bottom:82px}}

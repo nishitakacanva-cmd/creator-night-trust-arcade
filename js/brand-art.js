@@ -7,7 +7,7 @@
     const fitted=(c,w,h,img)=>{c.fillStyle='#201524';c.fillRect(0,0,w,h);const k=Math.min(w/img.width,h/img.height);c.drawImage(img,(w-img.width*k)/2,(h-img.height*k)/2,img.width*k,img.height*k)};
     const mappings={arch_sign:'entry_arch',chai_menu:'matcha_caffeine_bar_menu'};
     for(const id of ['fashion','beauty','food','fitness','travel','education'])mappings['pav_back_'+id]='pav_'+id;
-    await Promise.all(Object.entries(mappings).map(async([name,file])=>{const tex=await load('assets/banners/'+file+'.webp'),s=SCREENS.find(s=>s.name===name);if(s){s.drawFn=(c,w,h)=>fitted(c,w,h,tex.image);s.invalidate()}}));
+    await Promise.all(Object.entries(mappings).map(async([name,file])=>{const tex=await load('assets/banners/'+file+'.webp'),s=SCREENS.find(s=>s.name===name);if(s){window.TrustBoardArtwork ||= {};if(name.startsWith('pav_back_'))window.TrustBoardArtwork[name.slice(9)]=tex.image;s.drawFn=(c,w,h)=>fitted(c,w,h,tex.image);s.invalidate()}}));
     const back=REFS.booth.children.find(o=>o.geometry?.type==='CylinderGeometry'&&o.material?.side===THREE.BackSide);
     if(back){const original=REFS.booth.getObjectByName('booth_neon');if(original)original.visible=false;const t=await load('assets/banners/photobooth_backdrop.webp');t.wrapS=THREE.RepeatWrapping;t.repeat.x=-1;t.offset.x=1;back.material.map=t;back.material.emissiveMap=t;back.material.emissiveIntensity=.25;back.material.needsUpdate=true}
     // The supplied stage art is a backdrop below the live show display, preserving live captions.
@@ -23,6 +23,7 @@
     const dj=new Person({key:'festival_dj',name:'DJ Nikhil',model:'Male_Adult_09',x:0,z:-27.9,ry:0,base:'idle'});dj.onStage=true;
     const moveDJ=()=>dj.setBase(window.TrustDJ?.playing?'dance':'idle');
     window.addEventListener('festival-music-change',moveDJ);moveDJ();
+    SCREENS.forEach(screen=>screen.invalidate());
     return {banners:Object.keys(mappings).length+3,brandStalls:manifest.stalls.length};
   }
   window.TrustBrandArt={mount};

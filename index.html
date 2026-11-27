@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="css/editorial-hud.css?v=3.2.2">
+<link rel="stylesheet" href="css/editorial-hud.css?v=3.3.1">
 <title>Trust Arcade · Creator Night</title>
 <link rel="stylesheet" href="css/fonts.css">
 <script type="importmap">
@@ -174,7 +174,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css?v=3.2.2">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.3.1">
 </head>
 <body>
 <div id="stage"></div>
@@ -261,7 +261,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.2.2';
+const VERSION = '3.3.1';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -628,7 +628,7 @@ const GAME = {
 };
 
 /* ---------- people (all fictional) ---------- */
-const AVATAR_CHOICES = ['Female_Adult_08', 'Female_Adult_12', 'Female_Adult_15', 'Male_Adult_04', 'Male_Adult_09', 'Male_Adult_12'];
+const AVATAR_CHOICES = ['Female_Party_02', 'Female_Adult_12', 'Female_Adult_15', 'Male_Adult_04', 'Male_Adult_09', 'Male_Adult_12'];
 const MALE = new Set(['Male_Adult_04', 'Male_Adult_06', 'Male_Adult_08', 'Male_Adult_09', 'Male_Adult_10', 'Male_Adult_12', 'Male_Adult_17', 'Business_Male_05', 'Sports_Male_04']);
 const MENTORS = {
   fashion: { name: 'Riya', model: 'Female_Adult_03', hello: { en: 'Hi, I’m Riya. Ready to walk the runway?', hi: 'हाय, मैं रिया हूँ। रनवे पर चलने को तैयार?' } },
@@ -1384,6 +1384,18 @@ const Assets = {
   },
   /* place a prop clone, scaled so its height (or width) matches target metres; origin at the base centre */
   prop(name, { x = 0, y = 0, z = 0, h, w, s, ry = 0, parent = scene, shadow = true } = {}) {
+    if(name==='Bench'){
+      const holder=new THREE.Group(),batch=new Merger(),width=w||1.8;
+      holder.position.set(x,y,z);holder.rotation.y=ry;
+      for(let i=0;i<6;i++)batch.box(MAT.woodSlat,width,.055,.075,0,.46,-.22+i*.085);
+      for(let i=0;i<4;i++)batch.box(MAT.woodSlat,width,.09,.065,0,.65+i*.12,-.27-i*.025);
+      for(const side of [-1,1]){
+        batch.box(MAT.metal,.05,.43,.47,side*width*.37,.24,0);
+        batch.box(MAT.metal,.05,.5,.05,side*width*.37,.73,-.33);
+        batch.box(MAT.metal,.055,.04,.56,side*width*.37,.66,0);
+      }
+      batch.build(holder,{name:'timber_bench',shadow:false});parent.add(holder);return holder;
+    }
     const p = this.props[name]; if (!p) return null;
     const holder = new THREE.Group(); holder.name = 'prop_' + name;
     const inner = p.root.clone(true);
@@ -1768,7 +1780,7 @@ function buildEntry() {
     colBox(x - 1, z - 0.4, x + 1, z + 0.4, 'totem'); return scr;
   };
   REFS.screens.mapTotem = mkTotem(-9.2, 27.6, 0.35, 'totem_map', (c, w, h) => { darkBg(c, w, h); txt(c, L(TXT.mapTitle), w / 2, 70, 44, { d: true, w: 800, align: 'center' }); drawMiniMap(c, 30, 110, w - 60, h - 220); txt(c, S.lang === 'hi' ? 'टैप करें · M' : 'Tap to open · M', w / 2, h - 50, 30, { align: 'center', color: PALETTE.amber, w: 700 }); });
-  REFS.screens.schedule = mkTotem(9.2, 27.6, -0.35, 'totem_schedule', (c, w, h) => drawSchedule(c, w, h));
+  REFS.screens.schedule = mkTotem(14.7, 25.5, -0.35, 'totem_schedule', (c, w, h) => drawSchedule(c, w, h));
 }
 function drawMiniMap(c, x, y, w, h, opts = {}) {
   const sx = w / 80, sz = h / 74, X = v => x + (v + 40) * sx, Z = v => y + (v + 37) * sz;
@@ -1875,11 +1887,11 @@ function buildStage() {
   // award mark on the floor
   const mk = glowDecal(PALETTE.amber, 1.6, 1.6, 0.7); mk.position.set(0, h + 0.01, z1 - 1.5); g.add(mk); REFS.awardDecal = mk;
   // FOH desk in the lawn
-  const foh = new THREE.Group(); foh.position.set(0, 0, LAWN.z1 - 0.9); WORLD.add(foh);
+  const foh = new THREE.Group(); foh.position.set(-5, 0, LAWN.z1 - 0.9); WORLD.add(foh);
   mesh(boxGeo(3.2, 0.25, 2.2), MAT.black, foh, 0, 0.125, 0); mesh(boxGeo(2.4, 0.95, 0.8), MAT.blackGloss, foh, 0, 0.72, -0.3).castShadow = true; mesh(boxGeo(2.4, 0.06, 0.8), neon('#7a6cff', 1.2), foh, 0, 1.2, -0.3);
   for (const s of [-1, 1]) for (const zz of [-1, 1]) STATIC.cyl(MAT.alu, 0.03, 0.03, 2.6, s * 1.5, 1.3, LAWN.z1 - 0.9 + zz * 1.0);
   STATIC.box(MAT.canvas, 3.3, 0.06, 2.3, 0, 2.62, LAWN.z1 - 0.9);
-  colBox(-1.6, LAWN.z1 - 2.0, 1.6, LAWN.z1 + 0.2, 'foh'); noRay(foh);
+  colBox(-6.6, LAWN.z1 - 2.0, -3.4, LAWN.z1 + 0.2, 'foh'); noRay(foh);
   REFS.imagCamPos = new THREE.Vector3(0, 3.0, LAWN.z1 - 0.9);
   // stage-left VIP rail and backstage fence
   for (let z = -21; z <= -16; z += 1.25) { STATIC.cyl(MAT.alu, 0.03, 0.03, 1.0, -12, 0.5, z); }
@@ -1953,7 +1965,7 @@ function buildGates() {
       txt(c, gt.id.startsWith('core') ? (S.lang === 'hi' ? 'मोड़ ' : 'FORK ') + gt.id.slice(4) + '/3' : L(PLACES[gt.id]).toUpperCase(), 26, 46, 30, { d: true, w: 800, color: PALETTE.amber });
       fitPara(c, L(txtG.q), 26, 56, w - 52, h - 70, 46, { w: 600 });
     } });
-    q.mesh.position.set(0, 3.82, 0.02); g.add(q.mesh);
+    q.mesh.position.set(0, 2.65, 0.02); g.add(q.mesh);
     const opts = [];
     lanes.forEach((s, li) => {   // lane li: 0 = local -x side, 1 = local +x
       const isGood = (gt.axis === 'z' ? li : (gt.dir < 0 ? 1 - li : li)) === gt.good;
@@ -1963,7 +1975,7 @@ function buildGates() {
         txt(c, s < 0 ? '◀' : '▶', s < 0 ? 18 : w - 18, h / 2 + 4, 34, { align: s < 0 ? 'left' : 'right', base: 'middle', color: PALETTE.magenta, w: 800 });
         fitPara(c, L(label), s < 0 ? 64 : 18, 8, w - 84, h - 18, 40, { w: 700, color: '#1A1522', align: 'left' });
       } });
-      o.mesh.position.set(s * half / 2, 2.85, 0.03); g.add(o.mesh); opts.push({ screen: o, good: isGood });
+      o.mesh.position.set(s * half / 2, 1.91, 0.03); g.add(o.mesh); opts.push({ screen: o, good: isGood });
       o.mesh.raycast = THREE.Mesh.prototype.raycast;
       setInteractable(o.mesh, { cue: () => L(label), reach: 6, outline: false,
         onClick: () => Maze.choose(gt, isGood) });
@@ -2176,7 +2188,7 @@ function buildChai() {
   menu.mesh.position.set(sx, 2.55, sz - 1.31); WORLD.add(menu.mesh); LANG_HOOKS.push(() => menu.invalidate());
   REFS.chaiCounter = new THREE.Vector3(sx, 1.1, sz + 0.45);
   // benches, tables, lanterns
-  const seats = [[c.cx - 3.2, c.cz - 1.5, 0], [c.cx - 3.2, c.cz + 1.8, 0], [c.cx + 0.4, c.cz + 2.4, Math.PI / 2], [c.cx - 0.4, c.cz - 0.2, Math.PI / 2]];
+  const seats = [[c.cx - 3.2, c.cz - 1.5, 0], [c.cx - 3.2, c.cz + 1.8, 0], [c.cx - 0.4, c.cz - 0.2, Math.PI / 2]];
   for (const [x, z, ry] of seats) { Assets.prop('Bench', { x, z, y: 0.14, w: 1.8, ry }); const hw = ry ? 0.35 : 1, hd = ry ? 1 : 0.35; colBox(x - hw, z - hd, x + hw, z + hd, 'chaiBench'); }
   for (const [x, z] of [[c.cx - 3.2, c.cz + 0.15], [c.cx + 1.6, c.cz + 1.0]]) { STATIC.cyl(MAT.deck, 0.4, 0.4, 0.05, x, 0.86, z); STATIC.cyl(MAT.metal, 0.04, 0.04, 0.72, x, 0.5, z); Assets.prop('Lantern', { x, y: 0.9, z, h: 0.42 }); colCircle(x, z, 0.42, 'chaiTable'); }
   const sign = neonSign({ name: 'chai_sign', w: 3.2, h: 0.65, ppm: 220, sizes: [0.7], glowColor: PALETTE.orange, lines: () => [L(SIGNS.chai)] }); sign.mesh.position.set(sx, 3.5, sz + 0.95); sign.mesh.rotation.x = -0.05; WORLD.add(sign.mesh);
@@ -2613,7 +2625,7 @@ function spawnPeople() {
   const alt = ['Male_Adult_08', 'Female_Adult_08', 'Male_Adult_12', 'Female_Adult_12', 'Male_Adult_09', 'Female_Adult_15', 'Male_Adult_04'];
   const pick = (m) => { if (!taken.has(m)) return m; const fem = !MALE.has(m); return alt.find(a => a !== S.avatar && (MALE.has(a) !== fem)) || alt.find(a => a !== S.avatar); };
   // mentors in their pavilions
-  const mentorSpot = { fashion: [1.9, 3.8, -2.4], beauty: [-0.6, -3.9, 0], fitness: [2.2, -2.0, -0.6], food: [0, -2.5, 0], travel: [2.9, 2.2, -2.2], education: [2.4, -3.6, -0.4] };
+  const mentorSpot = { fashion: [3.4, 3.3, -2.4], beauty: [-0.6, -3.9, 0], fitness: [2.2, -2.0, -0.6], food: [3.4, 2.7, 0], travel: [3.4, 3, -2.2], education: [3.35, 2.7, -0.4] };
   for (const id of NICHES) {
     const [lx, lz, lry] = mentorSpot[id], w = pavToWorld(PAV[id], lx, lz), ry = (PAV[id].side < 0 ? Math.PI / 2 : -Math.PI / 2) + lry;
     new Person({ key: 'mentor_' + id, name: MENTORS[id].name, model: MENTORS[id].model, x: w.x, z: w.z, ry, role: 'mentor', niche: id, interact: (p) => Games.mentorTalk(id, p) });
@@ -2674,7 +2686,7 @@ function updatePeople(dt) {
   }
   // mentors greet the visitor when they come close
   for (const id of NICHES) { const m = PEOPLE_BY['mentor_' + id]; if (!m || !m.ok) continue; const d = Math.hypot(pp.x - m.pos.x, pp.z - m.pos.z);
-    if (d < 4.2) { m.faceTo(pp.x, pp.z); if (!m.greeted) { m.greeted = true; m.once('wave'); m.say(L(MENTORS[id].hello), 5); } } }
+    if (d < 4.2) { m.faceTo(pp.x, pp.z); if (!m.greeted) { m.greeted = true; m.once('wave'); } } }
   Card.update();
 }
 
@@ -2694,7 +2706,7 @@ const Show = {
     if (seg !== this.seg) { this.seg = seg; this.enter(seg); }
     if (this.subsT > 0) { this.subsT -= dt; if (this.subsT <= 0) this.subs = null; }
     LightShow.update(dt, this.seg); FX.update(dt); updateIMAG(dt);
-    if (REFS.heart) { REFS.heart.rotation.y += dt * 0.6; REFS.heart.position.y = 2.6 + Math.sin(this.elapsed * 1.3) * 0.12; REFS.heartRing.rotation.y -= dt * 0.25; }
+    if (REFS.heart) { REFS.heart.rotation.y = Math.sin(this.elapsed*.3)*.16; REFS.heart.position.y = 2.6 + Math.sin(this.elapsed * 1.3) * 0.12; REFS.heartRing.rotation.y -= dt * 0.25; }
   },
   enter(seg) {
     const tok = ++this.token; this.spotOn = false; this.imagOn = false; this.calling = false; setLedFeed(false);
@@ -2807,10 +2819,11 @@ const Show = {
   },
   async runFinale(tok) {
     this.lower = { who: '', text: L(SHOW_NAMES.finale) }; FX.drones.start();
+    FX.burst(-22,25,-32,new THREE.Color(PALETTE.pink));FX.burst(22,28,-34,new THREE.Color(PALETTE.amber));
     for (let k = 0; k < 30; k++) {
       if (!this.alive(tok)) return;
-      if (k % 2 === 0 || k > 22) FX.shell((Math.random() - 0.5) * 50, -48 - Math.random() * 12);
-      if (k > 24) FX.shell((Math.random() - 0.5) * 40, -44);
+      if (k % 2 === 0 || k > 22) FX.shell((k%4<2?-1:1)*(16+Math.random()*12), -33 - Math.random()*4, 13);
+      if (k > 24) FX.shell((k%2?-1:1)*(15+Math.random()*14),-32,15);
       if (!(await this.wait(1, tok))) return;
     }
     applause(5);
@@ -2825,10 +2838,11 @@ function giveTrophy(p, i) {
   REFS.trophyHeld = (REFS.trophyHeld || []).concat([t2]);
   setTimeout(() => { if (t2.parent) t2.parent.remove(t2); }, 16000);
 }
+let panelListening = false;
 function updateSubs() {
   const el = $('subs'); if (!el) return;
-  const pp = playerPos(), near = Math.hypot(pp.x, pp.z + 22) < 48;
-  if (Show.subs && near && S.started) { $('subsWho').textContent = Show.subs.who; $('subsText').textContent = Show.subs.text; el.classList.remove('hidden'); }
+  const pp = playerPos(), near = Math.hypot(pp.x, pp.z + 22) < 17;
+  if (Show.subs && near && S.started && panelListening) { $('subsWho').textContent = Show.subs.who; $('subsText').textContent = Show.subs.text; el.classList.remove('hidden'); }
   else el.classList.add('hidden');
 }
 
@@ -2888,7 +2902,7 @@ const FX = {
     this.drones.init();
   },
   emit(sys, x, y, z, vx, vy, vz, col, life) { const i = sys.next; sys.next = (sys.next + 1) % sys.n; const P = sys.pts.geometry.attributes.position.array; P[i * 3] = x; P[i * 3 + 1] = y; P[i * 3 + 2] = z; sys.vel[i * 3] = vx; sys.vel[i * 3 + 1] = vy; sys.vel[i * 3 + 2] = vz; sys.life[i] = life; sys.base[i * 3] = col.r; sys.base[i * 3 + 1] = col.g; sys.base[i * 3 + 2] = col.b; },
-  shell(x, z) { this.fw.shells.push({ x, z, y: 2, vy: 26 + Math.random() * 8, col: new THREE.Color([PALETTE.pink, PALETTE.amber, PALETTE.purple, PALETTE.orange, '#ffffff', '#7af0ff'][(Math.random() * 6) | 0]) }); Sound.launch({ x, y: 2, z }); },
+  shell(x, z, y = 2) { this.fw.shells.push({ x, z, y, vy: 18 + Math.random() * 5, col: new THREE.Color([PALETTE.pink, PALETTE.amber, PALETTE.purple, PALETTE.orange, '#ffffff', '#7af0ff'][(Math.random() * 6) | 0]) }); Sound.launch({ x, y: 2, z }); },
   burst(x, y, z, col) {
     const n = 220, c2 = col.clone().multiplyScalar(4);
     for (let k = 0; k < n; k++) { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = Math.sqrt(1 - u * u), sp = 11 + Math.random() * 4; this.emit(this.fw, x, y, z, r * Math.cos(a) * sp, u * sp, r * Math.sin(a) * sp, c2, 1.8 + Math.random() * 0.8); }
@@ -2987,6 +3001,8 @@ const Games = {
 /* shared screen chrome: header, meter, feedback box */
 function gameHeader(c, w, h, id, sub) {
   darkBg(c, w, h, true, 26);
+  const art=window.TrustBoardArtwork?.[id];
+  if(art){c.save();c.globalAlpha=.21;c.drawImage(art,0,0,w,h);c.restore();const shade=c.createLinearGradient(0,0,w,h);shade.addColorStop(0,'#181222cc');shade.addColorStop(1,'#18122288');c.fillStyle=shade;c.fillRect(0,0,w,h)}
   txt(c, L(PLACES[id]).toUpperCase() + ' · ' + L(GAME[id].title), 36, 66, 34, { d: true, w: 800, color: PAV[id].color === '#5851DB' ? '#9b95ff' : PALETTE.amber, maxW: w * 0.62 });
   const g = GS(id), bw = w * 0.28, bx = w - bw - 36;
   txt(c, T('meterTitle'), bx, 44, 20, { w: 600, color: 'rgba(250,247,244,.7)', maxW: bw });
@@ -3006,6 +3022,9 @@ function zoneScreen(id, name, lx, ly, lz, ry, w, h, draw, ppm = 560) {
   const P = REFS.pav[id], scr = new CanvasScreen({ name, w, h, ppm, draw });
   scr.mesh.position.set(lx, ly, lz); scr.mesh.rotation.y = ry; P.group.add(scr.mesh);
   const frame = mesh(rboxGeo(w + 0.08, h + 0.08, 0.05, 0.03), MAT.blackGloss, P.group, lx, ly, lz); frame.rotation.y = ry; frame.translateZ(-0.03); frame.raycast = () => {};
+  scr.mesh.userData.originalScreen=scr;
+  setInteractable(scr.mesh,{screen:null,cue:()=>L(PLACES[id])+' · '+(S.lang==='hi'?'खोलें':'open activity'),onClick:()=>window.TrustLabs.openLab(id),reach:5});
+  Object.defineProperty(scr.mesh.userData.interact,'screen',{get:()=>XRS.active?scr:null});
   return scr;
 }
 function standScreen(id, name, lx, lz, w, h, draw, y = 1.55) {
@@ -3016,6 +3035,24 @@ function standScreen(id, name, lx, lz, w, h, draw, y = 1.55) {
 
 /* ---------- maze gates ---------- */
 const Maze = {
+  setup(){
+    const guide=document.createElement('section');guide.id='mazeGuide';guide.className='hidden';guide.setAttribute('aria-label','Trust Maze choice');document.body.append(guide);
+  },
+  guide(){
+    const box=$('mazeGuide');if(!box)return;
+    const gate=GATES.slice(0,3).find(gt=>!S.gates[gt.id]?.passed);
+    const nearby=Math.abs(player.x)<3.2&&player.z>12&&player.z<25.5;
+    const on=S.started&&(S.zone==='maze'||nearby)&&!S.ui.modal&&!Shot.active&&!_isTraveling&&!!gate;
+    box.classList.toggle('hidden',!on);if(!on)return;
+    const text=GATE_TEXT[gate.id],key=gate.id+S.lang;
+    if(box.dataset.gate===key)return;box.dataset.gate=key;box.replaceChildren();
+    const progress=document.createElement('small');progress.textContent=(S.lang==='hi'?'मोड़ ':'GATE ')+gate.id.slice(-1)+' / 3';box.append(progress);
+    const heading=document.createElement('h3');heading.textContent=L(text.q);box.append(heading);
+    for(const correct of [gate.good===0,gate.good===1]){
+      const button=document.createElement('button');button.className='btn';button.textContent=L(correct?text.good:text.bad);button.onclick=()=>this.choose(gate,correct);box.append(button);
+    }
+    const hint=document.createElement('p');hint.textContent=S.lang==='hi'?'सही जवाब चुनने पर अगला रास्ता खुलता है।':'Choose the supported answer to continue through the gate.';box.append(hint);
+  },
   choose(gt, correct) {
     const st = S.gates[gt.id] ||= { passed: false, wrong: 0 };
     if (correct && !st.passed) S.meter = clamp(S.meter + 10, 0, 100);
@@ -3024,6 +3061,10 @@ const Maze = {
     toast(L(correct ? GATE_TEXT[gt.id].whyGood : GATE_TEXT[gt.id].whyBad), correct ? 'ok' : '');
     playFeedback(correct ? 'success' : 'select');
     logEvent('maze_choice', { gate: gt.id, correct }); persistSoon(); updateHUD();
+    if(correct&&gt.id.startsWith('core')){
+      fastTravel({x:gt.c+(gt.good===0?-1.4:1.4),z:gt.at-gt.len-.45,yaw:0});
+      $('mazeGuide')?.classList.add('hidden');
+    }
   },
   inLane(gt, p) {
     if (gt.axis === 'z') { if (p.z > gt.at || p.z < gt.at - gt.len) return -1; if (p.x >= gt.c - 2.6 && p.x <= gt.c - 0.2) return 0; if (p.x >= gt.c + 0.2 && p.x <= gt.c + 2.6) return 1; return -1; }
@@ -3047,7 +3088,7 @@ function setupFashion() {
   const startW = pavToWorld(PAV[id], 0, 2.4), endW = pavToWorld(PAV[id], 0, -4.6);
   const mk = (lz, col) => { const d = glowDecal(col, 1.2, 1.2, 0.9); d.position.set(0, 0.32, lz); P.group.add(d); return d; };
   const startMark = mk(2.4, '#7af0ff'), endMark = mk(-4.6, PALETTE.amber);
-  const scr = zoneScreen(id, 'fashion_wall', 1.75, 2.45, -5.72, 0, 3.0, 1.7, (c, w, h, s) => {
+  const scr = zoneScreen(id, 'fashion_wall', 1.75, 2.0, .8, 0, 2.7, 1.53, (c, w, h, s) => {
     const g = GS(id);
     if (g.step === 'intro') { gameHeader(c, w, h, id, L(G.intro)); uiBtn(c, s, 'go', 36, h - 150, w - 72, 110, T('start'), { onClick: () => Games.go(id, 'toStart') }); return; }
     if (g.step === 'toStart' || g.step === 'walk') { gameHeader(c, w, h, id); fitPara(c, g.step === 'toStart' ? (S.lang === 'hi' ? 'रनवे के आगे वाले नीले निशान पर जाइए।' : 'Go to the blue mark at the front of the runway.') : (S.lang === 'hi' ? 'अब रनवे पर पीछे सुनहरे निशान तक चलिए!' : 'Now walk the runway to the gold mark at the back!'), 36, 120, w - 72, h - 160, 54, { d: true, w: 700 }); return; }
@@ -3093,7 +3134,7 @@ function setupFood() {
     logEvent('food_taste', { dish: i }); if (g.tasted.length === 3) wait(0.9).then(() => Games.go(id, 'reveal')); scr.invalidate();
   };
   Games.restoreFood = () => { const g = GS(id); (g.tasted || []).forEach(i => { cl[i].position.y = 0.32; cl[i].rotation.z = 0.6; }); };
-  const scr = zoneScreen(id, 'food_board', 0, 2.35, -2.2, 0, 3.0, 1.75, (c, w, h, s) => {
+  const scr = zoneScreen(id, 'food_board', 1.85, 2.1, .4, 0, 2.65, 1.55, (c, w, h, s) => {
     const g = GS(id);
     if (g.step === 'intro') { gameHeader(c, w, h, id, L(G.intro)); uiBtn(c, s, 'go', 36, h - 150, w - 72, 110, T('start'), { onClick: () => Games.go(id, 'taste') }); return; }
     if (g.step === 'taste') { gameHeader(c, w, h, id, S.lang === 'hi' ? 'काउंटर पर रखी तीनों ढकी हुई डिश पर टैप करके चखिए।' : 'Tap each covered dish on the counter to taste it.'); (g.tasted || []).forEach((i, k) => { txt(c, '✓ ' + L(G.dishes[i].name), 50, 250 + k * 90, 38, { w: 700, color: PALETTE.amber }); txt(c, L(G.dishes[i].note), 90, 290 + k * 90, 30, { w: 500, maxW: w - 140 }); }); return; }
@@ -3204,7 +3245,7 @@ function setupFitness() {
 function setupTravel() {
   const id = 'travel', P = REFS.pav[id], G = GAME.travel;
   const postcard = new Image();
-  const card = new CanvasScreen({ name: 'postcard', w: 4.1, h: 3.35, ppm: 250, interactive: false, emissive: 1.1, draw: (c, w, h) => {
+  const card = new CanvasScreen({ name: 'postcard', w: 2.1, h: 2.1, ppm: 250, interactive: false, emissive: 1.1, draw: (c, w, h) => {
     c.fillStyle = '#1d2530'; c.fillRect(0, 0, w, h);
     if (postcard.complete && postcard.naturalWidth) {
       const sw = postcard.naturalHeight * w / h;
@@ -3218,14 +3259,14 @@ function setupTravel() {
   } });
   postcard.onload = () => card.invalidate();
   postcard.src = 'assets/gemini/travel_full_context.webp';
-  card.mesh.position.set(0, 1.9, -0.55); P.group.add(card.mesh); LANG_HOOKS.push(() => card.invalidate());
+  card.mesh.position.set(-1.8, 1.65, -4.6); P.group.add(card.mesh); LANG_HOOKS.push(() => card.invalidate());
   // rain behind the frame (reality side)
   const N = 420, pos = new Float32Array(N * 6), rr = rng(4); for (let i = 0; i < N; i++) { const x = (rr() - 0.5) * 7.4, y = rr() * 4.2, z = -0.9 - rr() * 4.9; pos.set([x, y, z, x + 0.02, y - 0.28, z], i * 6); }
   const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const rain = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: '#a9c4ff', transparent: true, opacity: 0.45 })); P.group.add(rain); noRay(rain); rain.frustumCulled = false;
+  const rain = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: '#a9c4ff', transparent: true, opacity: 0.45 })); P.group.add(rain); noRay(rain); rain.frustumCulled = false; rain.position.z = -2.3;
   const sign = neonSign({ name: 'reno_sign', w: 2.6, h: 0.6, ppm: 300, gradient: false, colors: ['#1a1a1a'], sizes: [0.7], bg: '#f7c548', lines: () => [S.lang === 'hi' ? 'मरम्मत चल रही है · ₹14,500/रात' : 'UNDER RENOVATION · ₹14,500/night'] });
   sign.mesh.position.set(-1.6, 1.8, -5.85); P.group.add(sign.mesh);
-  const scr = standScreen(id, 'travel_board', 1.9, -4.1, 2.2, 1.35, (c, w, h, s) => {
+  const scr = standScreen(id, 'travel_board', 1.9, 1.4, 2.2, 1.35, (c, w, h, s) => {
     const g = GS(id);
     if (g.step === 'intro' || g.step === 'through') { gameHeader(c, w, h, id, L(G.intro)); return; }
     if (g.step.startsWith('s')) { const si = +g.step.slice(1), st = G.steps[si]; gameHeader(c, w, h, id, L(st.q)); if (!feedbackBox(c, s, w, h, id, 190, ok => { if (ok) { if (si < 2) Games.go(id, 's' + (si + 1)); else Games.finish(id); } })) optionButtons(c, s, w, 200, st.a, i => Games.answer(id, i === st.good, L(st.why), { s: si }), 32); return; }
@@ -3248,8 +3289,8 @@ function setupEducation() {
   for (const s of [-1, 1]) { const l = mesh(cylGeo(0.035, 0.035, 2.9, 8), MAT.woodSlat, easel, s * 1.6, 1.45, 0.1); l.rotation.x = -0.08; }
   const ew = pavToWorld(PAV[id], 0.4, -4.2); colBox(ew.x - 0.6, ew.z - 0.6, ew.x + 0.6, ew.z + 0.6, 'easel');
   const cork = canvasTex(512, 320, (c, w, h) => { c.fillStyle = '#b07b4f'; c.fillRect(0, 0, w, h); for (let i = 0; i < 4000; i++) { c.fillStyle = `rgba(${90 + Math.random() * 60},${50 + Math.random() * 40},${20 + Math.random() * 30},.5)`; c.fillRect(Math.random() * w, Math.random() * h, 2, 2); } });
-  const scr = zoneScreen(id, 'edu_board', 0.4, 1.85, -4.05, 0, 3.3, 2.0, (c, w, h, s) => {
-    const g = GS(id); c.drawImage(cork.image, 0, 0, w, h); c.fillStyle = 'rgba(20,14,26,.35)'; c.fillRect(0, 0, w, h);
+  const scr = zoneScreen(id, 'edu_board', .55, 1.95, .1, 0, 3.3, 2.0, (c, w, h, s) => {
+    const g = GS(id); c.drawImage(window.TrustBoardArtwork?.education||cork.image, 0, 0, w, h); c.fillStyle = 'rgba(20,14,26,.84)'; c.fillRect(0, 0, w, h);
     txt(c, L(PLACES[id]).toUpperCase() + ' · ' + L(G.title), 30, 56, 34, { d: true, w: 800, color: '#fff', glow: 'rgba(0,0,0,.6)' });
     if (g.step === 'intro') { fitPara(c, L(G.intro), 30, 80, w - 60, 200, 40, { w: 600 }); uiBtn(c, s, 'go', 30, h - 140, w - 60, 100, T('start'), { onClick: () => Games.go(id, 'cards') }); return; }
     if (g.step === 'done') { txt(c, '✓ ' + T('done'), 30, 180, 64, { d: true, w: 800, color: '#59E3A0' }); fitPara(c, L(GATE_TEXT.education.whyGood), 30, 210, w - 60, h - 240, 40, { w: 600 }); return; }
@@ -3298,7 +3339,7 @@ const Booth = {
   previewPose() {
     const visitor = Self.p;
     if (!visitor?.ok || this.busy) return null;
-    const figure = SkeletonUtils.clone(Assets.avatars[visitor.def.model].root);
+    const figure = SkeletonUtils.clone(visitor.model);
     const mixer = new THREE.AnimationMixer(figure);
     const clip = visitor.clips.get(this.poses[this.pose][0]) || visitor.clips.get('idle');
     const mark = REFS.marks.photo;
@@ -3371,6 +3412,23 @@ function captureCamera(cam, size = 1080) {
     renderer.xr.enabled = xr; cam.aspect = aspect; cam.updateProjectionMatrix();
   }
 }
+function captureFestivalPhoto(){
+  const room=REFS.pav[S.zone],subject=room?room.group.localToWorld(new THREE.Vector3(-2.65,.12,3.15)):new THREE.Vector3(0,0,9.3);
+  const eye=room?room.group.localToWorld(new THREE.Vector3(-2.65,1.65,6.8)):new THREE.Vector3(2.4,1.7,11.5);
+  const visitor=Self.p,figure=SkeletonUtils.clone(Self.p.model),holder=new THREE.Group();
+  holder.add(figure);holder.position.copy(subject);holder.rotation.y=Math.atan2(eye.x-subject.x,eye.z-subject.z);scene.add(holder);
+  const mixer=new THREE.AnimationMixer(figure),clip=visitor.clips.get('wave')||visitor.clips.get('idle'),old=visitor.group.visible;
+  const cam=new THREE.PerspectiveCamera(room?47:70,1,.05,150);cam.layers.enableAll();cam.position.copy(eye);cam.lookAt(subject.clone().add(new THREE.Vector3(0,1,0)));
+  try{
+    visitor.group.visible=false;
+    if(clip){mixer.clipAction(clip).play();mixer.setTime(Math.min(.75,clip.duration*.4))}
+    holder.updateWorldMatrix(true,true);figure.traverse(o=>{if(o.name==='held_content_prop'&&o.parent)o.quaternion.copy(o.parent.getWorldQuaternion(new THREE.Quaternion())).invert()});
+    showPhoto(composePost(captureCamera(cam,1080)));
+  }finally{
+    visitor.group.visible=old;scene.remove(holder);mixer.uncacheRoot(figure);
+    const skeletons=new Set();figure.traverse(o=>{if(o.isSkinnedMesh)skeletons.add(o.skeleton)});skeletons.forEach(s=>s.dispose());
+  }
+}
 function composePost(img) {
   const W = 1080, H = 1440, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
   x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
@@ -3422,7 +3480,7 @@ Games.tick = {}; Games.frame = 0;
 function setupGames() { setupFashion(); setupFood(); setupBeauty(); setupFitness(); setupTravel(); setupEducation(); Booth.init(); setupKiosks(); FX_STEAM.init(); }
 function updateGames(dt) {
   const p = playerPos(); Games.frame++;
-  Maze.update(dt, p);
+  Maze.update(dt, p);Maze.guide();
   for (const id of NICHES) if (Games.tick[id]) { const d = Math.hypot(p.x - PAV[id].cx, p.z - PAV[id].z); if (d < 26 || id === 'beauty') Games.tick[id](dt, p); }
   FX_STEAM.update(dt);
   if (Games.frame % 90 === 0) { const g = GS('food'); if (g.step === 'taste' || g.step === 'intro') FX_STEAM.puff(REFS.pav.food.local(1.9, -5.2).setY(1.45)); FX_STEAM.puff(REFS.kettle.position.clone().add(new THREE.Vector3(0.2, 0.25, 0))); }
@@ -3431,7 +3489,7 @@ function updateGames(dt) {
 /* ============================================================================
    DOM UI: start panel, HUD, passport, map, photo, help, researcher overlay
    ============================================================================ */
-const MODALS = ['dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd', 'dlgStudio', 'dlgTrustWall', 'dlgMarket', 'dlgFreebies', 'dlgCaffeine'];
+const MODALS = ['dlgPanel','dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd', 'dlgStudio', 'dlgTrustWall', 'dlgMarket', 'dlgFreebies', 'dlgCaffeine', 'dlgRide'];
 function openModal(id) {
   if (XRS.active) return;
   MODALS.forEach(m => { if (m !== id) $(m)?.classList.add('hidden'); });
@@ -3445,7 +3503,9 @@ function releasePointer() { if (document.pointerLockElement) document.exitPointe
 
 function buildStartPanel() {
   const grid = $('avatarGrid'); grid.innerHTML = '';
-  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; b.setAttribute('aria-label', 'Choose avatar ' + a.replaceAll('_', ' ')); b.onclick = () => { S.avatar = a; refreshStart(); Sound.play && Sound.play('click'); }; grid.appendChild(b); });
+  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; const look=['After dark','Statement fit','Street edit','Night out','Festival layers','Creator casual'][AVATAR_CHOICES.indexOf(a)];
+    b.setAttribute('aria-label',look);b.title=look;
+    const label=document.createElement('span');label.className='look-label';label.textContent=look;b.append(label); b.onclick = () => { S.avatar = a; refreshStart(); Sound.play && Sound.play('click'); }; grid.appendChild(b); });
   document.querySelectorAll('#langSeg button').forEach(b => b.onclick = () => { setLang(b.dataset.lang); refreshStart(); });
   $('optLog').checked = S.consent;
   $('btnStart').onclick = () => startExperience({ sound: $('optSound').checked, consent: $('optLog').checked });
@@ -3518,7 +3578,7 @@ function passImage() {
 }
 /* ---------- map ---------- */
 const TRAVEL = {
-  entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: 0, z: -17.8, yaw: 0 },
+  entry: { x: 0, z: 29.5, yaw: 0 }, maze: { x: 0, z: 23.6, yaw: 0 }, hub: { x: 0, z: 9.5, yaw: 0 }, lawn: { x: 0, z: -12.5, yaw: 0 }, stage: { x: 5.7, z: -18.2, yaw: .65 },
   photo: { x: -21.0, z: 26.5, yaw: Math.PI / 2 }, chai: { x: 24.3, z: 32.3, yaw: -0.48 }, lounge: { x: 20.6, z: -25.0, yaw: -Math.PI / 2 }, arcade: { x: -20.0, z: -23.5, yaw: 1.39 },
 };
 for (const id of NICHES) { const p = PAV[id]; TRAVEL[id] = { x: p.side * 22.15, z: p.z + .68, yaw: -p.side * Math.PI / 2 + p.side * .075 }; }
@@ -3529,7 +3589,7 @@ const pxToMap = (px, py, w, h) => [px / w * MAP_W - 40, py / h * MAP_H - 37];
 let MAP_PIN_CACHE = null;
 function mapPins() {
   if (MAP_PIN_CACHE) return MAP_PIN_CACHE;
-  MAP_PIN_CACHE = [{ id: 'entry', x: 0, z: 30.6 }, { id: 'maze', x: 0, z: 18.5 }, { id: 'hub', x: 0, z: 6 }, { id: 'lawn', x: 0, z: -15.5 }, { id: 'stage', x: 0, z: -26 },
+  MAP_PIN_CACHE = [...window.TrustRides.pins(), { id: 'entry', x: 0, z: 30.6 }, { id: 'maze', x: 0, z: 18.5 }, { id: 'hub', x: 0, z: 6 }, { id: 'lawn', x: 0, z: -15.5 }, { id: 'stage', x: 0, z: -26 },
     ...NICHES.map(id => ({ id, x: PAV[id].cx, z: PAV[id].z })),
     {id:'wall',x:-15,z:25}, {id:'market',x:-10,z:-15}, {id:'freebies',x:SAMPLE_LOUNGE.x,z:SAMPLE_LOUNGE.z},
     ...['photo', 'chai', 'lounge', 'arcade'].map(id => ({ id, x: CORNERS[id].cx, z: CORNERS[id].cz }))];
@@ -3539,7 +3599,7 @@ function pinColor(id) {
   if (PAV[id]) return PAV[id].color;
   return { photo: PALETTE.pink, chai: PALETTE.orange, lounge: PALETTE.blue, arcade: PALETTE.purple, stage: '#FF3B5C', maze: '#3fae5a', hub: '#3fae5a', lawn: '#62c46f', entry: PALETTE.amber }[id] || '#ffffff';
 }
-const PIN_ICON = { entry: '🎟️', maze: '🧩', hub: '⛲', lawn: '🌿', stage: '🎤', fashion: '👗', beauty: '💄', fitness: '💪', food: '🍜', travel: '✈️', education: '📚', photo: '📸', chai: '☕', lounge: '🛋️', arcade: '🕹️' };
+const PIN_ICON = {collab:'🕹️',fall:'🪂',pit:'🏀',coaster:'🎢', entry: '🎟️', maze: '🧩', hub: '⛲', lawn: '🌿', stage: '🎤', fashion: '👗', beauty: '💄', fitness: '💪', food: '🍜', travel: '✈️', education: '📚', photo: '📸', chai: '☕', lounge: '🛋️', arcade: '🕹️' };
 const _vy = new THREE.Vector3();
 function viewYaw() { camera.getWorldDirection(_vy); return Math.atan2(-_vy.x, -_vy.z); }
 function drawYou(c, w, h, k) {
@@ -3650,7 +3710,7 @@ function drawMapDialog() {
   const list = $('mapList');
   if (list.dataset.lang !== S.lang) {
     list.innerHTML = ''; list.dataset.lang = S.lang;
-    for (const k of ['entry', 'maze', 'hub', 'lawn', 'stage', ...NICHES, 'photo', 'chai', 'market', 'wall', 'freebies', 'lounge', 'arcade']) {
+    for (const k of ['entry', 'maze', 'hub', 'lawn', 'stage', ...NICHES, 'photo', 'chai', 'market', 'wall', 'freebies', 'lounge', 'arcade', 'collab', 'fall', 'pit', 'coaster']) {
       const b = document.createElement('button'); b.textContent = L(PLACES[k]);
       b.onclick = () => { closeModal('dlgMap', true); MapUI.sel = null; fastTravel(TRAVEL[k]); logEvent('fast_travel', { to: k, via: 'list' }); };
       list.appendChild(b);
@@ -3669,6 +3729,7 @@ function drawMapDialog() {
 }
 let _isTraveling = false;
 async function fastTravel(t) {
+  window.TrustRides?.stop();
   if (_isTraveling) return; _isTraveling = true;
   try {
     const f = $('fade'); f.style.opacity = '1'; Sound.play('whoosh'); await wait(0.3);
@@ -3741,11 +3802,33 @@ const hover = { data: null, mesh: null, screen: null, outlined: [], cue: '' };
 const _o = new THREE.Vector3(), _d = new THREE.Vector3(), _hp = new THREE.Vector3(), _ndc = new THREE.Vector2(), _qq = new THREE.Quaternion();
 const _pp = { x: 0, z: 0 };
 function playerPos() { if (XRS.active) { renderer.xr.getCamera().getWorldPosition(_hp); _pp.x = _hp.x; _pp.z = _hp.z; } else { _pp.x = player.x; _pp.z = player.z; } return _pp; }
+let thirdPerson = false;
+function toggleView() {
+  if (XRS.active || Shot.active || S.ui.modal) return;
+  thirdPerson = !thirdPerson;
+  $('btnView').textContent = thirdPerson ? '1st' : '3rd';
+  $('btnView').setAttribute('aria-pressed',String(thirdPerson));
+  thirdPerson ? camera.layers.enable(LAYER_SELF) : camera.layers.disable(LAYER_SELF);
+}
 function applyRig(dt) {
   if (XRS.active || Shot.active) return;
   player.foot = lerp(player.foot, groundAt(player.x, player.z), 1 - Math.exp(-dt * 10));
   rig.position.set(player.x, player.foot, player.z); rig.rotation.set(0, player.yaw, 0);
-  camera.rotation.set(player.pitch, 0, 0, 'YXZ'); camera.position.y = player.eye;
+  camera.position.set(0,player.eye,0);
+  camera.rotation.set(player.pitch, 0, 0, 'YXZ');
+  if(thirdPerson){
+    // Shorten the boom before it crosses a wall or fixture.
+    let distance=3.5;
+    for(let d=.2;d<3.5;d+=.15){
+      const x=player.x+Math.sin(player.yaw)*d,z=player.z+Math.cos(player.yaw)*d;
+      if(pointBlocked(x,z,.15)){distance=Math.max(.15,d-.2);break}
+    }
+    if(distance>1.1){
+      camera.position.set(0,player.eye+distance*.25,distance);
+      camera.rotation.x=player.pitch-.14;
+      camera.layers.enable(LAYER_SELF);
+    }else camera.layers.disable(LAYER_SELF);
+  }
 }
 function look(dx, dy, sens) { player.yaw -= dx * sens; player.pitch = clamp(player.pitch - dy * sens, -1.45, 1.35); if (Tour.on) Tour.manualLook = 2.5; }
 const lookQ = { x: 0, y: 0 };            // touch drags are eased over a few frames so the view glides instead of stepping
@@ -3800,6 +3883,7 @@ function setupInput() {
       case 'KeyL': Research.toggle(); break; case 'KeyT': Tour.toggle(); break; case 'KeyN': toggleSound(); break;
       case 'KeyG': setLang(S.lang === 'hi' ? 'en' : 'hi'); break;
       case 'Space': if (Tour.on) Tour.paused = !Tour.paused; break;
+      case 'KeyV': toggleView(); break;
       case 'KeyE': case 'Enter': activate(ptr.locked || isTouch() ? pickCenter() : (ptr.mx >= 0 ? pickScreen(ptr.mx, ptr.my) : pickCenter()), 'keyboard'); break;
       default: break;
     }
@@ -3831,7 +3915,13 @@ function updateMovement(dt) {
   const a = 1 - Math.exp(-dt * (len > 0.01 || Math.abs(player.scrollV) > 0.05 ? SPEED.accel : SPEED.brake));
   player.vx = lerp(player.vx, tx, a); player.vz = lerp(player.vz, tz, a);
   const v = Math.hypot(player.vx, player.vz), n = Math.max(1, Math.ceil(v * dt / 0.08)), x0 = player.x, z0 = player.z;
-  for (let i = 0; i < n; i++) { const p = { x: player.x + (player.vx * dt) / n, y: player.z + (player.vz * dt) / n }; resolveCollisions(p, PLAYER_RADIUS, groundAt(player.x, player.z)); player.x = p.x; player.z = p.y; }
+  for (let i = 0; i < n; i++) { const p = { x: player.x + (player.vx * dt) / n, y: player.z + (player.vz * dt) / n }; resolveCollisions(p, PLAYER_RADIUS, groundAt(player.x, player.z));
+    for(const person of PEOPLE){
+      if(person===Self.p || !person.ok || Math.abs(person.group.position.y-player.foot)>.85)continue;
+      const dx=p.x-person.group.position.x,dz=p.y-person.group.position.z,r=PLAYER_RADIUS+.31,dist=Math.hypot(dx,dz);
+      if(dist<r){const length=dist||1;p.x+=(dist?dx/length:1)*(r-dist);p.y+=(dist?dz/length:0)*(r-dist)}
+    }
+    resolveCollisions(p,PLAYER_RADIUS,groundAt(player.x,player.z)); player.x = p.x; player.z = p.y; }
   const moved = Math.hypot(player.x - x0, player.z - z0);
   if (dt > 0) { const real = moved / dt; if (real < v * 0.6) { player.vx *= 0.92; player.vz *= 0.92; } }   // sliding along a wall: shed speed
   player.moving = v > 0.4;
@@ -4109,8 +4199,8 @@ let FRAME_DRAW = true;
 function frame(dt, draw = true) {
   frameN++; Perf.update(dt); FRAME_DRAW = draw; if (frameN % 30 === 0) updateLightBudget();
   updateMovement(dt); applyRig(dt);
-  Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); updateGames(dt);
-  updateXR(dt); VRPanel.update(dt);
+  Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); window.TrustSocial?.updateHeldProps(); updateGames(dt);
+  updateXR(dt); VRPanel.update(dt); window.TrustRides?.update(dt);
   if (frameN % 3 === 0 && !S.ui.modal) updateHover();
   updateZones(dt); updateTweens(dt); Research.update(dt);
 
@@ -4118,9 +4208,9 @@ function frame(dt, draw = true) {
   Sound.update(dt); if (frameN % 2 === 0) MiniMap.update(dt * 2); AutoQ.update(dt);
   hudT += dt; if (hudT > 0.5) { hudT = 0; updateShowChip(); updateSubs(); if (REFS.screens.schedule) REFS.screens.schedule.invalidate(); }
   screenT += dt; const liveTick = screenT > 1 / 6; if (liveTick) screenT = 0;
-  if (!S.ui.modal && (draw || frameN % 30 === 0)) for (const s of SCREENS) if (s.dirty || (s.live && liveTick)) { if (s.mesh.visible || s.live) s.redraw(Show.elapsed); }
+  if ((!S.ui.modal || S.ui.modal==='ride-motion') && (draw || frameN % 30 === 0)) for (const s of SCREENS) if (s.dirty || (s.live && liveTick)) { if (s.mesh.visible || s.live) s.redraw(Show.elapsed); }
   const every = QUALITY === 'high' ? 8 : 16; if (frameN % every === 0 || frameN < 4) renderer.shadowMap.needsUpdate = true;
-  if (!draw || (S.ui.modal && frameN % 4 !== 0)) return;
+  if (!draw || (S.ui.modal && S.ui.modal !== 'ride-motion' && frameN % 4 !== 0)) return;
   renderer.info.reset();
   if (Booth.recording) { const shot = captureCamera(Booth.cam, 720); Booth.recording.ctx.drawImage(shot, 0, 0); }
   else Post.render(dt);
@@ -4138,11 +4228,22 @@ async function init() {
   document.documentElement.lang = S.lang; $('ldTitle').textContent = T('brand'); setLoad(0.02, T('loading'));
   await Promise.all([loadFonts(), Assets.loadAll(p => setLoad(0.05 + p * 0.8, p > 0.5 ? T('loadingPeople') : T('loading')))]);
   setLoad(0.88);
-  buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); VRPanel.init();
-  setupInput(); setupXR(); bindUI(); Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
-  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, TRAVEL, SAMPLE_LOUNGE, addPlatform, PEOPLE_BY, Merger, rboxGeo, torusGeo,
+  buildWorld(); setupLights(); initIMAG(); FX.init(); Card.init(); spawnPeople(); setupGames(); Maze.setup(); VRPanel.init();
+  setupInput(); setupXR(); bindUI();
+  const view=document.createElement('button');view.id='btnView';view.className='ib';view.textContent='3rd';view.title='Switch first-person / third-person view';view.setAttribute('aria-label',view.title);view.setAttribute('aria-pressed','false');view.onclick=toggleView;$('hudTR').append(view);
+ Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
+  window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, camera, LAYER_SELF, TRAVEL, SAMPLE_LOUNGE, addPlatform, PEOPLE_BY, Merger, rboxGeo, torusGeo,
     capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
 
+  window.TrustRides.install({THREE,WORLD,REFS,MAT,Merger,mesh,boxGeo,cylGeo,torusGeo,rboxGeo,std,CanvasScreen,txt,
+    setInteractable,colBox,colCircle,addPlatform,TRAVEL,ZONES,PLACES,player,S,Sound,openModal,closeModal,Shot,camera,panelQuestions:AUDIENCE_QS,L,
+    listenPanel(){panelListening=!panelListening;if(panelListening && Show.seg.id!=='panel'){Show.t=40.01;Show.update(.01)}updateSubs();return panelListening},
+    panelAnswer(i){const q=AUDIENCE_QS[i];S.askQ=i;persistSoon();Show.line(q.who,L(q.a),Show.lineDur(L(q.a)));return L(q.a)},
+    fireworks(){Show.t=392.01;Show.update(.01)},
+    people:PEOPLE_BY,self:Self,
+    captureSpot: captureFestivalPhoto,
+    stopMotion(){keys.clear();player.vx=player.vz=player.scrollV=0;lookQ.x=lookQ.y=0;Tour.stop(true)},
+    rebuildTargets(){RAY_TARGETS=[...interactables,...occluders]}});
   window.brandArtReady = window.TrustBrandArt.mount({THREE,REFS,WORLD,SCREENS,drawMark,Person});
   RAY_TARGETS = [...interactables, ...occluders];
   setLang(S.lang); buildStartPanel();
@@ -4158,7 +4259,10 @@ async function init() {
 
 }
 window.TrustArcadeBridge = {
-  awardLab(zone) { if (NICHES.includes(zone) && S.started) Games.stamp(zone); },
+  awardLab(zone) { if (NICHES.includes(zone) && S.started) {
+      Games.stamp(zone);
+      try {const bag=JSON.parse(sessionStorage.getItem('creator-night-pavilion-rewards')||'[]');if(!bag.includes(zone)){bag.push(zone);sessionStorage.setItem('creator-night-pavilion-rewards',JSON.stringify(bag))}} catch {}
+    } },
   onLabOpen(id) { S.ui.modal = id; player.vx = player.vz = player.scrollV = 0; lookQ.x = lookQ.y = 0; keys.clear(); releasePointer(); applyHover(null); },
   onLabClose(id) { if (S.ui.modal === id) S.ui.modal = null; if (window.TrustLabs) window.TrustLabs.updateZoneTrigger(S.zone); },
   jumpToZone(id) {
@@ -4167,7 +4271,8 @@ window.TrustArcadeBridge = {
 };
 function debugAPI() {
   return {
-    ready: false, S, Show, PEOPLE_BY, Games, Booth, Tour, REFS,
+    ready: false, S, Show, PEOPLE_BY, Games, Booth, Tour, REFS, toggleView,
+    view:()=>thirdPerson,
     teleport(x, z, yaw = 0) { player.x = x; player.z = z; player.yaw = yaw; player.pitch = -0.04; applyRig(1); },
     look(yaw, pitch = -0.04) { player.yaw = yaw; player.pitch = pitch; applyRig(1); },
     lookAt(x, y, z) { const dx = x - player.x, dz = z - player.z; player.yaw = Math.atan2(-dx, -dz); player.pitch = Math.atan2(y - (player.foot + EYE), Math.hypot(dx, dz)); applyRig(1); },
@@ -4192,10 +4297,11 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
-<script src="js/trust-labs.js?v=3.2.2" defer></script>
-<script src="js/model-slots.js?v=3.2.2" defer></script>
-<script src="js/dj-deck.js?v=3.2.2" defer></script>
-<script src="js/world-visuals.js?v=3.2.2" defer></script>
-<script src="js/social-spaces.js?v=3.2.2" defer></script><script src="js/brand-art.js?v=3.2.2" defer></script>
+<script src="js/trust-labs.js?v=3.3.1" defer></script>
+<script src="js/rides.js?v=3.3.1" defer></script>
+<script src="js/model-slots.js?v=3.3.1" defer></script>
+<script src="js/dj-deck.js?v=3.3.1" defer></script>
+<script src="js/world-visuals.js?v=3.3.1" defer></script>
+<script src="js/social-spaces.js?v=3.3.1" defer></script><script src="js/brand-art.js?v=3.3.1" defer></script>
 </body>
 </html>

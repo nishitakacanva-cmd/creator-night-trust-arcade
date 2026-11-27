@@ -1,0 +1,59 @@
+{
+  "pack": "Trust Arcade 4 New Attractions (Renders + Posters)",
+  "assets": [
+    {
+      "file": "assets/rides/entry_collab_claw.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "Concept render: Entry Collab Claw"
+    },
+    {
+      "file": "assets/rides/trust_fall_bungee.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "Concept render: Trust Fall Bungee Tower"
+    },
+    {
+      "file": "assets/rides/ball_pit_dunk.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "Concept render: Bouncy Ball Pit Dunk Arena"
+    },
+    {
+      "file": "assets/rides/trust_coaster.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "Concept render: Elevated Hype Coaster"
+    },
+    {
+      "file": "assets/rides/updated_master_map_rides.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "Updated 76x69m Master Map with 4 new rides"
+    },
+    {
+      "file": "assets/rides/poster_collab_claw.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "3D-mounted station rules poster: Entry Collab Claw"
+    },
+    {
+      "file": "assets/rides/poster_trust_fall.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "3D-mounted station rules poster: Trust Fall Bungee"
+    },
+    {
+      "file": "assets/rides/poster_ball_pit_dunk.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "3D-mounted station rules poster: Ball Pit Dunk"
+    },
+    {
+      "file": "assets/rides/poster_hype_coaster.jpg",
+      "width": 1376,
+      "height": 768,
+      "purpose": "3D-mounted station rules poster: Hype Coaster"
+    }
+  ]
+}

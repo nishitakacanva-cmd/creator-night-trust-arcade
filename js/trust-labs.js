@@ -31,7 +31,14 @@
     }
   }
   function saveNote(zone, summary) {
-    window.TrustArcadeBridge?.awardLab(zone);
+    const st=LAB_STATE[zone];
+    const complete=zone==='fashion'?st.disclose&&st.condition&&st.limitation:
+      zone==='food'?st.initialPick&&st.revealed&&st.finalAction:
+      zone==='beauty'?st.decision&&st.tab!=='bottle':
+      zone==='fitness'?st.claims.length&&!st.claims.includes('universal'):
+      zone==='travel'?st.cropPct>=95&&st.decision:
+      zone==='education'?st.checkedIndependence&&st.decision:false;
+    if(complete)window.TrustArcadeBridge?.awardLab(zone);
     const notes = loadNotes();
     notes[zone] = { summary, at: new Date().toISOString() };
     try { sessionStorage.setItem(NOTES_KEY, JSON.stringify(notes)); } catch (_) {}
@@ -520,6 +527,6 @@
     }
   }
 
-  window.TrustLabs = { openLab, closeLab, updateZoneTrigger, renderFieldNotesHook };
+  window.TrustLabs = { saveNote, openLab, closeLab, updateZoneTrigger, renderFieldNotesHook };
   document.addEventListener('DOMContentLoaded', () => { ensureDOM(); renderFieldNotesHook(); });
 })();

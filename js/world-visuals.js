@@ -1,12 +1,12 @@
 /* Trust Arcade v3 — 3D Exhibition Gallery Lightboxes & Quick Zone Jump Bar */
 (function () {
   const GALLERY_PRINTS = [
-    { zone: 'fashion', file: 'assets/gemini/fashion_jacket_hero.webp', w: 1.5, h: 1.5, pos: [-2.1, 1.55, -2.5], rotY: 0.35 },
-    { zone: 'beauty', file: 'assets/gemini/beauty_serum_hero.webp', w: 1.35, h: 1.35, pos: [2.1, 1.5, -2.4], rotY: -0.35 },
-    { zone: 'food', file: 'assets/gemini/food_dish_a.webp', w: 1.3, h: 1.3, pos: [-2.1, 1.5, -2.4], rotY: 0.35 },
-    { zone: 'fitness', file: 'assets/gemini/fitness_product_hero.webp', w: 1.35, h: 1.35, pos: [2.2, 1.5, -2.3], rotY: -0.35 },
-    { zone: 'travel', file: 'assets/gemini/travel_full_context.webp', w: 3.4, h: 1.9, pos: [0, 1.85, -3.45], rotY: 0 },
-    { zone: 'education', file: 'assets/gemini/education_evidence_objects.webp', w: 1.8, h: 1.35, pos: [2.0, 1.55, -2.4], rotY: -0.35 },
+    { zone: 'fashion', file: 'assets/gemini/fashion_jacket_hero.webp', w: 1.5, h: 1.5, pos: [-3.73, 2.0, -2.7], rotY: 1.570796 },
+    { zone: 'beauty', file: 'assets/gemini/beauty_serum_hero.webp', w: 1.35, h: 1.35, pos: [3.73, 2.0, -2.7], rotY: -1.570796 },
+    { zone: 'food', file: 'assets/gemini/food_dish_a.webp', w: 1.3, h: 1.3, pos: [-3.73, 2.0, -2.7], rotY: 1.570796 },
+    { zone: 'fitness', file: 'assets/gemini/fitness_product_hero.webp', w: 1.35, h: 1.35, pos: [-3.73, 2.0, -2.7], rotY: 1.570796 },
+    { zone: 'travel', file: 'assets/gemini/travel_full_context.webp', w: 3.4, h: 1.9, pos: [-3.73, 2.0, -2.7], rotY: 1.570796 },
+    { zone: 'education', file: 'assets/gemini/education_evidence_objects.webp', w: 1.8, h: 1.35, pos: [-3.73, 2.0, -2.7], rotY: 1.570796 },
   ];
 
   function mountGalleryLightboxes(THREE, REFS, register) {
@@ -45,16 +45,6 @@
         frameGroup.add(strip);
 
         frameGroup.name = 'gallery_lightbox_' + item.zone;
-        const floor = .12 - item.pos[1];
-        const lower = -(item.h + .14) / 2;
-        const leg = new THREE.BoxGeometry(.032, lower - floor, .045);
-        for (const side of [-1, 1]) {
-          const upright = new THREE.Mesh(leg, brass);
-          upright.position.set(side * item.w * .35, (floor + lower)/2, -.025);
-          frameGroup.add(upright);
-        }
-        const foot = new THREE.Mesh(new THREE.BoxGeometry(item.w * .9,.045,.38), charcoal);
-        foot.position.y = floor + .023; frameGroup.add(foot);
         pav.group.add(frameGroup);
         register(face, item.zone);
       });
@@ -64,6 +54,7 @@
   const destinations = [
     ['fashion','Fashion','फ़ैशन'], ['beauty','Beauty','ब्यूटी'], ['food','Food','फ़ूड'],
     ['fitness','Fitness','फ़िटनेस'], ['travel','Travel','ट्रैवल'], ['education','Education','शिक्षा'],
+    ['collab','Collab claw','क्लॉ'], ['fall','Trust Fall','ट्रस्ट फ़ॉल'], ['pit','Ball pit','बॉल पिट'], ['coaster','Coaster','कोस्टर'],
     ['stage','Stage','स्टेज'], ['market','Brand market','ब्रांड बाज़ार'], ['photo','Photo studio','फ़ोटो स्टूडियो'],
     ['wall','Trust wall','भरोसा दीवार'], ['chai','Caffeine','कैफ़ीन'], ['freebies','Freebies','सैंपल']
   ];
