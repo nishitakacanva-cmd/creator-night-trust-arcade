@@ -317,7 +317,7 @@
         if(elapsed>=20)stop();
       }
     }
-    $('panelActions').classList.toggle('hidden',Math.hypot(c.player.x,c.player.z+22)>12||!c.S.started||!!c.S.ui.modal||!!active);
+    $('panelActions').classList.toggle('hidden',(Math.abs(c.player.x)>7||c.player.z> -16.8||c.player.z< -25.5)||!c.S.started||!!c.S.ui.modal||!!active);
     const near=Object.entries(points).find(([id,p])=>Math.hypot(c.player.x-p.x,c.player.z-p.z)<(id==='pit'?5.8:6));
     document.body.classList.toggle('nearRide',!!near&&!active);
     const launch=$('rideLaunch');launch.classList.toggle('hidden',!near||!c.S.started||!!c.S.ui.modal||!!active);

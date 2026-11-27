@@ -119,3 +119,20 @@ body.nearRide #labLaunchBar{display:none!important}
 body:has(#mazeGuide:not(.hidden)) #labLaunchBar{display:none!important}
 @media(max-width:600px){#mazeGuide{bottom:182px;max-height:50dvh;overflow:auto;padding:14px}#mazeGuide h3{font-size:15px}#mazeGuide .btn{font-size:13px;padding:10px}#panelActions{bottom:226px;max-width:94vw}#panelActions .btn{font-size:11px;padding:10px}.look-label{font-size:8px}}
 @media(min-width:601px){#panelActions{left:auto;right:16px;transform:none;bottom:82px}}
+#bagItems{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.bag-item{border:1px solid #b58e8b55;border-radius:16px;padding:10px;background:#3a293d}
+.bag-item img{width:100%;aspect-ratio:1.3;object-fit:contain;background:#f6e9d7;border-radius:10px}
+.bag-item h3{font-size:14px;margin:8px 0}.bag-item p{font-size:12px;color:#edd9e8}
+.bag-item button{font-size:11px;padding:9px}
+#openGym{position:fixed;right:16px;bottom:190px;z-index:42;background:#513245}
+#gymControls{position:fixed;right:16px;bottom:80px;width:min(340px,calc(100vw - 32px));background:#291f31f5;border:1px solid #b59880;border-radius:18px;padding:18px;z-index:48}
+#gymControls h3{font-size:17px}#gymPlates{display:grid;gap:7px}
+#gymPlates button{font-size:12px;text-align:left;padding:10px}
+#gymPlates button[aria-pressed=true]{background:#9c426c;border-color:#f7c186}
+#gymControls .btnrow button{font-size:12px;padding:9px}
+#gymFeedback{font-size:12px;line-height:1.5}
+@media(max-width:600px){#bagItems{grid-template-columns:repeat(2,minmax(0,1fr))}#openGym{bottom:225px;font-size:12px}#gymControls{bottom:175px;max-height:55dvh;overflow:auto}}
+#avatarGrid canvas{display:block;width:100%;height:100%;object-fit:cover}#avatarGrid button{aspect-ratio:180/220}#avatarGrid .look-label{font-size:10px}
+.passport-art{float:right;width:100px;border-radius:10px;margin:0 0 12px 16px}.lab-header{background:#241a30 url("../assets/festival-art/activity_screen_background.webp") center/cover;color:#fff}.lab-header .lab-title{color:#fff}.lab-header .lab-kicker{color:#ffc9d9}#dlgBag .card{background:#231d2e}.passport-art+button{position:relative}@media(max-width:600px){.passport-art{width:72px}}
+
+#gymControls{background:#291f31}@media(max-width:600px){#hudTR{display:grid;grid-template-columns:repeat(6,36px);gap:5px;width:241px;max-width:calc(100vw - 120px)}#hudTR .ib{min-width:0;font-size:10px}#btnSelfie{font-size:9px}}

@@ -9,7 +9,7 @@
     for(const id of ['fashion','beauty','food','fitness','travel','education'])mappings['pav_back_'+id]='pav_'+id;
     await Promise.all(Object.entries(mappings).map(async([name,file])=>{const tex=await load('assets/banners/'+file+'.webp'),s=SCREENS.find(s=>s.name===name);if(s){window.TrustBoardArtwork ||= {};if(name.startsWith('pav_back_'))window.TrustBoardArtwork[name.slice(9)]=tex.image;s.drawFn=(c,w,h)=>fitted(c,w,h,tex.image);s.invalidate()}}));
     const back=REFS.booth.children.find(o=>o.geometry?.type==='CylinderGeometry'&&o.material?.side===THREE.BackSide);
-    if(back){const original=REFS.booth.getObjectByName('booth_neon');if(original)original.visible=false;const t=await load('assets/banners/photobooth_backdrop.webp');t.wrapS=THREE.RepeatWrapping;t.repeat.x=-1;t.offset.x=1;back.material.map=t;back.material.emissiveMap=t;back.material.emissiveIntensity=.25;back.material.needsUpdate=true}
+    if(back){const original=REFS.booth.getObjectByName('booth_neon');if(original)original.visible=false;const t=await load('assets/festival-art/creator_photo_wall.webp');t.wrapS=THREE.RepeatWrapping;t.repeat.x=-1;t.offset.x=1;back.material.map=t;back.material.emissiveMap=t;back.material.emissiveIntensity=.25;back.material.needsUpdate=true}
     // The supplied stage art is a backdrop below the live show display, preserving live captions.
     const stage=await load('assets/banners/stage_led.webp');const oldLED=REFS.led.drawFn;REFS.led.drawFn=(c,w,h,s,t)=>{const seg=window.TrustArcade?.Show.seg?.id;if(['dj','interval','finale'].includes(seg))fitted(c,w,h,stage.image);else oldLED(c,w,h,s,t)};REFS.led.invalidate();
     const welcome=await load('assets/banners/welcome_totem.webp');const poster=new THREE.Mesh(new THREE.PlaneGeometry(1.66,2.475),new THREE.MeshBasicMaterial({map:welcome}));poster.name='welcome_brand_poster';poster.position.set(10.5,1.8,28);poster.rotation.y=-.3;WORLD.add(poster);
@@ -23,6 +23,12 @@
     const dj=new Person({key:'festival_dj',name:'DJ Nikhil',model:'Male_Adult_09',x:0,z:-27.9,ry:0,base:'idle'});dj.onStage=true;
     const moveDJ=()=>dj.setBase(window.TrustDJ?.playing?'dance':'idle');
     window.addEventListener('festival-music-change',moveDJ);moveDJ();
+    const maze=SCREENS.find(s=>s.name==='maze_in');
+    if(maze){const art=await load('assets/festival-art/trust_maze_arch_banner.webp');maze.ch=Math.round(maze.cw*.30);maze.canvas.height=maze.ch;maze.mesh.geometry.dispose();maze.mesh.geometry=new THREE.PlaneGeometry(6,1.8);maze.drawFn=(c,w,h)=>c.drawImage(art.image,0,0,w,h)}
+    const lounge=WORLD.getObjectByName('exit_sample_lounge');
+    if(lounge){const art=await load('assets/festival-art/exit_lounge_header.webp');const print=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.19),new THREE.MeshBasicMaterial({map:art}));print.position.set(1.85,2.30,-1.99);lounge.add(print)}
+    const pass=document.querySelector('#dlgPass .card');
+    if(pass&&!pass.querySelector('.passport-art')){const img=document.createElement('img');img.className='passport-art';img.src='assets/festival-art/creator_passport_cover.webp';img.alt='Creator Passport';pass.prepend(img)}
     SCREENS.forEach(screen=>screen.invalidate());
     return {banners:Object.keys(mappings).length+3,brandStalls:manifest.stalls.length};
   }

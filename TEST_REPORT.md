@@ -24,3 +24,10 @@ The test writes screenshots and JSON under the ignored output/playwright/polish 
 The ride checks capture all four attractions in world and interaction states, the Collab Claw decision, Claim Dunk response, moving tower/coaster camera and Escape return. They also capture all six pavilion sightlines, the Travel screen at close range, merchandise, third-person view and all four ride dialogs at phone width.
 
 Additional checks cover a ₹30 demo chai order and resulting wallet balance, cup orientation, the heart portrait, opt-in captions and a panel answer, the fireworks viewing action, and the three maze choices with forward progression. See scripts/verify-rides.cjs for the repeatable checks. The screenshot captures use a headless Chromium browser. Physical phones and headsets remain unverified.
+
+
+## v3.3.2 collection and supplied-art verification
+
+The additional Chromium pass covers the six illustrated picker options, selected character state, third-person artwork and held bag, market collection, inventory image loading, equipping a sample, selfie capture, physical plate selection/lift/reset, Trust Wall submission, upright chai, stage Q&A, and mobile bag/fitness layouts at 390 x 844. The final local run reported no page errors, no HTTP failures and no failed engine assets. Desktop captures use 1440 x 900. These checks do not guarantee performance on every device.
+
+Run `node scripts/verify-collection.cjs http://localhost:8130/` with Playwright available and CHROME_PATH set if needed. The same script accepts the hosted GitHub Pages URL.

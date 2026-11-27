@@ -5,7 +5,7 @@ const errors=[],shots='output/playwright/polish/rides-';let p;
 try{
 p=await browser.newPage({viewport:{width:1440,height:900},ignoreHTTPSErrors:true});
 p.on('pageerror',e=>{errors.push(String(e));console.log('ERROR',String(e))});p.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url())});
-await p.goto((process.argv[2]||'http://127.0.0.1:8130/')+'?test=1&q=low&v=3.3.1',{waitUntil:'domcontentloaded'});
+await p.goto((process.argv[2]||'http://127.0.0.1:8130/')+'?test=1&q=low&v=3.3.2',{waitUntil:'domcontentloaded'});
 await p.waitForFunction(()=>window.TrustArcade?.ready,null,{timeout:120000});await p.evaluate(()=>Promise.all([TrustArcade.modelsReady,brandArtReady]));
 await p.locator('#btnStart').waitFor();await p.evaluate(()=>TrustArcade.start({sound:false}));
 const tick=async(n=3,dt=.05)=>p.evaluate(([n,dt])=>TrustArcade.tick(n,dt,true),[n,dt]);

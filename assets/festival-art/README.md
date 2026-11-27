@@ -1,0 +1,1 @@
+Eight supplied Creator Night artworks from Creator_Night_Complete_8_Brand_Artworks.zip, received 27 November 2026. Runtime copies use WebP at a maximum 2048-pixel edge. Original source PNGs remain in the user-provided ZIP. These materials belong to an unofficial educational concept. Brand participation is simulated.

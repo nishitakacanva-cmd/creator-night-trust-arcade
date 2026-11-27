@@ -43,6 +43,15 @@ Caffeine Corner now has matcha, coffee and chai ordering, sweetness selection, a
 
 Panel captions require Listen to panel near the stage. Visitors can stop listening and select a prepared question for a scripted answer. The panelists use the existing talking and seated speaking animations. Fireworks now burst on visible stage flanks and have a dedicated viewing action.
 
-Character faces use the licensed generic Rocketbox models. The new party outfit choice and portrait are rendered from the existing character asset. Celebrity or influencer likeness models were not supplied or built in this pass.
+Six reference-led illustrated creator cutouts now appear in the picker, visitor avatar, reel crew and photo captures. These are camera-facing 2D artworks in the 3D scene. Other visitors, mentors and panelists retain their licensed rigged Rocketbox characters.
 
 Repeated balls and capsules use InstancedMesh. Static ride parts are merged by material. Animated ride cameras render continuously, while ordinary modal backgrounds keep the lower redraw cadence. A real-device sustained FPS measurement remains outstanding.
+
+
+## v3.3.2 artwork, collection and physical activities
+
+Installed all eight user-supplied artworks as optimized WebP files. The partner wall, photo backdrop, passport, sample bag, maze arch, exit header, Trust Wall and activity header use this pack. The partner image preserves its aspect ratio. Lab content keeps its light paper surface for legibility.
+
+Added a visual bag with session sample rewards, equippable products, a held shopping bag and a selfie action. Portrait capture temporarily removes bystanders and restores them immediately afterward. Fitness has visible load, unload, lift and reset controls attached to the physical activity. Market fronts and attendants face the stage. Panel prompts are restricted to the stage audience strip.
+
+The first-person shopping bag now hides in the same frame as a view change. Mobile controls wrap into a fixed grid and the fitness panel uses an opaque surface. Distant buildings receive atmospheric haze instead of appearing as noisy black silhouettes. Main artwork and curated models finish loading before entry is offered. Character atlases were reduced from 2,450,407 bytes of PNG to 370,584 bytes of WebP while preserving alpha transparency.

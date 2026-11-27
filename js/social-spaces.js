@@ -64,8 +64,9 @@
     const cork=c.createLinearGradient(0,0,W,H);
     cork.addColorStop(0,'#b5997c');cork.addColorStop(1,'#896f5b');
     c.fillStyle=cork;c.fillRect(0,0,W,H);
-    ctx.txt(c,'What does trust mean to you?',W/2,62,40,{w:800,align:'center',color:'#30252a'});
-    ctx.txt(c,'TAKE A NOTE. LEAVE YOUR OWN WORDS.',W/2,98,16,{align:'center',color:'#382b31'});
+    if(ctx.Assets.tex.trustWall)c.drawImage(ctx.Assets.tex.trustWall.image,0,0,W,H);
+    else ctx.txt(c,'What does trust mean to you?',W/2,62,40,{w:800,align:'center',color:'#30252a'});
+    if(!ctx.Assets.tex.trustWall)ctx.txt(c,'TAKE A NOTE. LEAVE YOUR OWN WORDS.',W/2,98,16,{align:'center',color:'#382b31'});
     const cards=[...examples.map(t=>({t,example:true})),...notes.map(t=>({t}))].slice(-12);
     const cols=cards.length>9?4:3,rows=Math.ceil(cards.length/cols);
     const gap=16,margin=34,w=(W-margin*2-gap*(cols-1))/cols;
@@ -187,7 +188,7 @@
     $('storyText').oninput=updateStory;$('giftDisclosure').onchange=updateStory;
     $('marketForm').onsubmit=e=>{e.preventDefault();if(!$('giftDisclosure').checked||!$('storyText').value.trim())return;let samples=[];try{samples=JSON.parse(sessionStorage.getItem(sampleKey)||'[]')}catch{}if(!samples.includes(activeBrand.name))samples.push(activeBrand.name);try{sessionStorage.setItem(sampleKey,JSON.stringify(samples))}catch{}$('storyStatus').textContent='Story preview ready. '+activeBrand.item+' added to your demo sample bag. No real post was made.';ctx.Sound.play('stamp')};
     $('marketPhoto').onclick=()=>{ctx.Booth.last=ctx.capture();ctx.showPhoto(ctx.Booth.last)};
-    brands.forEach((b,i)=>{const g=new THREE.Group();g.name='market_'+b.name;g.position.set(b.x,0,b.z);g.rotation.y=b.rot;WORLD.add(g);
+    brands.forEach((b,i)=>{b.rot=Math.atan2(-b.x,-26-b.z);const g=new THREE.Group();g.name='market_'+b.name;g.position.set(b.x,0,b.z);g.rotation.y=b.rot;WORLD.add(g);
       const colored=std(b.color,{roughness:.7}),shell=new ctx.Merger();
       shell.box(MAT.deck,3.05,.13,2.15,0,.065,0);
       shell.box(colored,2.9,1,.65,0,.62,.5);shell.box(MAT.cream,3,.06,.75,0,1.15,.5);
@@ -199,9 +200,10 @@
       // Rounded sample packaging and a single shared attendant rig per stall.
       dressCounter(g,b,colored);
       const pos=g.localToWorld(new THREE.Vector3(.6,0,-.2));new Person({key:'market_host_'+i,name:['Riya','Maya','Kabir','Zoya','Naina','Arun','Anya','Neel','Tara'][i]+' · '+b.name,model:i%2?'Female_Adult_08':'Business_Male_05',x:pos.x,z:pos.z,ry:b.rot,interact:()=>openMarket(b)});
-      ctx.colBox(b.x-1.55,b.z-.9,b.x+1.55,b.z+.95,'marketStall');
+      const w=Math.abs(Math.cos(b.rot))*1.55+Math.abs(Math.sin(b.rot))*.95,d=Math.abs(Math.sin(b.rot))*1.55+Math.abs(Math.cos(b.rot))*.95;
+      ctx.colBox(b.x-w,b.z-d,b.x+w,b.z+d,'marketStall');
     });
-    ctx.TRAVEL.market={x:-8.05,z:-8.70,yaw:.38};
+    const first=brands[0];ctx.TRAVEL.market={x:first.x+Math.sin(first.rot)*3.4,z:first.z+Math.cos(first.rot)*3.4,yaw:first.rot};
   }
   function buildExit(){
     const {THREE,WORLD,MAT,mesh,boxGeo,cylGeo,std,TRAVEL,Merger,rboxGeo,torusGeo,Assets,SAMPLE_LOUNGE}=ctx;
@@ -310,22 +312,49 @@
   function handProp(p,kind){
     if(!p?.model)return;const {THREE,MAT}=ctx;let hand;p.model.traverse(o=>{if(o.isBone&&/hand/i.test(o.name)&&/(right|[ _]r[ _]|r_hand|hand_r)/i.test(o.name))hand=o});
     if(!hand){p.model.traverse(o=>{if(!hand&&o.isBone&&/hand/i.test(o.name))hand=o})}if(!hand)return;
-    hand.children.filter(o=>o.name==='held_content_prop').forEach(o=>hand.remove(o));const g=new THREE.Group();g.name='held_content_prop';
+    hand.children.filter(o=>o.name==='held_content_prop').forEach(o=>hand.remove(o));
+    p.artFigure?.children.filter(o=>o.name==='held_content_prop').forEach(o=>o.removeFromParent());const g=new THREE.Group();g.name='held_content_prop';
     // Bone scale is inherited from the original avatar; compensate to world metres.
     p.group.updateMatrixWorld(true);
     const sc=hand.getWorldScale(new THREE.Vector3());g.scale.set(1/sc.x,1/sc.y,1/sc.z);g.position.set(.02,0,.025);hand.add(g);
-    if(kind==='phone'){ctx.mesh(new THREE.BoxGeometry(.074,.15,.012),MAT.blackGloss,g,0,.055,0);ctx.mesh(new THREE.PlaneGeometry(.064,.13),new THREE.MeshBasicMaterial({color:'#ce9bbc'}),g,0,.055,.007)}
+    if(kind==='sample'){
+      ctx.mesh(ctx.rboxGeo(.065,.12,.045,.008,2),ctx.std('#c38ca2',{roughness:.45}),g,0,.02,0);
+      ctx.mesh(ctx.boxGeo(.045,.025,.035),MAT.alu,g,0,.092,0);
+      heldCups.push({person:p,hand,group:g});
+    }else if(kind==='phone'){ctx.mesh(new THREE.BoxGeometry(.074,.15,.012),MAT.blackGloss,g,0,.055,0);ctx.mesh(new THREE.PlaneGeometry(.064,.13),new THREE.MeshBasicMaterial({color:'#ce9bbc'}),g,0,.055,.007)}
     else {heldCups.push({person:p,hand,group:g});ctx.mesh(new THREE.CylinderGeometry(.045,.034,.13,16),MAT.cream,g,0,.04,0);ctx.mesh(new THREE.CylinderGeometry(.04,.04,.008,16),ctx.std(kind==='matcha'?'#8c9d5b':'#a8703f'),g,0,.108,0)}
+    if(p.artFigure){p.artFigure.add(g);g.scale.setScalar(1);g.position.set(.24,.91,.08);g.quaternion.identity()}
     if(p.def.self)g.traverse(o=>o.layers.set(ctx.LAYER_SELF));
   }
   const cupWorldQuaternion = new Object();
   function updateHeldProps(){
     if(!ctx)return;
+    for(const label of nameplates)label.sprite.visible=Math.hypot(label.person.pos.x-ctx.player.x,label.person.pos.z-ctx.player.z)<12;
+    if(firstBag)firstBag.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
     if(handDrink)handDrink.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
     for(const cup of heldCups){
       if(!cup.person.model.visible)continue;
-      cup.hand.updateWorldMatrix(true,false);
-      cup.group.quaternion.copy(cup.hand.getWorldQuaternion(cupWorldQuaternion.q ||= new ctx.THREE.Quaternion())).invert();
+      const parent=cup.group.parent;if(!parent)continue;
+      parent.updateWorldMatrix(true,false);
+      cup.group.quaternion.copy(parent.getWorldQuaternion(cupWorldQuaternion.q ||= new ctx.THREE.Quaternion())).invert();
+    }
+  }
+  const creatorHandles=[
+    ['reel_dancer_1','@ananyapanday'],
+    ['reel_dancer_2','@orry1'],
+    ['reel_camera','@the.rebel.kid'],
+    ['reel_vlogger','@taneesho'],
+    ['reel_reviewer','@shivprizzz'],
+    ['reel_stylist','@vriddhipatwa']
+  ];
+  const nameplates=[];
+  function labelCreators(){
+    for(const [key,handle] of creatorHandles){
+      const person=ctx.PEOPLE_BY[key];if(!person?.ok)continue;
+      const canvas=document.createElement('canvas');canvas.width=620;canvas.height=110;const c=canvas.getContext('2d');
+      c.fillStyle='#261d2aee';ctx.rrect(c,0,0,620,110,26);c.fill();ctx.txt(c,handle,310,47,34,{align:'center',w:700,color:'#fff2df'});ctx.txt(c,'ILLUSTRATED CREATOR',310,84,19,{align:'center',color:'#e7afc5'});
+      const texture=new ctx.THREE.CanvasTexture(canvas);texture.colorSpace=ctx.THREE.SRGBColorSpace;
+      const sprite=new ctx.THREE.Sprite(new ctx.THREE.SpriteMaterial({map:texture,depthWrite:false}));sprite.name='creator_handle';sprite.position.set(0,2.15,0);sprite.scale.set(2.35,.417,1);person.group.add(sprite);nameplates.push({person,sprite});
     }
   }
   function buildReelCrew(){
@@ -351,7 +380,58 @@
 
     sign(ctx.WORLD,3.7,2.65,-10.6,2.8,'Reel together','MAKE A MOMENT. KEEP IT HONEST.');
   }
-  function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();
+  let bagOwner=null,firstBag,lastInventory='',bagCount=0;
+  function inventory(){
+    const list=[{title:'Creator Night pass',image:'assets/festival-art/creator_sample_bag_card.webp',detail:'Your festival keepsake',kind:'pass'}];
+    let samples=[],rewards=[],capsules=[];
+    try{samples=JSON.parse(sessionStorage.getItem(sampleKey)||'[]');rewards=JSON.parse(sessionStorage.getItem('creator-night-pavilion-rewards')||'[]');capsules=JSON.parse(sessionStorage.getItem('creator-night-claw-bag')||'[]')}catch{}
+    samples.forEach(name=>{const brand=brands.find(b=>b.name===name);if(brand)list.push({title:name,image:'assets/brands/'+({'Kay Beauty':'kay_beauty','Plum':'plum','SNITCH':'snitch','MOKOBARA':'mokobara','Swiss Beauty':'swiss_beauty','Paper Boat':'paper_boat','Blue Tokai':'blue_tokai','Boldfit':'boldfit','upGrad':'upgrad'}[name])+'_stall.webp',detail:brand.item,kind:brand.cat==='Coffee'?'coffee':'sample'})});
+    rewards.forEach(zone=>list.push({title:zone[0].toUpperCase()+zone.slice(1)+' reward',image:'assets/banners/pav_'+zone+'.webp',detail:'Unlocked by your evidence activity',kind:'sample'}));
+    capsules.forEach(item=>list.push({title:item,image:'assets/rides/entry_collab_claw.webp',detail:'Collected from Capsule Club',kind:'sample'}));
+    return list;
+  }
+  function bagModel(parent,scale=1){
+    const {THREE,MAT,mesh}=ctx,g=new THREE.Group();g.name='held_sample_bag';parent.add(g);
+    const paper=ctx.std('#f4dbc0',{roughness:.88});
+    mesh(ctx.rboxGeo(.26,.30,.11,.016,2),paper,g,0,-.12,0);
+    for(const z of [-.045,.045])mesh(new THREE.TorusGeometry(.063,.006,6,24,Math.PI),MAT.metal,g,0,.038,z);
+    mesh(new THREE.PlaneGeometry(.17,.23),new THREE.MeshBasicMaterial({map:ctx.Assets.tex.bagCard,side:THREE.DoubleSide}),g,0,-.10,.058);
+    for(let i=0;i<3;i++){mesh(new THREE.CylinderGeometry(.019,.019,.085,12),ctx.std(['#c793aa','#a5b894','#c49b65'][i]),g,-.07+i*.07,.049,0);mesh(ctx.boxGeo(.027,.023,.028),MAT.cream,g,-.07+i*.07,.10,0)}
+    g.scale.setScalar(scale);return g;
+  }
+  function equipBag(){
+    const p=ctx.Self.p;if(!p?.model||bagOwner===p)return;
+    bagOwner=p;let hand;p.model.traverse(o=>{if(o.isBone&&/hand/i.test(o.name)&&/(left|[ _]l[ _]|l_hand|hand_l)/i.test(o.name))hand=o});
+    if(hand){
+      p.group.updateMatrixWorld(true);const g=bagModel(hand),scale=hand.getWorldScale(new ctx.THREE.Vector3());g.scale.set(1/scale.x,1/scale.y,1/scale.z);g.position.set(.02,-.01,.01);if(p.artFigure){p.artFigure.add(g);g.scale.setScalar(1);g.position.set(-.24,.95,.08)}g.traverse(o=>o.layers.set(ctx.LAYER_SELF));heldCups.push({person:p,hand,group:g});
+    }
+    if(firstBag)firstBag.remove();firstBag=bagModel(ctx.camera);firstBag.position.set(-.22,-.25,-.52);firstBag.rotation.y=.16;
+  }
+  function showBag(){
+    const grid=$('bagItems');grid.replaceChildren();
+    for(const item of inventory()){
+      const card=document.createElement('article');card.className='bag-item';
+      const image=document.createElement('img');image.src=item.image;image.alt=item.title;
+      const title=document.createElement('h3');title.textContent=item.title;
+      const detail=document.createElement('p');detail.textContent=item.detail;
+      card.append(image,title,detail);
+      if(item.kind!=='pass'){const hold=document.createElement('button');hold.className='btn';hold.textContent='Hold this sample';hold.onclick=()=>{handProp(ctx.Self.p,item.kind);$('bagStatus').textContent=item.title+' is in your hand. Your collection stays in the bag.'};card.append(hold)}
+      grid.append(card);
+    }
+    open('dlgBag');
+  }
+  function setupBag(){
+    dialog('dlgBag','Your festival collection','Everything you picked up', '<p class="fine">Virtual samples, activity rewards and your festival pass.</p><div id="bagItems"></div><p id="bagStatus" role="status"></p>');
+    const bag=document.createElement('button');bag.className='ib';bag.id='btnBag';bag.textContent='Bag';bag.title='Open your sample bag';bag.setAttribute('aria-label',bag.title);bag.onclick=showBag;$('hudTR').append(bag);
+    const selfie=document.createElement('button');selfie.className='ib';selfie.id='btnSelfie';selfie.textContent='Selfie';selfie.title='Take a selfie';selfie.setAttribute('aria-label',selfie.title);selfie.onclick=()=>{if(!ctx.S.ui.modal)ctx.selfie()};$('hudTR').append(selfie);
+    setInterval(()=>{
+      if(!ctx.S.started)return;equipBag();
+      if(firstBag)firstBag.visible=!window.TrustArcade?.view()&&!ctx.S.ui.modal&&!document.body.classList.contains('riding');
+      const items=inventory(),key=JSON.stringify(items.map(i=>i.title));
+      if(key!==lastInventory){if(lastInventory&&items.length>bagCount)ctx.Sound.play('stamp');lastInventory=key;bagCount=items.length;bag.textContent='Bag '+items.length;bag.setAttribute('aria-label','Open sample bag, '+items.length+' items')}
+    },300);
+  }
+  function install(c){ctx=c;buildPhoto();buildWall();buildDrinks();buildMarket();buildExit();buildReelCrew();labelCreators();setupBag();
     const action=document.createElement('button');action.id='socialAction';action.className='btn pri hidden';document.body.append(action);action.onclick=()=>{const id=action.dataset.action;if(id==='photo')openStudio();else if(id==='wall'){renderNotes();open('dlgTrustWall')}else if(id==='chai')open('dlgCaffeine');else if(id==='freebies')open('dlgFreebies');else openMarket(nearestBrand(ctx.player.x,ctx.player.z))};
     let prev='';setInterval(()=>{if(!ctx.S.started)return;const x=ctx.player.x,z=ctx.player.z;const a=x<-20&&z>21?'photo':x>20&&z>21?'chai':Math.hypot(x+15,z-27)<5?'wall':Math.abs(x-ctx.SAMPLE_LOUNGE.x)<4.25&&Math.abs(z-ctx.SAMPLE_LOUNGE.z-1)<3.7?'freebies':z<-8&&z>-23&&Math.abs(x)>=6&&Math.abs(x)<18?'market':'';
       const destination=a==='market'?nearestBrand(x,z).name:a; if(destination!==prev){prev=destination;action.dataset.action=a;action.textContent={photo:'Ask Dev: take my photo',wall:'Leave a trust note',chai:'Pick your caffeine',freebies:'Play for a demo freebie',market:'Visit '+destination}[a]||''}action.classList.toggle('hidden',!a||!!ctx.S.ui.modal)},250);

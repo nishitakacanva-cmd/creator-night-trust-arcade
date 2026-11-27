@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="css/editorial-hud.css?v=3.3.1">
+<link rel="stylesheet" href="css/editorial-hud.css?v=3.3.2">
 <title>Trust Arcade · Creator Night</title>
 <link rel="stylesheet" href="css/fonts.css">
 <script type="importmap">
@@ -174,7 +174,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
   #btnResearch{display:none}
 }
 </style>
-<link rel="stylesheet" href="css/social-spaces.css?v=3.3.1">
+<link rel="stylesheet" href="css/social-spaces.css?v=3.3.2">
 </head>
 <body>
 <div id="stage"></div>
@@ -202,7 +202,7 @@ body.shotmode #hud,body.shotmode #reticle,body.shotmode #VRButton{display:none!i
     </div>
     <button class="go" id="btnStart" data-t="enter">Enter Creator Night</button>
     <div class="keys" id="keysText"></div>
-    <div class="fine" data-t="unofficial">Unofficial student exhibit. Not affiliated with, endorsed by or connected to Instagram or Meta. All creators, brands and posts here are fictional.</div>
+    <div class="fine" data-t="unofficial">Unofficial student exhibit. Not affiliated with, endorsed by or connected to Instagram or Meta. Illustrated creator appearances are a fan concept. Brand stalls and posts are simulated.</div>
   </div>
 </div>
 
@@ -261,7 +261,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const VERSION = '3.3.1';
+const VERSION = '3.3.2';
 const URLP = new URLSearchParams(location.search);
 const TEST_MODE = URLP.has('test');
 const NO_LOCK = !URLP.has('pointerlock') || URLP.has('nolock') || TEST_MODE;
@@ -380,7 +380,7 @@ const TXT = {
   soundOpt: { en: 'Sound: music, crowd and stage audio', hi: 'आवाज़: संगीत, भीड़ और स्टेज ऑडियो' },
   logOpt: { en: 'Share anonymous research logs (optional). No names, no photos; nothing leaves this device unless you export it.', hi: 'गुमनाम रिसर्च लॉग साझा करें (वैकल्पिक)। कोई नाम या फ़ोटो नहीं; जब तक आप एक्सपोर्ट न करें, कुछ भी इस डिवाइस से बाहर नहीं जाता।' },
   enter: { en: 'Enter Creator Night', hi: 'क्रिएटर नाइट में प्रवेश करें' },
-  unofficial: { en: 'Unofficial student exhibit. Not affiliated with, endorsed by or connected to Instagram or Meta. All creators, brands and posts here are fictional.', hi: 'अनौपचारिक स्टूडेंट प्रदर्शनी। Instagram या Meta से संबद्ध, समर्थित या जुड़ी नहीं। यहाँ के सभी क्रिएटर, ब्रांड और पोस्ट काल्पनिक हैं।' },
+  unofficial: { en: 'Unofficial student exhibit. Not affiliated with, endorsed by or connected to Instagram or Meta. Illustrated creator appearances are a fan concept. Brand stalls and posts are simulated.', hi: 'अनौपचारिक स्टूडेंट प्रदर्शनी। Instagram या Meta से संबद्ध, समर्थित या जुड़ी नहीं। यहाँ के सभी क्रिएटर, ब्रांड और पोस्ट काल्पनिक हैं।' },
   keysDesk: { en: 'WASD or arrows walk · Shift run · drag to look · release and click to interact · M or the top-left map to jump anywhere · P passport · T guided tour · H help', hi: 'WASD या ऐरो से चलें · Shift से दौड़ें · माउस से देखें · स्क्रॉल से आगे बढ़ें · क्लिक से इस्तेमाल करें · M या ऊपर बाईं ओर का मैप — कहीं भी पहुँचें · P पासपोर्ट · T गाइडेड टूर · H मदद' },
   keysTouch: { en: 'Left pad walks · drag to look · tap to use · tap the map (top left) to jump anywhere', hi: 'बायाँ पैड चलाता है · देखने के लिए खींचें · इस्तेमाल के लिए टैप करें · कहीं भी पहुँचने के लिए ऊपर बाईं ओर का मैप टैप करें' },
   loading: { en: 'Setting up the festival ground…', hi: 'फ़ेस्टिवल ग्राउंड तैयार हो रहा है…' },
@@ -810,7 +810,7 @@ const S = {
   sessionId: SAVED?.sessionId || ('s-' + randHex(8)),
   variant: ['A', 'B'].includes((URLP.get('v') || '').toUpperCase()) ? URLP.get('v').toUpperCase() : (SAVED?.variant || (Math.random() < 0.5 ? 'A' : 'B')),
   lang: URLP.get('lang') === 'hi' ? 'hi' : URLP.get('lang') === 'en' ? 'en' : (SAVED?.lang || ((navigator.language || '').startsWith('hi') ? 'hi' : 'en')),
-  avatar: SAVED?.avatar || AVATAR_CHOICES[0],
+  avatar: SAVED?.avatar || AVATAR_CHOICES[0], characterId:SAVED?.characterId||'ananya',
   alias: SAVED?.alias || genAlias(),
   consent: !!SAVED?.consent, audio: false,
   started: false, startPerf: 0, msOffset: SAVED?.msOffset || 0,
@@ -827,7 +827,7 @@ const S = {
 let persistTimer = 0;
 function persistSoon() { clearTimeout(persistTimer); persistTimer = setTimeout(persistNow, 250); }
 function persistNow() {
-  ssSave({ v: 2, sessionId: S.sessionId, variant: S.variant, lang: S.lang, avatar: S.avatar, alias: S.alias, consent: S.consent, stamps: S.stamps, helped: S.helped, gates: S.gates, meter: S.meter, games: S.games, award: S.award, photo: S.photo, survey: S.survey, askQ: S.askQ, dwell: S.dwell, visits: S.visits, msOffset: nowMs(), events: S.consent ? S.events : [], path: S.consent ? S.path : [] });
+  ssSave({ v: 2, sessionId: S.sessionId, variant: S.variant, lang: S.lang, avatar: S.avatar, characterId:S.characterId, alias: S.alias, consent: S.consent, stamps: S.stamps, helped: S.helped, gates: S.gates, meter: S.meter, games: S.games, award: S.award, photo: S.photo, survey: S.survey, askQ: S.askQ, dwell: S.dwell, visits: S.visits, msOffset: nowMs(), events: S.consent ? S.events : [], path: S.consent ? S.path : [] });
 }
 function nowMs() { return S.started ? Math.round(performance.now() - S.startPerf + S.msOffset) : S.msOffset; }
 const stampCount = () => STAMPS.filter(k => S.stamps[k]).length;
@@ -1312,6 +1312,10 @@ const texLoader = new THREE.TextureLoader();
 const AVATAR_MODELS = ['Business_Female_01', 'Business_Male_05', 'Chef_Female_01', 'Female_Adult_03', 'Female_Adult_05', 'Female_Adult_08', 'Female_Adult_11', 'Female_Adult_12', 'Female_Adult_15', 'Female_Party_02', 'Male_Adult_04', 'Male_Adult_06', 'Male_Adult_08', 'Male_Adult_09', 'Male_Adult_10', 'Male_Adult_12', 'Male_Adult_17', 'Sports_Female_02', 'Sports_Male_04'];
 const PROP_FILES = ['Lantern', 'GlamVelvetSofa', 'SheenChair', 'SpecularSilkPouf', 'IridescentDishWithOlives', 'WaterBottle', 'MaterialsVariantsShoe', 'GlassVaseFlowers', 'DiffuseTransmissionPlant', 'BoomBox', 'PotOfCoals', 'AnisotropyBarnLamp', 'Avocado', 'Bench'];
 const TEX_FILES = {
+  partnerWall:['festival-art/creator_night_partner_wall.webp',true],
+  activityBackdrop:['festival-art/activity_screen_background.webp',true],
+  bagCard:['festival-art/creator_sample_bag_card.webp',true],
+  trustWall:['festival-art/trust_wall_backdrop.webp',true],
   grass: ['env/grass_col.jpg', true], grassN: ['env/grass_nrm.jpg', false],
   gravel: ['tex/gravel_col.jpg', true], gravelN: ['tex/gravel_nrm.jpg', false],
   wood: ['tex/wood_col.jpg', true], woodN: ['tex/wood_nrm.jpg', false],
@@ -1667,7 +1671,7 @@ function buildSky() {
     c.globalAlpha = 1;
   }, { repeat: [1, 1] });
   win.wrapS = win.wrapT = THREE.RepeatWrapping;
-  const cityMat = new THREE.MeshBasicMaterial({ map: win, fog: false, color: new THREE.Color(0.42, 0.4, 0.48) });
+  const cityMat = new THREE.MeshBasicMaterial({ map: win, fog: true, color: new THREE.Color(0.42, 0.4, 0.48) });
   const M = new Merger(), r = rng(31);
   for (let i = 0; i < 120; i++) {
     const a = -Math.PI / 2 + (r() - 0.5) * 2.4, dist = 330 + r() * 220, w = 14 + r() * 30, d = 14 + r() * 26, h = 18 + Math.pow(r(), 2.2) * 110;
@@ -1715,7 +1719,8 @@ function buildGround() {
   for (const s of [-1, 1]) { STATIC.box(MAT.woodSlat, 0.08, 0.06, 43, s * 16.4, 0.03, 2.05); STATIC.box(MAT.woodSlat, 0.08, 0.06, 43, s * 22.5, 0.03, 2.05); }
 }
 function buildPerimeter() {
-  const panelW = 3.4, H = 2.1, banner = canvasTex(1024, 256, (c, w, h) => {
+  const panelW = 3.4, H = 2.1, banner = canvasTex(1536, 838, (c, w, h) => {
+    if(Assets.tex.partnerWall){const image=Assets.tex.partnerWall.image,k=Math.min(w/image.width,h/image.height);c.fillStyle='#1b1427';c.fillRect(0,0,w,h);c.drawImage(image,(w-image.width*k)/2,(h-image.height*k)/2,image.width*k,image.height*k);return}
     c.fillStyle = '#140f1c'; c.fillRect(0, 0, w, h); c.fillStyle = gradFill(c, 0, 0, w, 0); c.fillRect(0, h - 14, w, 14);
     drawMark(c, 90, h / 2 - 4, 46); txt(c, 'CREATOR NIGHT', 160, h / 2 + 22, 64, { d: true, w: 800 }); txt(c, 'क्रिएटर नाइट  ·  Trust Arcade', 650, h / 2 + 16, 34, { d: true, w: 600, color: 'rgba(250,247,244,.75)' });
   });
@@ -2625,7 +2630,7 @@ function spawnPeople() {
   const alt = ['Male_Adult_08', 'Female_Adult_08', 'Male_Adult_12', 'Female_Adult_12', 'Male_Adult_09', 'Female_Adult_15', 'Male_Adult_04'];
   const pick = (m) => { if (!taken.has(m)) return m; const fem = !MALE.has(m); return alt.find(a => a !== S.avatar && (MALE.has(a) !== fem)) || alt.find(a => a !== S.avatar); };
   // mentors in their pavilions
-  const mentorSpot = { fashion: [3.4, 3.3, -2.4], beauty: [-0.6, -3.9, 0], fitness: [2.2, -2.0, -0.6], food: [3.4, 2.7, 0], travel: [3.4, 3, -2.2], education: [3.35, 2.7, -0.4] };
+  const mentorSpot = { fashion: [3.4, 3.3, -2.4], beauty: [-0.6, -3.9, 0], fitness: [3.35, 3.3, -.6], food: [3.4, 2.7, 0], travel: [3.4, 3, -2.2], education: [3.35, 2.7, -0.4] };
   for (const id of NICHES) {
     const [lx, lz, lry] = mentorSpot[id], w = pavToWorld(PAV[id], lx, lz), ry = (PAV[id].side < 0 ? Math.PI / 2 : -Math.PI / 2) + lry;
     new Person({ key: 'mentor_' + id, name: MENTORS[id].name, model: MENTORS[id].model, x: w.x, z: w.z, ry, role: 'mentor', niche: id, interact: (p) => Games.mentorTalk(id, p) });
@@ -2985,7 +2990,7 @@ const Games = {
     if (g.step === 'done') { p.once('nod'); p.say(L(GATE_TEXT[id].whyGood), 5); }
     else if (g.step === 'intro') { p.once('talk'); p.say(L(GAME[id].intro), 7); this.go(id, this.firstStep[id]); }
     else { p.once('talk2'); p.say(L(GAME[id].intro), 6); }
-    if (!XRS.active) window.TrustLabs?.openLab(id);
+    if (!XRS.active) {if(id==='fitness')window.TrustGym?.open();else window.TrustLabs?.openLab(id);}
     logEvent('mentor_talk', { niche: id, step: g.step });
   },
   firstStep: { fashion: 'toStart', food: 'taste', beauty: 'filter', fitness: 'load', travel: 'through', education: 'cards' },
@@ -3001,8 +3006,8 @@ const Games = {
 /* shared screen chrome: header, meter, feedback box */
 function gameHeader(c, w, h, id, sub) {
   darkBg(c, w, h, true, 26);
-  const art=window.TrustBoardArtwork?.[id];
-  if(art){c.save();c.globalAlpha=.21;c.drawImage(art,0,0,w,h);c.restore();const shade=c.createLinearGradient(0,0,w,h);shade.addColorStop(0,'#181222cc');shade.addColorStop(1,'#18122288');c.fillStyle=shade;c.fillRect(0,0,w,h)}
+  const art=Assets.tex.activityBackdrop?.image || window.TrustBoardArtwork?.[id];
+  if(art){c.save();c.globalAlpha=.8;c.drawImage(art,0,0,w,h);c.restore();const shade=c.createLinearGradient(0,0,w,h);shade.addColorStop(0,'#181222cc');shade.addColorStop(1,'#18122288');c.fillStyle=shade;c.fillRect(0,0,w,h)}
   txt(c, L(PLACES[id]).toUpperCase() + ' · ' + L(GAME[id].title), 36, 66, 34, { d: true, w: 800, color: PAV[id].color === '#5851DB' ? '#9b95ff' : PALETTE.amber, maxW: w * 0.62 });
   const g = GS(id), bw = w * 0.28, bx = w - bw - 36;
   txt(c, T('meterTitle'), bx, 44, 20, { w: 600, color: 'rgba(250,247,244,.7)', maxW: bw });
@@ -3214,7 +3219,7 @@ function setupFitness() {
     plateMeshes.push({ g, disc });
   });
   const barPlates = []; let lifting = false;
-  const rebuildBar = () => { barPlates.forEach(m => { bar.remove(m); const ii = interactables.indexOf(m); if (ii >= 0) interactables.splice(ii, 1); }); barPlates.length = 0; loaded.forEach((i, k) => { for (const s of [-1, 1]) { const m = mesh(cylGeo(0.2, 0.2, 0.05, 28), std(plateCols[i], { roughness: 0.6 }), bar, s * (0.78 + k * 0.07), 0, 0); m.rotation.z = Math.PI / 2; setInteractable(m, { cue: () => (S.lang === 'hi' ? 'प्लेट उतारें' : 'Unload plate'), onClick: () => togglePlate(i), enabled: () => GS(id).step === 'load' && !lifting }); barPlates.push(m); } }); plateMeshes.forEach((pm, i) => { pm.disc.visible = !loaded.includes(i); }); };
+  const rebuildBar = () => { barPlates.forEach(m => { bar.remove(m); const ii = interactables.indexOf(m); if (ii >= 0) interactables.splice(ii, 1); }); barPlates.length = 0; loaded.forEach((i, k) => { for (const s of [-1, 1]) { const m = mesh(cylGeo(0.2, 0.2, 0.05, 28), std(plateCols[i], { roughness: 0.6 }), bar, s * (0.78 + k * 0.07), 0, 0); m.rotation.z = Math.PI / 2; setInteractable(m, { cue: () => (S.lang === 'hi' ? 'प्लेट उतारें' : 'Unload plate'), onClick: () => togglePlate(i), enabled: () => GS(id).step === 'load' && !lifting }); barPlates.push(m); } }); plateMeshes.forEach((pm, i) => { pm.disc.visible = !loaded.includes(i); }); RAY_TARGETS=[...interactables,...occluders]; };
   const togglePlate = (i) => { if (lifting) return; const k = loaded.indexOf(i); if (k >= 0) loaded.splice(k, 1); else loaded.push(i); Sound.play('clank'); rebuildBar(); scr.invalidate(); };
   const resetBar = () => { if (lifting) return; loaded.length = 0; Sound.play('clank'); rebuildBar(); scr.invalidate(); };
   const lift = async () => {
@@ -3227,6 +3232,7 @@ function setupFitness() {
       Games.answer(id, ok, L(ok ? G.win : G.fail), { loaded: loaded.length, bad });
     } finally { lifting = false; scr.invalidate(); }
   };
+  setInteractable(bar.children[0],{cue:()=> 'Lift the bar',onClick:()=>lift(),enabled:()=>GS(id).step==='load'&&loaded.length>0&&!lifting,reach:4.6});
   const scr = standScreen(id, 'fitness_board', 1.9, -0.4, 2.2, 1.35, (c, w, h, s) => {
     const g = GS(id);
     if (g.step === 'intro') { gameHeader(c, w, h, id, L(G.intro)); uiBtn(c, s, 'go', 36, h - 140, w - 72, 100, T('start'), { onClick: () => Games.go(id, 'load') }); return; }
@@ -3240,6 +3246,18 @@ function setupFitness() {
     gameHeader(c, w, h, id); txt(c, '✓ ' + T('done'), 36, 170, 64, { d: true, w: 800, color: '#59E3A0' }); fitPara(c, L(G.win), 36, 200, w - 72, h - 240, 38, { w: 500 });
   });
   Games.screens[id] = scr;
+  const panel=document.createElement('section');panel.id='gymControls';panel.className='hidden';
+  panel.innerHTML='<h3>Load the evidence. Lift the claim.</h3><div id="gymPlates"></div><div class="btnrow"><button class="btn pri" id="gymLift">Lift the bar</button><button class="btn" id="gymReset">Reset</button><button class="btn" id="gymClose">Close</button></div><p id="gymFeedback" role="status">Choose supported claims from the plate rack.</p>';
+  document.body.append(panel);
+  const refresh=()=>{panel.querySelectorAll('[data-plate]').forEach(button=>button.setAttribute('aria-pressed',String(loaded.includes(+button.dataset.plate))));$('gymLift').disabled=lifting||!loaded.length};
+  G.plates.forEach((plate,i)=>{const button=document.createElement('button');button.className='btn';button.dataset.plate=i;button.textContent=L(plate.t);button.onclick=()=>{togglePlate(i);refresh()};$('gymPlates').append(button)});
+  window.TrustGym={open(){Games.go(id,'load');panel.classList.remove('hidden');refresh()},get loaded(){return [...loaded]}};
+  $('gymLift').onclick=async()=>{if(lifting)return;$('gymLift').disabled=true;await lift();$('gymFeedback').textContent=L(GS(id).fb?.ok?G.win:G.fail);refresh();if(GS(id).fb?.ok)window.TrustLabs.saveNote('fitness','Fitness: Lifted the supported claims on the physical bar.');};
+  $('gymReset').onclick=()=>{resetBar();refresh();$('gymFeedback').textContent='Bar cleared. Choose your claims again.'};
+  $('gymClose').onclick=()=>panel.classList.add('hidden');
+  const invite=document.createElement('button');invite.id='openGym';invite.className='btn hidden';invite.textContent='Lift with the trainer';invite.onclick=()=>window.TrustGym.open();document.body.append(invite);
+  setInterval(()=>{const near=S.zone==='fitness'&&S.started&&!S.ui.modal;invite.classList.toggle('hidden',!near);if(!near)panel.classList.add('hidden')},250);
+
 }
 /* ---------- TRAVEL: Postcard vs Reality ---------- */
 function setupTravel() {
@@ -3290,7 +3308,7 @@ function setupEducation() {
   const ew = pavToWorld(PAV[id], 0.4, -4.2); colBox(ew.x - 0.6, ew.z - 0.6, ew.x + 0.6, ew.z + 0.6, 'easel');
   const cork = canvasTex(512, 320, (c, w, h) => { c.fillStyle = '#b07b4f'; c.fillRect(0, 0, w, h); for (let i = 0; i < 4000; i++) { c.fillStyle = `rgba(${90 + Math.random() * 60},${50 + Math.random() * 40},${20 + Math.random() * 30},.5)`; c.fillRect(Math.random() * w, Math.random() * h, 2, 2); } });
   const scr = zoneScreen(id, 'edu_board', .55, 1.95, .1, 0, 3.3, 2.0, (c, w, h, s) => {
-    const g = GS(id); c.drawImage(window.TrustBoardArtwork?.education||cork.image, 0, 0, w, h); c.fillStyle = 'rgba(20,14,26,.84)'; c.fillRect(0, 0, w, h);
+    const g = GS(id); c.drawImage(Assets.tex.activityBackdrop?.image||window.TrustBoardArtwork?.education||cork.image, 0, 0, w, h); c.fillStyle = 'rgba(20,14,26,.84)'; c.fillRect(0, 0, w, h);
     txt(c, L(PLACES[id]).toUpperCase() + ' · ' + L(G.title), 30, 56, 34, { d: true, w: 800, color: '#fff', glow: 'rgba(0,0,0,.6)' });
     if (g.step === 'intro') { fitPara(c, L(G.intro), 30, 80, w - 60, 200, 40, { w: 600 }); uiBtn(c, s, 'go', 30, h - 140, w - 60, 100, T('start'), { onClick: () => Games.go(id, 'cards') }); return; }
     if (g.step === 'done') { txt(c, '✓ ' + T('done'), 30, 180, 64, { d: true, w: 800, color: '#59E3A0' }); fitPara(c, L(GATE_TEXT.education.whyGood), 30, 210, w - 60, h - 240, 40, { w: 600 }); return; }
@@ -3339,7 +3357,7 @@ const Booth = {
   previewPose() {
     const visitor = Self.p;
     if (!visitor?.ok || this.busy) return null;
-    const figure = SkeletonUtils.clone(visitor.model);
+    const figure = window.TrustIllustrations?.clone(visitor) || SkeletonUtils.clone(visitor.model);
     const mixer = new THREE.AnimationMixer(figure);
     const clip = visitor.clips.get(this.poses[this.pose][0]) || visitor.clips.get('idle');
     const mark = REFS.marks.photo;
@@ -3350,7 +3368,7 @@ const Booth = {
     const visible = visitor.group.visible;
     try {
       visitor.group.visible = false;
-      if (clip) { mixer.clipAction(clip).play(); mixer.setTime(Math.min(.8,clip.duration*.42)); }
+      if (clip && !figure.userData.illustrated) { mixer.clipAction(clip).play(); mixer.setTime(Math.min(.8,clip.duration*.42)); }
       return captureCamera(this.cam, 360);
     } finally {
       visitor.group.visible = visible; scene.remove(holder); mixer.uncacheRoot(figure);
@@ -3366,7 +3384,8 @@ const Booth = {
     fr.forEach((p, i) => { p.posing = true; const side = new THREE.Vector3(-Math.cos(REFS.boothRy), 0, Math.sin(REFS.boothRy)).multiplyScalar(i ? -0.75 : 0.75); p.walkTo([{ x: mark.x + side.x, z: mark.z + side.z }], q => { q.faceTo(REFS.boothCamPos.x, REFS.boothCamPos.z); q.play(i ? 'wave' : 'cheer'); }, 1.6); });
     for (this.count = 3; this.count > 0; this.count--) { this.scr.invalidate(); window.TrustSocial?.countdown(this.count); Sound.play('beep'); await wait(1); }
     this.scr.invalidate(); flashScreen(); Sound.play('shutter');
-    const shot = captureCamera(this.cam, 1080);
+    const others=PEOPLE.filter(p=>p!==Self.p).map(p=>[p.group,p.group.visible]);let shot;
+    try{others.forEach(([g])=>g.visible=false);shot=captureCamera(this.cam,1080)}finally{others.forEach(([g,visible])=>g.visible=visible)}
     this.last = composePost(shot); S.photo.taken++; persistSoon(); logEvent('photo', { action: 'taken' });
     await wait(0.6); this.busy = false; this.scr.invalidate();
     fr.forEach(p => { p.posing = false; p.walkTo([p.home], q => { q.faceTo(friends.cx, friends.cz); }, 1.3); });
@@ -3412,20 +3431,22 @@ function captureCamera(cam, size = 1080) {
     renderer.xr.enabled = xr; cam.aspect = aspect; cam.updateProjectionMatrix();
   }
 }
-function captureFestivalPhoto(){
-  const room=REFS.pav[S.zone],subject=room?room.group.localToWorld(new THREE.Vector3(-2.65,.12,3.15)):new THREE.Vector3(0,0,9.3);
+function captureFestivalPhoto(selfie=false){
+  const room=selfie?null:REFS.pav[S.zone],subject=room?room.group.localToWorld(new THREE.Vector3(-2.65,.12,3.15)):new THREE.Vector3(0,0,9.3);
   const eye=room?room.group.localToWorld(new THREE.Vector3(-2.65,1.65,6.8)):new THREE.Vector3(2.4,1.7,11.5);
-  const visitor=Self.p,figure=SkeletonUtils.clone(Self.p.model),holder=new THREE.Group();
+  if(selfie){subject.set(player.x,groundAt(player.x,player.z),player.z);eye.set(player.x-Math.sin(player.yaw)*1.6+Math.cos(player.yaw)*.20,subject.y+1.65,player.z-Math.cos(player.yaw)*1.6-Math.sin(player.yaw)*.20)}
+  const hidden=PEOPLE.filter(p=>p!==Self.p).map(p=>[p.group,p.group.visible]);hidden.forEach(([g])=>g.visible=false);
+  const visitor=Self.p,figure=window.TrustIllustrations?.clone(Self.p)||SkeletonUtils.clone(Self.p.model),holder=new THREE.Group();
   holder.add(figure);holder.position.copy(subject);holder.rotation.y=Math.atan2(eye.x-subject.x,eye.z-subject.z);scene.add(holder);
   const mixer=new THREE.AnimationMixer(figure),clip=visitor.clips.get('wave')||visitor.clips.get('idle'),old=visitor.group.visible;
-  const cam=new THREE.PerspectiveCamera(room?47:70,1,.05,150);cam.layers.enableAll();cam.position.copy(eye);cam.lookAt(subject.clone().add(new THREE.Vector3(0,1,0)));
+  const cam=new THREE.PerspectiveCamera(selfie?45:room?47:70,1,.05,150);cam.layers.enableAll();cam.position.copy(eye);cam.lookAt(subject.clone().add(new THREE.Vector3(0,selfie?1.35:1,0)));
   try{
     visitor.group.visible=false;
-    if(clip){mixer.clipAction(clip).play();mixer.setTime(Math.min(.75,clip.duration*.4))}
+    if(clip&&!figure.userData.illustrated){mixer.clipAction(clip).play();mixer.setTime(Math.min(.75,clip.duration*.4))}
     holder.updateWorldMatrix(true,true);figure.traverse(o=>{if(o.name==='held_content_prop'&&o.parent)o.quaternion.copy(o.parent.getWorldQuaternion(new THREE.Quaternion())).invert()});
-    showPhoto(composePost(captureCamera(cam,1080)));
+    Booth.last=composePost(captureCamera(cam,1080));S.photo.taken++;persistSoon();showPhoto(Booth.last);
   }finally{
-    visitor.group.visible=old;scene.remove(holder);mixer.uncacheRoot(figure);
+    hidden.forEach(([g,visible])=>g.visible=visible);visitor.group.visible=old;scene.remove(holder);mixer.uncacheRoot(figure);
     const skeletons=new Set();figure.traverse(o=>{if(o.isSkinnedMesh)skeletons.add(o.skeleton)});skeletons.forEach(s=>s.dispose());
   }
 }
@@ -3489,7 +3510,7 @@ function updateGames(dt) {
 /* ============================================================================
    DOM UI: start panel, HUD, passport, map, photo, help, researcher overlay
    ============================================================================ */
-const MODALS = ['dlgPanel','dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd', 'dlgStudio', 'dlgTrustWall', 'dlgMarket', 'dlgFreebies', 'dlgCaffeine', 'dlgRide'];
+const MODALS = ['dlgBag','dlgPanel','dlgPass', 'dlgMap', 'dlgPhoto', 'dlgHelp', 'dlgEnd', 'dlgStudio', 'dlgTrustWall', 'dlgMarket', 'dlgFreebies', 'dlgCaffeine', 'dlgRide'];
 function openModal(id) {
   if (XRS.active) return;
   MODALS.forEach(m => { if (m !== id) $(m)?.classList.add('hidden'); });
@@ -3503,7 +3524,7 @@ function releasePointer() { if (document.pointerLockElement) document.exitPointe
 
 function buildStartPanel() {
   const grid = $('avatarGrid'); grid.innerHTML = '';
-  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; const look=['After dark','Statement fit','Street edit','Night out','Festival layers','Creator casual'][AVATAR_CHOICES.indexOf(a)];
+  AVATAR_CHOICES.forEach(a => { const b = document.createElement('button'); b.innerHTML = `<img src="assets/ui/${a}.jpg" alt="">`; b.dataset.av = a; const look=['Ananya-inspired','Rebel Kid-inspired','Niharika-inspired','Orry-inspired','Festival layers','Creator casual'][AVATAR_CHOICES.indexOf(a)];
     b.setAttribute('aria-label',look);b.title=look;
     const label=document.createElement('span');label.className='look-label';label.textContent=look;b.append(label); b.onclick = () => { S.avatar = a; refreshStart(); Sound.play && Sound.play('click'); }; grid.appendChild(b); });
   document.querySelectorAll('#langSeg button').forEach(b => b.onclick = () => { setLang(b.dataset.lang); refreshStart(); });
@@ -4199,7 +4220,7 @@ let FRAME_DRAW = true;
 function frame(dt, draw = true) {
   frameN++; Perf.update(dt); FRAME_DRAW = draw; if (frameN % 30 === 0) updateLightBudget();
   updateMovement(dt); applyRig(dt);
-  Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); window.TrustSocial?.updateHeldProps(); updateGames(dt);
+  Show.update(dt); updatePeople(dt); Self.update(dt, player.moving); window.TrustIllustrations?.update(dt); window.TrustSocial?.updateHeldProps(); updateGames(dt);
   updateXR(dt); VRPanel.update(dt); window.TrustRides?.update(dt);
   if (frameN % 3 === 0 && !S.ui.modal) updateHover();
   updateZones(dt); updateTweens(dt); Research.update(dt);
@@ -4233,7 +4254,7 @@ async function init() {
   const view=document.createElement('button');view.id='btnView';view.className='ib';view.textContent='3rd';view.title='Switch first-person / third-person view';view.setAttribute('aria-label',view.title);view.setAttribute('aria-pressed','false');view.onclick=toggleView;$('hudTR').append(view);
  Post.init(); Tour.init(); AutoQ.init(); MiniMap.init(); applyQuality(QUALITY, false);
   window.TrustSocial.install({THREE, WORLD, REFS, MAT, Person, Assets, Self, CanvasScreen, mesh, boxGeo, cylGeo, std, neonSign, drawMark, txt, rrect, setInteractable, colBox, colCircle, openModal, closeModal, Booth, Sound, camera, LAYER_SELF, TRAVEL, SAMPLE_LOUNGE, addPlatform, PEOPLE_BY, Merger, rboxGeo, torusGeo,
-    capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
+    selfie:()=>captureFestivalPhoto(true), capture: () => composePost(captureCamera(camera,1080)), showPhoto, saveFile, player, L, S, persistSoon});
 
   window.TrustRides.install({THREE,WORLD,REFS,MAT,Merger,mesh,boxGeo,cylGeo,torusGeo,rboxGeo,std,CanvasScreen,txt,
     setInteractable,colBox,colCircle,addPlatform,TRAVEL,ZONES,PLACES,player,S,Sound,openModal,closeModal,Shot,camera,panelQuestions:AUDIENCE_QS,L,
@@ -4245,8 +4266,11 @@ async function init() {
     stopMotion(){keys.clear();player.vx=player.vz=player.scrollV=0;lookQ.x=lookQ.y=0;Tour.stop(true)},
     rebuildTargets(){RAY_TARGETS=[...interactables,...occluders]}});
   window.brandArtReady = window.TrustBrandArt.mount({THREE,REFS,WORLD,SCREENS,drawMark,Person});
+  const curatedReady=window.TrustModelSlots.tryLoadCuratedSlots(THREE,gltfLoader,REFS,realtimeMaterial);
   RAY_TARGETS = [...interactables, ...occluders];
   setLang(S.lang); buildStartPanel();
+  await window.TrustIllustrations.install({THREE,S,people:PEOPLE_BY,self:Self,player,camera,selfLayer:LAYER_SELF,persist:persistSoon});
+  const curatedStatus=await curatedReady;await window.brandArtReady;
   player.x = START.x; player.z = START.z; player.yaw = START.yaw; player.pitch = START.pitch || 0; applyRig(1);
   Show.update(0.001); renderer.shadowMap.needsUpdate = true;
   setLoad(.97, 'Preparing the festival lights…');
@@ -4255,7 +4279,7 @@ async function init() {
   setTimeout(() => { $('loader').classList.add('hidden'); if (!S.started) $('start').classList.remove('hidden'); }, 250);
   window.TrustArcade = debugAPI(); window.TrustArcade.ready = true;
   window.TrustWorldVisuals?.mountGalleryLightboxes(THREE, REFS, (obj, zone) => { setInteractable(obj, { cue: () => L(PLACES[zone]), onClick: () => XRS.active ? Games.screens[zone]?.invalidate() : window.TrustLabs.openLab(zone), enabled: () => !XRS.active, reach: 5 }); RAY_TARGETS = [...interactables, ...occluders]; });
-  window.TrustArcade.modelsReady = window.TrustModelSlots.tryLoadCuratedSlots(THREE, gltfLoader, REFS, realtimeMaterial).then(result => { window.TrustArcade.modelStatus = result; renderer.shadowMap.needsUpdate = true; return result; });
+  window.TrustArcade.modelsReady = Promise.resolve(curatedStatus); window.TrustArcade.modelStatus=curatedStatus;
 
 }
 window.TrustArcadeBridge = {
@@ -4297,11 +4321,12 @@ function debugAPI() {
 }
 init().catch(e => { console.error(e); $('ldText').textContent = 'Something went wrong while loading: ' + (e && e.message); });
 </script>
-<script src="js/trust-labs.js?v=3.3.1" defer></script>
-<script src="js/rides.js?v=3.3.1" defer></script>
-<script src="js/model-slots.js?v=3.3.1" defer></script>
-<script src="js/dj-deck.js?v=3.3.1" defer></script>
-<script src="js/world-visuals.js?v=3.3.1" defer></script>
-<script src="js/social-spaces.js?v=3.3.1" defer></script><script src="js/brand-art.js?v=3.3.1" defer></script>
+<script src="js/trust-labs.js?v=3.3.2" defer></script>
+<script src="js/creator-art.js?v=3.3.2" defer></script>
+<script src="js/rides.js?v=3.3.2" defer></script>
+<script src="js/model-slots.js?v=3.3.2" defer></script>
+<script src="js/dj-deck.js?v=3.3.2" defer></script>
+<script src="js/world-visuals.js?v=3.3.2" defer></script>
+<script src="js/social-spaces.js?v=3.3.2" defer></script><script src="js/brand-art.js?v=3.3.2" defer></script>
 </body>
 </html>
